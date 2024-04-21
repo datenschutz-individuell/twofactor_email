@@ -25,8 +25,6 @@ Once you enable OTP with Two Factor Totp, your applications (for example your An
 
 ## Development setup
 
-* `composer update`
-* `composer i`
-* `npm install`
+* `composer i --no-dev`
 * `npm ci`
 * `npm run build` or `npm run dev` [more info](https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/npm.html)
