@@ -32,6 +32,9 @@ use OCP\DB\Exception as DbException;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Accounts\UserUpdatedEvent;
+use OCP\IUser;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -53,10 +56,43 @@ class EmailDeleted implements IEventListener {
 	public function handle(Event $event): void {
 		if ($event instanceof UserUpdatedEvent && empty($event->getUser()->getEMailAddress())) {
 			try {
-                $this->twoFactorEMailMapper->deleteTwoFactorEMailByUserId($event->getUser()->getUID());
-            } catch (DbException $e) {
+                $this->disableTwofactorEMail($event);
+                $this->notifyUser($event->getUser());
+            } catch (DbException|NotFoundExceptionInterface|ContainerExceptionInterface $e) {
 				$this->logger->warning($e->getMessage(), ['uid' => $event->getUser()->getUID()]);
             }
         }
 	}
+
+    /**
+     * @param UserUpdatedEvent|Event $event
+     * @return void
+     * @throws DbException
+     */
+    public function disableTwofactorEMail(UserUpdatedEvent|Event $event): void
+    {
+        $this->twoFactorEMailMapper->deleteTwoFactorEMailByUserId($event->getUser()->getUID());
+    }
+
+    /**
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function notifyUser(IUser $user): void
+    {
+        $manager = \OCP\Server::get(\OCP\Notification\IManager::class);
+        $notification = $manager->createNotification();
+
+        $acknowledgeAction = $notification->createAction();
+        $acknowledgeAction->setPrimary(true)
+            ->setLabel('OK');
+
+        $notification->setApp(\OCA\TwoFactorEMail\AppInfo\Application::APP_ID)
+            ->setUser($user->getUID())
+            ->setDateTime(new \DateTime())
+            ->setObject('user_notification', 'primary_email_deleted')
+            ->setSubject('Email address deleted')
+            ->setMessage('Your primary email address was deleted while you had twofactor_email active. Thus, twofactor_email was deactivated.');
+    }
 }
