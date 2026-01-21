@@ -33,7 +33,7 @@ class EMailSender implements IEMailSender {
 			throw new UnknownEMailException($user);
 		}
 
-		$this->logger->debug("sending email message to $email, code: $code");
+		$this->logger->debug('Sending 2FA code via email');
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
 		$user_at_cloud = $user->getDisplayName() . ' @ ' . $this->defaults->getName();
@@ -50,7 +50,7 @@ class EMailSender implements IEMailSender {
 		try {
 			$this->mailer->send($message);
 		} catch (Exception $e) {
-			$this->logger->error("failed sending email message to $email, code: $code");
+			$this->logger->error('Failed sending 2FA email', ['exception' => $e]);
 			throw new EMailTransportFailedException(previous: $e);
 		}
 	}
