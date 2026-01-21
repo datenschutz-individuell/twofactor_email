@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Provider;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
+use OCA\TwoFactorEMail\Exception\RateLimitExceededException;
 use OCA\TwoFactorEMail\Service\IChallengeService;
 use OCA\TwoFactorEMail\Service\IEMailAddressMasker;
 use OCA\TwoFactorEMail\Service\IStateManager;
@@ -61,9 +62,21 @@ class EMailProvider implements IProvider, IProvidesIcons, IProvidesPersonalSetti
 	 * This function is called from nextcloud when the user activated the e-mail 2FA and is now logging in.
 	 */
 	public function getTemplate(IUser $user): ITemplate {
-		$this->challengeService->sendChallenge($user);
-		// Return the template for the challenge view (challenge.php file in the templates folder of the app)
-		return $this->templateManager->getTemplate(Application::APP_ID, 'challenge');
+		$template = $this->templateManager->getTemplate(Application::APP_ID, 'challenge');
+		$rateLimited = false;
+		$secondsRemaining = 0;
+
+		try {
+			$this->challengeService->sendChallenge($user);
+		} catch (RateLimitExceededException $e) {
+			$rateLimited = true;
+			$secondsRemaining = $e->getSecondsRemaining();
+		}
+
+		$template->assign('rateLimited', $rateLimited);
+		$template->assign('secondsRemaining', $secondsRemaining);
+
+		return $template;
 	}
 
 	public function verifyChallenge(IUser $user, string $challenge): bool {
