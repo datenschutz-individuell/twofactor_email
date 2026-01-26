@@ -13,7 +13,7 @@ use Exception;
 
 class RateLimitExceededException extends Exception {
 	public function __construct(
-		private int $secondsRemaining,
+		private int $secondsRemaining = 0,
 		string $message = 'Rate limit exceeded',
 	) {
 		parent::__construct($message);

@@ -24,16 +24,4 @@ interface IChallengeService {
 	 * @return bool True if code is valid
 	 */
 	public function verifyChallenge(IUser $user, string $submittedCode): bool;
-
-	/**
-	 * Check if user can request a new challenge code
-	 * @return bool True if within rate limits
-	 */
-	public function canSendChallenge(IUser $user): bool;
-
-	/**
-	 * Get seconds until user can request a new code
-	 * @return int Seconds to wait, 0 if can send now
-	 */
-	public function getSecondsUntilCanResend(IUser $user): int;
 }
