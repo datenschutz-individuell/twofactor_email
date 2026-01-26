@@ -33,14 +33,17 @@ class EMailSender implements IEMailSender {
 			throw new UnknownEMailException($user);
 		}
 
-		$this->logger->debug('Sending 2FA code via email');
+		$this->logger->debug('Sending 2FA code via email', [
+			'userId' => $user->getUID(),
+			'email' => $email,
+		]);
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
 		$user_at_cloud = $user->getDisplayName() . ' @ ' . $this->defaults->getName();
 		$template->setSubject($this->l10n->t('Login attempt for %s', [$user_at_cloud]));
 		$template->addHeader();
 		$template->addHeading($this->l10n->t('Your two-factor authentication code is: %s', [$code]));
-		$template->addBodyText($this->l10n->t('If you tried to login, please enter that code on %s. If you did not, somebody else did and knows your your email address or username – and your password!', [$this->defaults->getName()]));
+		$template->addBodyText($this->l10n->t('If you tried to login, please enter that code on %s. If you did not, somebody else did and knows your email address or username – and your password!', [$this->defaults->getName()]));
 		$template->addFooter();
 
 		$message = $this->mailer->createMessage();
