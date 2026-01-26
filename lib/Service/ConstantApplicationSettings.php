@@ -28,6 +28,6 @@ class ConstantApplicationSettings implements IApplicationSettings
 
 	public function getCodeLength(): int
 	{
-		return 8; // 8 digits for higher entropy (100M combinations)
+		return 6; // 6 digits to match common 2FA UX expectations
 	}
 }
