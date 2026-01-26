@@ -11,6 +11,7 @@ namespace OCA\TwoFactorEMail\Provider;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Exception\RateLimitExceededException;
+use OCA\TwoFactorEMail\Service\IApplicationSettings;
 use OCA\TwoFactorEMail\Service\IChallengeService;
 use OCA\TwoFactorEMail\Service\IEMailAddressMasker;
 use OCA\TwoFactorEMail\Service\IStateManager;
@@ -41,6 +42,7 @@ class EMailProvider implements IProvider, IProvidesIcons, IProvidesPersonalSetti
 		private IURLGenerator       $urlGenerator,
 		private ContainerInterface  $container,
 		private IChallengeService   $challengeService,
+		private IApplicationSettings $settings,
 		private IStateManager       $stateManager,
 	) {
 	}
@@ -75,6 +77,7 @@ class EMailProvider implements IProvider, IProvidesIcons, IProvidesPersonalSetti
 
 		$template->assign('rateLimited', $rateLimited);
 		$template->assign('secondsRemaining', $secondsRemaining);
+		$template->assign('codeLength', $this->settings->getCodeLength());
 
 		return $template;
 	}
