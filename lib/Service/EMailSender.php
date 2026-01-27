@@ -50,7 +50,7 @@ final class EMailSender implements IEMailSender {
 		try {
 			$this->mailer->send($message);
 		} catch (Exception $e) {
-			$this->logger->error("failed sending e-mail message to user ".$user->getUID().".", ['exception' => $e]);
+			$this->logger->error('failed sending e-mail message to user ' . $user->getUID() . '.', ['exception' => $e]);
 			throw new SendEMailFailed(previous: $e);
 		}
 	}

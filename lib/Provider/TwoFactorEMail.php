@@ -81,9 +81,9 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 			);
 			$this->challengeService->sendChallenge($user);
 		} catch (IRateLimitExceededException $e) {
-            // ignore, because we just don't want to send a new code
-			$this->logger->warning("E-mail not sent since the user '".$user->getUID()."' already sent too many in a row", ['exception' => $e]);
-        }
+			// ignore, because we just don't want to send a new code
+			$this->logger->warning("E-mail not sent since the user '" . $user->getUID() . "' already sent too many in a row", ['exception' => $e]);
+		}
 		// Return the template for the challenge view (LoginChallenge.php file in the templates folder of the app)
 		return $this->templateManager->getTemplate(Application::APP_ID, 'LoginChallenge');
 	}
