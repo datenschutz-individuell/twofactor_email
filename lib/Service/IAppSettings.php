@@ -9,6 +9,12 @@ namespace OCA\TwoFactorEMail\Service;
 
 interface IAppSettings {
 	/**
+	 * How many digits a stored 2FA code shall consist of.
+	 *
+	 * @return int number of digits
+	 */
+	public function getCodeLength(): int;
+	/**
 	 * How long shall a stored 2FA code be valid.
 	 *
 	 * @return int seconds of validity

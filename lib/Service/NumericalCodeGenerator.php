@@ -14,10 +14,14 @@ use OCP\Security\ISecureRandom;
 final class NumericalCodeGenerator implements ICodeGenerator {
 	public function __construct(
 		private ISecureRandom $secureRandom,
+		private IAppSettings $settings,
 	) {
 	}
 
 	public function generateChallengeCode(): string {
-		return $this->secureRandom->generate(6, ISecureRandom::CHAR_DIGITS);
+		return $this->secureRandom->generate(
+			$length = $this->settings->getCodeLength(),
+			ISecureRandom::CHAR_DIGITS,
+		);
 	}
 }
