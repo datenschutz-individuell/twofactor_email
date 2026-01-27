@@ -31,10 +31,7 @@ final class LoginChallenge implements ILoginChallenge {
 		$isValid = $submittedCode === $code;
 		if ($isValid) {
 			$this->codeStorage->deleteCode($user->getUID());
-			return true;
-		} else {
-			// don't delete, could be a typo
-			return false;
 		}
+		return $isValid;
 	}
 }
