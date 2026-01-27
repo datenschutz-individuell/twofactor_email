@@ -11,6 +11,7 @@ namespace OCA\TwoFactorEMail\Test\Unit\Provider;
 
 use ChristophWurst\Nextcloud\Testing\TestCase;
 use OCA\TwoFactorEMail\Provider\TwoFactorEMail;
+use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Service\IEMailAddressMasker;
 use OCA\TwoFactorEMail\Service\ILoginChallenge;
 use OCA\TwoFactorEMail\Service\IStateManager;
@@ -19,20 +20,25 @@ use OCP\AppFramework\Services\IInitialState;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUser;
+use OCP\Security\RateLimiting\ILimiter;
 use OCP\Template\ITemplateManager;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 class TwoFactorEMailTest extends TestCase {
 	private IEMailAddressMasker&MockObject $masker;
 	private ITemplateManager&MockObject $templateManager;
 	private IL10N&MockObject $l10n;
+	private LoggerInterface&MockObject $logger;
 	private IInitialState&MockObject $initialState;
 	private IURLGenerator&MockObject $urlGenerator;
 	private ContainerInterface&MockObject $container;
+	private ILimiter&MockObject $limiter;
 	private ILoginChallenge&MockObject $challengeService;
 	private IStateManager&MockObject $stateManager;
+	private IAppSettings&MockObject $settings;
 
 	private TwoFactorEMail $provider;
 
@@ -45,21 +51,27 @@ class TwoFactorEMailTest extends TestCase {
 		$this->masker = $this->createMock(IEMailAddressMasker::class);
 		$this->templateManager = $this->createMock(ITemplateManager::class);
 		$this->l10n = $this->createMock(IL10N::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->initialState = $this->createMock(IInitialState::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->container = $this->createMock(ContainerInterface::class);
+		$this->limiter = $this->createMock(ILimiter::class);
 		$this->challengeService = $this->createMock(ILoginChallenge::class);
 		$this->stateManager = $this->createMock(IStateManager::class);
+		$this->settings = $this->createMock(IAppSettings::class);
 
 		$this->provider = new TwoFactorEMail(
 			$this->masker,
 			$this->templateManager,
 			$this->l10n,
+			$this->logger,
 			$this->initialState,
 			$this->urlGenerator,
 			$this->container,
+			$this->limiter,
 			$this->challengeService,
 			$this->stateManager,
+			$this->settings,
 		);
 	}
 

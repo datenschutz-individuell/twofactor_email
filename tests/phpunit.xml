@@ -4,19 +4,24 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 bootstrap="bootstrap.php"
-		 verbose="true"
-		 convertDeprecationsToExceptions="true"
-		 xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage>
-    <include>
-      <directory suffix=".php">../lib</directory>
-    </include>
-    <report>
-      <clover outputFile="./clover.xml"/>
-    </report>
-  </coverage>
-  <testsuite name="E-mail 2FA Provider">
-    <directory suffix="Test.php">.</directory>
-  </testsuite>
+         bootstrap="bootstrap.php"
+         xsi:noNamespaceSchemaLocation="../vendor/phpunit/phpunit/phpunit.xsd">
+    <source>
+        <include>
+            <directory>../lib</directory>
+        </include>
+    </source>
+    <coverage>
+        <report>
+            <clover outputFile="./clover.xml"/>
+        </report>
+    </coverage>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>Unit</directory>
+        </testsuite>
+        <testsuite name="Acceptance">
+            <directory>Acceptance</directory>
+        </testsuite>
+    </testsuites>
 </phpunit>
