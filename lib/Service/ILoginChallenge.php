@@ -18,7 +18,12 @@ interface ILoginChallenge {
 	 * @throws EMailNotSet
 	 * @throws SendEMailFailed
 	 */
-	public function sendChallenge(IUser $user): void;
+	/**
+	 * Generate a challenge code and send it to the user via e-mail
+	 */public function sendChallenge(IUser $user): void;
 
-	public function verifyChallenge(IUser $user, string $submittedCode): bool;
+	/**
+	 * Verify the challenge code entered by the user against the one stored upon sending it
+	 * @return bool True if code is valid
+	 */public function verifyChallenge(IUser $user, string $submittedCode): bool;
 }
