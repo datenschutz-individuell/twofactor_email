@@ -45,7 +45,7 @@ class TwoFactorEMailAcceptanceTest extends TestCase {
 		$this->webDriver->findElement(WebDriverBy::id('password'))->sendKeys('password');
 		$this->webDriver->findElement(WebDriverBy::cssSelector('form[name=login] [type=submit]'))->click();
 
-		// Go to personal settings and email settings
+		// Go to personal settings and e-mail settings
 		$this->webDriver->get('http://localhost:8080/index.php/settings/user/security');
 
 		// Enable TwoFactorEMail

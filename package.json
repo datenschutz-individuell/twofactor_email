@@ -1,6 +1,6 @@
 {
   "name": "twofactor_email",
-  "description": "Nextcloud TwoFactor Email",
+  "description": "Two-Factor e-mail Provider",
   "version": "3.0.5-beta.1",
   "type": "module",
   "author": {
