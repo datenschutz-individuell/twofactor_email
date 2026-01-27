@@ -7,7 +7,7 @@
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
     findUnusedCode="false"
     ensureOverrideAttribute="false"
-    autoloader="tests/autoload-ocp.php"
+    autoloader="tests/bootstrap.php"
 >
     <projectFiles>
         <directory name="lib" />
