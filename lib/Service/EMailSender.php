@@ -33,7 +33,7 @@ final class EMailSender implements IEMailSender {
 			throw new EMailNotSet($user);
 		}
 
-		$this->logger->debug("sending email message to $email, code: $code");
+		$this->logger->debug("sending e-mail message to $email.");
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
 		$user_at_cloud = $user->getDisplayName() . ' @ ' . $this->defaults->getName();
@@ -50,7 +50,7 @@ final class EMailSender implements IEMailSender {
 		try {
 			$this->mailer->send($message);
 		} catch (Exception $e) {
-			$this->logger->error("failed sending email message to $email, code: $code");
+			$this->logger->error("failed sending e-mail message to user ".$user->getUID().".", ['exception' => $e]);
 			throw new SendEMailFailed(previous: $e);
 		}
 	}
