@@ -70,6 +70,7 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	 * If a user reloads that web page, a new code is generated and re-sent. Thus throttled.
 	 */
 	public function getTemplate(IUser $user): ITemplate {
+		$template = $this->templateManager->getTemplate(Application::APP_ID, 'LoginChallenge');
 		try {
 			// skip sending further emails once rate limit is reached
 			// see https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/security.html#rate-limiting
@@ -82,10 +83,13 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 			$this->challengeService->sendChallenge($user);
 		} catch (IRateLimitExceededException $e) {
 			// ignore, because we just don't want to send a new code
+			// ToDo: Inform the User
 			$this->logger->warning("E-mail not sent since the user '" . $user->getUID() . "' already sent too many in a row", ['exception' => $e]);
 		}
+		// In order to use app settings in the LoginChallenge.php template, we must provide them here
+		$template->assign('codeLength', $this->settings->getCodeLength());
 		// Return the template for the challenge view (LoginChallenge.php file in the templates folder of the app)
-		return $this->templateManager->getTemplate(Application::APP_ID, 'LoginChallenge');
+		return $template;
 	}
 
 	public function verifyChallenge(IUser $user, string $challenge): bool {
