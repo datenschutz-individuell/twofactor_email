@@ -22,4 +22,5 @@
 /tests
 /vendor/bin
 /vendor-bin
+/vite.config.js
 /webpack.config.js
