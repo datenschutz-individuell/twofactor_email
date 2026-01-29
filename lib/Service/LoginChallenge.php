@@ -45,7 +45,7 @@ final class LoginChallenge implements ILoginChallenge {
 		$submittedCode = trim($submittedCode);
 		$storedCode = $this->codeStorage->readCode($user->getUID());
 
-		if (! is_null($storedCode) ) {
+		if (! is_null($storedCode)) {
 			$array = preg_split(':', $storedCode, -1, PREG_SPLIT_NO_EMPTY);
 			if ($array) {
 				$isValid = match ($array[0]) {
