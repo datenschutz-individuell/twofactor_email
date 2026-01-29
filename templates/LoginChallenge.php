@@ -12,7 +12,12 @@ use OCP\Util;
 Util::addScript('twofactor_email', 'twofactor_email-login_challenge');
 Util::addStyle('twofactor_email', 'twofactor_email-login_challenge');
 
-$codeLength = $_['codeLength'] ?? 6; // provided in Provider/TwoFactorEMail.php, so this fallback should never be used
+$codeLength = $_['codeLength']; // provided in Provider/TwoFactorEMail.php, so this fallback should never be used
+if (!empty($codelength)) {
+	$minmax=" minlength=$codeLength maxlength=$codeLength";
+} else {
+	$minmax="";
+}
 ?>
 
 <img class="two-factor-icon twofactor_email-challenge-icon" src="<?php print_unescaped(image_path('twofactor_email', 'app.svg')); ?>" alt="Icon depicting a letter and a user">
@@ -20,7 +25,7 @@ $codeLength = $_['codeLength'] ?? 6; // provided in Provider/TwoFactorEMail.php,
 <p><?php p($l->t('Get the authentication code from your e-mail inbox.')); ?></p>
 
 <form method="POST" class="twofactor_email-challenge-form">
-	<input type="text" minlength="<?php p($codeLength); ?>" maxlength="<?php p($codeLength); ?>" name="challenge" required="required" autofocus autocomplete="one-time-code" inputmode="numeric" autocapitalize="off" placeholder="<?php p($l->t('Authentication code')) ?>">
+	<input type="text"$minmax name="challenge" required="required" autofocus autocomplete="one-time-code" inputmode="numeric" autocapitalize="off" placeholder="<?php p($l->t('Authentication code')) ?>">
 	<button class="primary two-factor-submit" type="submit">
 		<?php p($l->t('Submit')); ?>
 	</button>
