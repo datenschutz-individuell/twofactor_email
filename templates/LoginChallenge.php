@@ -14,9 +14,9 @@ Util::addStyle('twofactor_email', 'twofactor_email-login_challenge');
 
 $codeLength = $_['codeLength']; // provided in Provider/TwoFactorEMail.php, so this fallback should never be used
 if (!empty($codelength)) {
-	$minmax=" minlength=$codeLength maxlength=$codeLength";
+	$minmax = " minlength=$codeLength maxlength=$codeLength";
 } else {
-	$minmax="";
+	$minmax = "";
 }
 ?>
 
