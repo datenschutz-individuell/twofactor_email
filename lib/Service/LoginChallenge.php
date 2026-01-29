@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Service;
 
 use OCP\IUser;
-use function PHPUnit\Framework\isNull;
 
 final class LoginChallenge implements ILoginChallenge {
 	public function __construct(
