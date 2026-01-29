@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Service;
 
 use OCP\IUser;
+use function PHPUnit\Framework\isNull;
 
 final class LoginChallenge implements ILoginChallenge {
 	public function __construct(
@@ -44,7 +45,7 @@ final class LoginChallenge implements ILoginChallenge {
 		$submittedCode = trim($submittedCode);
 		$storedCode = $this->codeStorage->readCode($user->getUID());
 
-		if (!null($storedCode)) {
+		if (!isNull($storedCode)) {
 			$array = preg_split(':', $storedCode, -1, PREG_SPLIT_NO_EMPTY);
 			if ($array) {
 				$isValid = match ($array[0]) {
