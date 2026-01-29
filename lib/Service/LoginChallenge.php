@@ -44,19 +44,26 @@ final class LoginChallenge implements ILoginChallenge {
 		$submittedCode = trim($submittedCode);
 		$storedCode = $this->codeStorage->readCode($user->getUID());
 
-		$array = preg_split(':', $storedCode, -1, PREG_SPLIT_NO_EMPTY);
-		if ($array) {
-			$isValid = match ($array[0]) {
-				'PBC' => password_hash($submittedCode, PASSWORD_BCRYPT) === $storedCode,
-				default => false, // unknown algorithm identifier → discard
-			};
+		if (!null($storedCode)) {
+			$array = preg_split(':', $storedCode, -1, PREG_SPLIT_NO_EMPTY);
+			if ($array) {
+				$isValid = match ($array[0]) {
+					'PBC' => password_hash($submittedCode, PASSWORD_BCRYPT) === $storedCode,
+					default => false, // unknown algorithm identifier → discard
+				};
+			} else {
+				// preg_split either did not find a delimiter (":") in the stored string or one field was empty
+				$isValid = false;
+				// ToDo: Should The user be notified? Should these cases then be handled differently?
+			}
 		} else {
-			// preg_split either did not find a delimiter (":") in the stored string or one field was empty
-			$isValid = false;
+			$isValid = false; // readCode did not return a code
+			// ToDo: This should never happen since a code should have been saved prior to verifying it
+			//       So should this be logged as warning* Should the user be notified (about what)?
 		}
 
-		// ToDo: Decide: Should we delete the code as soon as it was used once?The user could re-login…
-		//               The user would then need to start over the whole login process …
+		// ToDo: Should we delete the code as soon as it was used once?The user could re-login…
+		//       The user would then need to start over the whole login process …
 		if ($isValid) {
 			$this->codeStorage->deleteCode($user->getUID());
 		}
