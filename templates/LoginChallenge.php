@@ -16,7 +16,7 @@ $codeLength = $_['codeLength']; // provided in Provider/TwoFactorEMail.php, so t
 if (!empty($codelength)) {
 	$minmax = " minlength=$codeLength maxlength=$codeLength";
 } else {
-	$minmax = "";
+	$minmax = '';
 }
 ?>
 
