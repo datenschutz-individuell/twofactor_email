@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-// Adding Script or Style doesn't seem to have any effect
-// use OCP\Util;
-// Util::addScript('twofactor_email', 'twofactor_email-login_challenge');
-// Util::addStyle('twofactor_email', 'twofactor_email-login_challenge');
+use OCP\Util;
+
+Util::addScript('twofactor_email', 'twofactor_email-login_challenge');
+Util::addStyle('twofactor_email', 'twofactor_email-login_challenge');
 
 $codeLength = $_['codeLength'] ?? 6; // provided in Provider/TwoFactorEMail.php, so this fallback should never be used
 ?>
