@@ -45,7 +45,7 @@ final class LoginChallenge implements ILoginChallenge {
 		$storedCode = $this->codeStorage->readCode($user->getUID());
 
 		if (! is_null($storedCode)) {
-			$array = preg_split(':', $storedCode, -1, PREG_SPLIT_NO_EMPTY);
+			$array = explode(':', $storedCode, 2);
 			if ($array) {
 				$isValid = match ($array[0]) {
 					'PBC' => password_verify($submittedCode, $array[1]),
