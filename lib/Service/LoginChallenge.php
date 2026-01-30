@@ -10,12 +10,14 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Service;
 
 use OCP\IUser;
+use OCP\Security\IHasher;
 
 final class LoginChallenge implements ILoginChallenge {
 	public function __construct(
 		private ICodeGenerator $codeGenerator,
 		private ICodeStorage $codeStorage,
 		private IEMailSender $emailSender,
+		private IHasher $hasher,
 	) {
 	}
 
@@ -34,8 +36,7 @@ final class LoginChallenge implements ILoginChallenge {
 		// list of yet defined algorithm identifiers:
 		//   PBC = password_hash($code, PASSWORD_BCRYPT) – currently in use
 
-		$hashedCode = 'PBC:' . password_hash($generatedCode, PASSWORD_BCRYPT);
-
+		$hashedCode = 'PBC:' . $this->hasher->hash($generatedCode);
 		$this->codeStorage->writeCode($user->getUID(), $hashedCode);
 		$this->emailSender->sendChallengeEMail($user, $generatedCode);
 	}
@@ -48,7 +49,7 @@ final class LoginChallenge implements ILoginChallenge {
 			$array = explode(':', $storedCode, 2);
 			if (count($array) === 2) {
 				$isValid = match ($array[0]) {
-					'PBC' => password_verify($submittedCode, $array[1]),
+					'PBC' => $this->hasher->verify($submittedCode, $array[1]),
 					default => false, // unknown algorithm identifier → discard
 				};
 			} else {
