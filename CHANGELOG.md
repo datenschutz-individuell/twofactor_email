@@ -5,6 +5,16 @@
 # Changelog
 Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## 3.0.5-beta.3 (2026-01-31)
+
+### Added
+
+- Limit sending e-mails
+
+### Changed
+
+- Hardening: Store code as hash
+
 ## 3.0.5-beta.2 (2026-01-26)
 
 ### Fixed
