@@ -46,7 +46,7 @@ final class LoginChallenge implements ILoginChallenge {
 
 		if (! is_null($storedCode)) {
 			$array = explode(':', $storedCode, 2);
-			if ($array) {
+			if (count($array) === 2) {
 				$isValid = match ($array[0]) {
 					'PBC' => password_verify($submittedCode, $array[1]),
 					default => false, // unknown algorithm identifier → discard
