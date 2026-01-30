@@ -31,7 +31,11 @@ final class LoginChallenge implements ILoginChallenge {
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {
 		$submittedCode = trim($submittedCode);
 		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
-		$isValid = $this->hasher->verify($submittedCode, $storedCodeHash);
+		if (is_null($storedCodeHash)) {
+			$isValid = false;
+		} else {
+			$isValid = $this->hasher->verify($submittedCode, $storedCodeHash);
+		}
 
 		// We could always delete the code here but this way it is more convenient for users (in case of a mistype).
 		if ($isValid) {
