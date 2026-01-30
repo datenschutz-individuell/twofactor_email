@@ -34,7 +34,7 @@ final class LoginChallenge implements ILoginChallenge {
 		// list of yet defined algorithm identifiers:
 		//   PBC = password_hash($code, PASSWORD_BCRYPT) – currently in use
 
-		$hashedCode = 'PBC' . password_hash($generatedCode, PASSWORD_BCRYPT);
+		$hashedCode = 'PBC:' . password_hash($generatedCode, PASSWORD_BCRYPT);
 
 		$this->codeStorage->writeCode($user->getUID(), $hashedCode);
 		$this->emailSender->sendChallengeEMail($user, $generatedCode);
