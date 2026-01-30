@@ -48,7 +48,7 @@ final class LoginChallenge implements ILoginChallenge {
 			$array = preg_split(':', $storedCode, -1, PREG_SPLIT_NO_EMPTY);
 			if ($array) {
 				$isValid = match ($array[0]) {
-					'PBC' => password_hash($submittedCode, PASSWORD_BCRYPT) === $storedCode,
+					'PBC' => password_verify($submittedCode, $array[1]),
 					default => false, // unknown algorithm identifier → discard
 				};
 			} else {
