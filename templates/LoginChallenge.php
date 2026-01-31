@@ -22,7 +22,7 @@ if (!empty($codelength)) {
 
 <img class="two-factor-icon twofactor_email-challenge-icon" src="<?php print_unescaped(image_path('twofactor_email', 'app.svg')); ?>" alt="Icon depicting a letter and a user">
 
-<p><?php p($l->t('Get the authentication code from your e-mail inbox.')); ?></p>
+<p><?php p($l->t('Enter the authentication code that was sent to your e-mail address.')); ?></p>
 
 <form method="POST" class="twofactor_email-challenge-form">
 	<input type="text"$minmax name="challenge" required="required" autofocus autocomplete="one-time-code" inputmode="numeric" autocapitalize="off" placeholder="<?php p($l->t('Authentication code')) ?>">
