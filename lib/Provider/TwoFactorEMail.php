@@ -70,7 +70,6 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	 * If a user reloads that web page, a new code is generated and re-sent. Thus throttled.
 	 */
 	public function getTemplate(IUser $user): ITemplate {
-		//
 		$template = $this->templateManager->getTemplate(Application::APP_ID, 'LoginChallenge');
 		try {
 			// Login retry throttling is done by Nextcloud, but re-loading the form would generate and send new codes.
