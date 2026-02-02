@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Service;
 
+use OCA\TwoFactorEMail\Exception\EMailNotSet;
+use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCP\IUser;
 use OCP\Security\IHasher;
 
@@ -22,21 +24,35 @@ final class LoginChallenge implements ILoginChallenge {
 	}
 
 	/**
+	 * Store code securely (and resistent to time-based attacks) in case an attacker managed to elevate his privileges.
+	 *
 	 * Login retry throttling is done by Nextcloud, but re-loading the form would generate and send new codes.
 	 * This is not handled by the brute force protection. We could skip sending emails once a rate limit is reached,
 	 * see https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/security.html#rate-limiting
 	 * Instead, we don't send a new code if we can read the code from storage (which means that there's a code that
 	 * is still valid).
+	 *
+	 * One could always delete the code after verification. Allowing retries is more convenient for users (mistype).
 	 */
 	public function sendChallenge(IUser $user): bool {
+		// If there is still a valid code stored, don't generate and send another.
 		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
 		if (! is_null($storedCodeHash)) { return false; }
 
 		$generatedCode = $this->codeGenerator->generateChallengeCode();
-		// to harden in case of privilege escalation, store code as hash using a method resistent to time-based attacks
-		$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode));
-		$this->emailSender->sendChallengeEMail($user, $generatedCode);
-		return true;
+		try {
+			$this->emailSender->sendChallengeEMail($user, $generatedCode);
+
+			// Only store the code if it could be sent.
+			$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode));
+			return true;
+		} catch (EMailNotSet $e) {
+			// There is no primary e-mail address for that user.
+		} catch (SendEMailFailed $e) {
+			// There is something wrong with this instance's e-mail setup.
+		} finally {
+			return false;
+		}
 	}
 
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {
@@ -48,7 +64,6 @@ final class LoginChallenge implements ILoginChallenge {
 			$isValid = $this->hasher->verify($submittedCode, $storedCodeHash);
 		}
 
-		// We could always delete the code here but this way it is more convenient for users (in case of a mistype).
 		if ($isValid) {
 			$this->codeStorage->deleteCode($user->getUID());
 		}
