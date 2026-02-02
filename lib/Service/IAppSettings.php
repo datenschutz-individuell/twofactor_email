@@ -33,4 +33,12 @@ interface IAppSettings {
 	 * @return int seconds of sliding window
 	 */
 	public function getSendRateLimitPeriodSeconds(): int;
+
+	/**
+	 * How many failed verification attempts are allowed before the code is invalidated.
+	 * This is a defense-in-depth measure on top of Nextcloud's built-in rate limiting.
+	 *
+	 * @return int maximum number of failed attempts before code invalidation
+	 */
+	public function getMaxVerificationAttempts(): int;
 }

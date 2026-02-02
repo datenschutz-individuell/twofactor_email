@@ -24,9 +24,11 @@ use OCA\TwoFactorEMail\Service\IEMailAddressMasker;
 use OCA\TwoFactorEMail\Service\IEMailSender;
 use OCA\TwoFactorEMail\Service\ILoginChallenge;
 use OCA\TwoFactorEMail\Service\IStateManager;
+use OCA\TwoFactorEMail\Service\IVerificationAttemptTracker;
 use OCA\TwoFactorEMail\Service\LoginChallenge;
 use OCA\TwoFactorEMail\Service\NumericalCodeGenerator;
 use OCA\TwoFactorEMail\Service\StateManager;
+use OCA\TwoFactorEMail\Service\VerificationAttemptTracker;
 use OCP\Accounts\UserUpdatedEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -50,6 +52,7 @@ final class Application extends App implements IBootstrap {
 		$context->registerServiceAlias(IEMailAddressMasker::class, EMailAddressMasker::class);
 		$context->registerServiceAlias(IEMailSender::class, EMailSender::class);
 		$context->registerServiceAlias(IStateManager::class, StateManager::class);
+		$context->registerServiceAlias(IVerificationAttemptTracker::class, VerificationAttemptTracker::class);
 
 		$context->registerEventListener(StateChanged::class, StateChangeActivity::class);
 		$context->registerEventListener(StateChanged::class, StateChangeRegistryUpdater::class);
