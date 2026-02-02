@@ -21,11 +21,22 @@ final class LoginChallenge implements ILoginChallenge {
 	) {
 	}
 
-	public function sendChallenge(IUser $user): void {
+	/**
+	 * Login retry throttling is done by Nextcloud, but re-loading the form would generate and send new codes.
+	 * This is not handled by the brute force protection. We could skip sending emails once a rate limit is reached,
+	 * see https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/security.html#rate-limiting
+	 * Instead, we don't send a new code if we can read the code from storage (which means that there's a code that
+	 * is still valid).
+	 */
+	public function sendChallenge(IUser $user): bool {
+		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
+		if (! is_null($storedCodeHash)) { return false; }
+
 		$generatedCode = $this->codeGenerator->generateChallengeCode();
 		// to harden in case of privilege escalation, store code as hash using a method resistent to time-based attacks
 		$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode));
 		$this->emailSender->sendChallengeEMail($user, $generatedCode);
+		return true;
 	}
 
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {
