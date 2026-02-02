@@ -21,19 +21,14 @@ if (!empty($codeLength)) {
 
 $newCodeWasSent = $_['newCodeWasSent']; // provided in Provider/TwoFactorEMail.php
 ?>
-
 <img class="two-factor-icon twofactor_email-challenge-icon" src="<?php print_unescaped(image_path('twofactor_email', 'app.svg')); ?>" alt="Icon depicting a letter and a user">
-
-<?php
-	echo '<p>';
-	if ($newCodeWasSent) {
-		p($l->t('A new authentication code was just sent. Please enter it:'));
-	} else {
-		p($l->t('Enter the authentication code that was sent to you:'));
-	}
-	echo '</p>';
-?>
-
+<p><?php
+if ($newCodeWasSent) {
+	p($l->t('A new authentication code was just sent. Please enter it:'));
+} else {
+	p($l->t('Enter the authentication code that was sent to you:'));
+}
+?></p>
 <form method="POST" class="twofactor_email-challenge-form">
 	<input type="text"<?= $minmax ?> name="challenge" required="required" autofocus autocomplete="one-time-code" inputmode="numeric" autocapitalize="off" placeholder="<?php p($l->t('Authentication code')) ?>">
 	<button class="primary two-factor-submit" type="submit">

@@ -37,7 +37,9 @@ final class LoginChallenge implements ILoginChallenge {
 	public function sendChallenge(IUser $user): bool {
 		// If there is still a valid code stored, don't generate and send another.
 		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
-		if (! is_null($storedCodeHash)) { return false; }
+		if (! is_null($storedCodeHash)) {
+			return false;
+		}
 
 		$generatedCode = $this->codeGenerator->generateChallengeCode();
 		try {
