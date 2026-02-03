@@ -21,6 +21,7 @@ final class LoginChallenge implements ILoginChallenge {
 		private IEMailSender $emailSender,
 		private IHasher $hasher,
 		private IVerificationAttemptTracker $attemptTracker,
+		private IAppSettings $settings,
 	) {
 	}
 
@@ -39,6 +40,7 @@ final class LoginChallenge implements ILoginChallenge {
 		$userId = $user->getUID();
 
 		// If there is a still valid code, don't generate and send another.
+		// This prevents a DoS attack vector and thus obsoletes the use of ILimiter in EMailSender.
 		if (! is_null($this->codeStorage->readCode($userId))) {
 			return false; // No new e-mail sent
 		}
@@ -57,7 +59,8 @@ final class LoginChallenge implements ILoginChallenge {
 
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {
 		$userId = $user->getUID();
-		$submittedCode = trim($submittedCode);
+		// Normalize: trim whitespace and convert to uppercase for case-insensitive comparison
+		$submittedCode = strtoupper(trim($submittedCode));
 		$storedCodeHash = $this->codeStorage->readCode($userId);
 
 		if (is_null($storedCodeHash)) {

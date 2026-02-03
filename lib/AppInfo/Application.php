@@ -13,8 +13,9 @@ use OCA\TwoFactorEMail\Event\StateChanged;
 use OCA\TwoFactorEMail\Listener\EMailDeleted;
 use OCA\TwoFactorEMail\Listener\StateChangeActivity;
 use OCA\TwoFactorEMail\Listener\StateChangeRegistryUpdater;
+use OCA\TwoFactorEMail\Service\CodeGenerator;
 use OCA\TwoFactorEMail\Service\CodeStorage;
-use OCA\TwoFactorEMail\Service\ConstantAppSettings;
+use OCA\TwoFactorEMail\Service\ConfigurableAppSettings;
 use OCA\TwoFactorEMail\Service\EMailAddressMasker;
 use OCA\TwoFactorEMail\Service\EMailSender;
 use OCA\TwoFactorEMail\Service\IAppSettings;
@@ -26,7 +27,6 @@ use OCA\TwoFactorEMail\Service\ILoginChallenge;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCA\TwoFactorEMail\Service\IVerificationAttemptTracker;
 use OCA\TwoFactorEMail\Service\LoginChallenge;
-use OCA\TwoFactorEMail\Service\NumericalCodeGenerator;
 use OCA\TwoFactorEMail\Service\StateManager;
 use OCA\TwoFactorEMail\Service\VerificationAttemptTracker;
 use OCP\Accounts\UserUpdatedEvent;
@@ -45,9 +45,9 @@ final class Application extends App implements IBootstrap {
 	public function register(IRegistrationContext $context): void {
 		include_once __DIR__ . '/../../vendor/autoload.php';
 
-		$context->registerServiceAlias(IAppSettings::class, ConstantAppSettings::class);
+		$context->registerServiceAlias(IAppSettings::class, ConfigurableAppSettings::class);
 		$context->registerServiceAlias(ILoginChallenge::class, LoginChallenge::class);
-		$context->registerServiceAlias(ICodeGenerator::class, NumericalCodeGenerator::class);
+		$context->registerServiceAlias(ICodeGenerator::class, CodeGenerator::class);
 		$context->registerServiceAlias(ICodeStorage::class, CodeStorage::class);
 		$context->registerServiceAlias(IEMailAddressMasker::class, EMailAddressMasker::class);
 		$context->registerServiceAlias(IEMailSender::class, EMailSender::class);

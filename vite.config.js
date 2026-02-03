@@ -9,6 +9,7 @@ export default createAppConfig({
 	personal_settings: 'src/PersonalSettings.js',
 	login_setup: 'src/LoginSetup.js',
 	login_challenge: 'src/LoginChallenge.css',
+	admin_settings: 'src/AdminSettings.js',
 }, {
 	extractLicenseInformation: {
 		validateLicenses: true,

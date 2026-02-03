@@ -19,5 +19,15 @@ return [
 			'url' => '/personal_settings/state',
 			'verb' => 'POST',
 		],
+		[
+			'name' => 'AdminSettings#get',
+			'url' => '/admin_settings',
+			'verb' => 'GET',
+		],
+		[
+			'name' => 'AdminSettings#update',
+			'url' => '/admin_settings',
+			'verb' => 'POST',
+		],
 	]
 ];
