@@ -48,7 +48,7 @@ final class LoginChallenge implements ILoginChallenge {
 			// Only store the code if it could be sent.
 			$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode));
 			return true;
-		} catch (EMailNotSet | SendEMailFailed) {
+		} catch (EMailNotSet|SendEMailFailed) {
 			return false;
 		}
 	}
