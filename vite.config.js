@@ -8,7 +8,7 @@ import { createAppConfig } from '@nextcloud/vite-config'
 export default createAppConfig({
 	personal_settings: 'src/PersonalSettings.js',
 	login_setup: 'src/LoginSetup.js',
-	login_challenge: 'src/LoginChallenge.css',
+	login_challenge: 'src/LoginChallenge.js',
 	admin_settings: 'src/AdminSettings.js',
 }, {
 	extractLicenseInformation: {
