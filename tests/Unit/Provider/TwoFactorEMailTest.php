@@ -55,7 +55,6 @@ class TwoFactorEMailTest extends TestCase {
 		$this->initialState = $this->createMock(IInitialState::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->container = $this->createMock(ContainerInterface::class);
-		$this->limiter = $this->createMock(ILimiter::class);
 		$this->challengeService = $this->createMock(ILoginChallenge::class);
 		$this->stateManager = $this->createMock(IStateManager::class);
 		$this->settings = $this->createMock(IAppSettings::class);
@@ -68,7 +67,6 @@ class TwoFactorEMailTest extends TestCase {
 			$this->initialState,
 			$this->urlGenerator,
 			$this->container,
-			$this->limiter,
 			$this->challengeService,
 			$this->stateManager,
 			$this->settings,

@@ -27,8 +27,6 @@ use OCP\Authentication\TwoFactorAuth\IProvidesPersonalSettings;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUser;
-use OCP\Security\RateLimiting\ILimiter;
-use OCP\Security\RateLimiting\IRateLimitExceededException;
 use OCP\Template\ITemplate;
 use OCP\Template\ITemplateManager;
 use Psr\Container\ContainerInterface;
@@ -44,7 +42,6 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 		private IInitialState $initialStateService,
 		private IURLGenerator $urlGenerator,
 		private ContainerInterface $container,
-		private ILimiter $limiter,
 		private ILoginChallenge $challengeService,
 		private IStateManager $stateManager,
 		private IAppSettings $settings,
@@ -71,24 +68,12 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	 */
 	public function getTemplate(IUser $user): ITemplate {
 		$template = $this->templateManager->getTemplate(Application::APP_ID, 'LoginChallenge');
-		try {
-			// Login retry throttling is done by Nextcloud, but re-loading the form would generate and send new codes.
-			// This is not handled by the brute force protection. We skip sending emails once a rate limit is reached,
-			// see https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/security.html#rate-limiting
-			$this->limiter->registerUserRequest(
-				'twofactor_email_send',
-				$this->settings->getSendRateLimitAttempts(),
-				$this->settings->getSendRateLimitPeriodSeconds(),
-				$user,
-			);
-			$this->challengeService->sendChallenge($user);
-		} catch (IRateLimitExceededException $e) {
-			// ignore, because we just don't want to send a new code
-			// ToDo: Inform the User
-			$this->logger->warning("E-mail not sent since the user '" . $user->getUID() . "' already sent too many in a row", ['exception' => $e]);
-		}
-		// In order to use app settings in the LoginChallenge.php template, we must provide them here
+
+		$newCodeWasSent = $this->challengeService->sendChallenge($user);
+
+		// In order to use information in the LoginChallenge.php template, we must provide them here
 		$template->assign('codeLength', $this->settings->getCodeLength());
+		$template->assign('newCodeWasSent', $newCodeWasSent);
 		// Return the template for the challenge view (LoginChallenge.php file in the templates folder of the app)
 		return $template;
 	}
