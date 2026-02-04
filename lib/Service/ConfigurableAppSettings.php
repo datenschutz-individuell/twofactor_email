@@ -223,10 +223,10 @@ final class ConfigurableAppSettings implements IAppSettings {
 				$cleaned[] = $domain;
 			}
 		}
-		$this->config->setValueArray(
+		$this->config->setValueString(
 			Application::APP_ID,
 			self::KEY_ALLOWED_DOMAINS,
-			array_unique($cleaned),
+			implode(',', array_unique($cleaned)),
 		);
 	}
 
