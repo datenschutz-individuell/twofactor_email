@@ -10,11 +10,11 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Service;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
-use OCP\IConfig;
+use OCP\IAppConfig;
 
 /**
  * App settings that can be configured by admins via the admin settings panel.
- * Values are stored in Nextcloud's appconfig table.
+ * Values are stored in Nextcloud's app preferences store (which is the oc_preferences table in NC ≤33).
  */
 final class ConfigurableAppSettings implements IAppSettings {
 	// Setting keys
@@ -36,47 +36,43 @@ final class ConfigurableAppSettings implements IAppSettings {
 	private const DEFAULT_USE_ALPHANUMERIC = false;
 	private const DEFAULT_RATE_LIMIT_ATTEMPTS = 10;
 	private const DEFAULT_RATE_LIMIT_PERIOD = 600; // 10 minutes
-	private const DEFAULT_SKIP_SEND_IF_EXISTS = false;
 	private const DEFAULT_INCLUDE_EMAIL_HEADER = true;
 	private const DEFAULT_ALLOWED_DOMAINS = '';
 	private const DEFAULT_PREFER_LDAP_EMAIL = false;
 
 	public function __construct(
-		private IConfig $config,
+		private IAppConfig $config,
 	) {
 	}
 
 	// ========== CODE SETTINGS ==========
 
 	public function getCodeLength(): int {
-		$value = $this->config->getAppValue(
+		$length = $this->config->getValueInt(
 			Application::APP_ID,
 			self::KEY_CODE_LENGTH,
-			(string)self::DEFAULT_CODE_LENGTH
+			self::DEFAULT_CODE_LENGTH,
 		);
-		$length = (int)$value;
 		// Enforce valid range (4-12)
 		return max(4, min(12, $length));
 	}
 
 	public function getCodeValidSeconds(): int {
-		$value = $this->config->getAppValue(
+		$seconds = $this->config->getValueInt(
 			Application::APP_ID,
 			self::KEY_CODE_VALID_SECONDS,
-			(string)self::DEFAULT_CODE_VALID_SECONDS
+			self::DEFAULT_CODE_VALID_SECONDS,
 		);
-		$seconds = (int)$value;
 		// Enforce valid range (60 seconds to 30 minutes)
 		return max(60, min(1800, $seconds));
 	}
 
 	public function getMaxVerificationAttempts(): int {
-		$value = $this->config->getAppValue(
+		$attempts = $this->config->getValueInt(
 			Application::APP_ID,
 			self::KEY_MAX_VERIFICATION_ATTEMPTS,
-			(string)self::DEFAULT_MAX_VERIFICATION_ATTEMPTS
+			self::DEFAULT_MAX_VERIFICATION_ATTEMPTS,
 		);
-		$attempts = (int)$value;
 		// Enforce valid range (1-10)
 		return max(1, min(10, $attempts));
 	}
@@ -84,61 +80,49 @@ final class ConfigurableAppSettings implements IAppSettings {
 	// ========== CODE FORMAT ==========
 
 	public function useAlphanumericCodes(): bool {
-		return $this->config->getAppValue(
+		return $this->config->getValueBool(
 			Application::APP_ID,
 			self::KEY_USE_ALPHANUMERIC,
-			self::DEFAULT_USE_ALPHANUMERIC ? '1' : '0'
-		) === '1';
+			self::DEFAULT_USE_ALPHANUMERIC,
+		);
 	}
 
 	// ========== RATE LIMITING ==========
 
 	public function getSendRateLimitAttempts(): int {
-		$value = $this->config->getAppValue(
+		$attempts = $this->config->getValueInt(
 			Application::APP_ID,
 			self::KEY_RATE_LIMIT_ATTEMPTS,
-			(string)self::DEFAULT_RATE_LIMIT_ATTEMPTS
+			self::DEFAULT_RATE_LIMIT_ATTEMPTS,
 		);
-		$attempts = (int)$value;
 		// Enforce valid range (1-50)
 		return max(1, min(50, $attempts));
 	}
 
 	public function getSendRateLimitPeriodSeconds(): int {
-		$value = $this->config->getAppValue(
+		$seconds = $this->config->getValueInt(
 			Application::APP_ID,
 			self::KEY_RATE_LIMIT_PERIOD,
-			(string)self::DEFAULT_RATE_LIMIT_PERIOD
+			self::DEFAULT_RATE_LIMIT_PERIOD,
 		);
-		$seconds = (int)$value;
 		// Enforce valid range (60 seconds to 1 hour)
 		return max(60, min(3600, $seconds));
-	}
-
-	// ========== CODE DELIVERY ==========
-
-	public function skipSendIfCodeExists(): bool {
-		return $this->config->getAppValue(
-			Application::APP_ID,
-			self::KEY_SKIP_SEND_IF_EXISTS,
-			self::DEFAULT_SKIP_SEND_IF_EXISTS ? '1' : '0'
-		) === '1';
 	}
 
 	// ========== EMAIL SETTINGS ==========
 
 	public function includeEmailHeader(): bool {
-		return $this->config->getAppValue(
+		return $this->config->getValueBool(
 			Application::APP_ID,
 			self::KEY_INCLUDE_EMAIL_HEADER,
-			self::DEFAULT_INCLUDE_EMAIL_HEADER ? '1' : '0'
-		) === '1';
+			self::DEFAULT_INCLUDE_EMAIL_HEADER,
+		);
 	}
 
 	// ========== DOMAIN RESTRICTIONS ==========
 
 	public function getAllowedDomains(): array {
-		$value = $this->config->getAppValue(
+		$value = $this->config->getValueString(
 			Application::APP_ID,
 			self::KEY_ALLOWED_DOMAINS,
 			self::DEFAULT_ALLOWED_DOMAINS
@@ -148,81 +132,81 @@ final class ConfigurableAppSettings implements IAppSettings {
 		}
 		// Parse comma-separated domains and clean them
 		$domains = array_map('trim', explode(',', $value));
-		$domains = array_filter($domains, fn($d) => $d !== '');
+		$domains = array_filter($domains, fn ($d) => $d !== '');
 		return array_map('strtolower', $domains);
 	}
 
 	public function preferLdapEmail(): bool {
-		return $this->config->getAppValue(
+		return $this->config->getValueBool(
 			Application::APP_ID,
 			self::KEY_PREFER_LDAP_EMAIL,
-			self::DEFAULT_PREFER_LDAP_EMAIL ? '1' : '0'
-		) === '1';
+			self::DEFAULT_PREFER_LDAP_EMAIL,
+		);
 	}
 
 	// ========== SETTERS (for admin settings) ==========
 
 	public function setCodeLength(int $length): void {
-		$this->config->setAppValue(
+		$this->config->setValueInt(
 			Application::APP_ID,
 			self::KEY_CODE_LENGTH,
-			(string)max(4, min(12, $length))
+			max(4, min(12, $length)),
 		);
 	}
 
 	public function setCodeValidSeconds(int $seconds): void {
-		$this->config->setAppValue(
+		$this->config->setValueInt(
 			Application::APP_ID,
 			self::KEY_CODE_VALID_SECONDS,
-			(string)max(60, min(1800, $seconds))
+			max(60, min(1800, $seconds)),
 		);
 	}
 
 	public function setMaxVerificationAttempts(int $attempts): void {
-		$this->config->setAppValue(
+		$this->config->setValueInt(
 			Application::APP_ID,
 			self::KEY_MAX_VERIFICATION_ATTEMPTS,
-			(string)max(1, min(10, $attempts))
+			max(1, min(10, $attempts)),
 		);
 	}
 
 	public function setUseAlphanumericCodes(bool $use): void {
-		$this->config->setAppValue(
+		$this->config->setValueBool(
 			Application::APP_ID,
 			self::KEY_USE_ALPHANUMERIC,
-			$use ? '1' : '0'
+			$use,
 		);
 	}
 
 	public function setSendRateLimitAttempts(int $attempts): void {
-		$this->config->setAppValue(
+		$this->config->setValueInt(
 			Application::APP_ID,
 			self::KEY_RATE_LIMIT_ATTEMPTS,
-			(string)max(1, min(50, $attempts))
+			max(1, min(50, $attempts)),
 		);
 	}
 
 	public function setSendRateLimitPeriodSeconds(int $seconds): void {
-		$this->config->setAppValue(
+		$this->config->setValueInt(
 			Application::APP_ID,
 			self::KEY_RATE_LIMIT_PERIOD,
-			(string)max(60, min(3600, $seconds))
+			max(60, min(3600, $seconds)),
 		);
 	}
 
 	public function setSkipSendIfCodeExists(bool $skip): void {
-		$this->config->setAppValue(
+		$this->config->setValueBool(
 			Application::APP_ID,
 			self::KEY_SKIP_SEND_IF_EXISTS,
-			$skip ? '1' : '0'
+			$skip,
 		);
 	}
 
 	public function setIncludeEmailHeader(bool $include): void {
-		$this->config->setAppValue(
+		$this->config->setValueBool(
 			Application::APP_ID,
 			self::KEY_INCLUDE_EMAIL_HEADER,
-			$include ? '1' : '0'
+			$include,
 		);
 	}
 
@@ -239,18 +223,18 @@ final class ConfigurableAppSettings implements IAppSettings {
 				$cleaned[] = $domain;
 			}
 		}
-		$this->config->setAppValue(
+		$this->config->setValueArray(
 			Application::APP_ID,
 			self::KEY_ALLOWED_DOMAINS,
-			implode(',', array_unique($cleaned))
+			array_unique($cleaned),
 		);
 	}
 
 	public function setPreferLdapEmail(bool $prefer): void {
-		$this->config->setAppValue(
+		$this->config->setValueBool(
 			Application::APP_ID,
 			self::KEY_PREFER_LDAP_EMAIL,
-			$prefer ? '1' : '0'
+			$prefer,
 		);
 	}
 
@@ -267,7 +251,6 @@ final class ConfigurableAppSettings implements IAppSettings {
 			'rateLimitAttempts' => $this->getSendRateLimitAttempts(),
 			'rateLimitPeriodSeconds' => $this->getSendRateLimitPeriodSeconds(),
 			'rateLimitPeriodMinutes' => (int)($this->getSendRateLimitPeriodSeconds() / 60),
-			'skipSendIfCodeExists' => $this->skipSendIfCodeExists(),
 			'includeEmailHeader' => $this->includeEmailHeader(),
 			'allowedDomains' => $this->getAllowedDomains(),
 			'preferLdapEmail' => $this->preferLdapEmail(),

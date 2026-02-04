@@ -58,16 +58,6 @@ interface IAppSettings {
 	 */
 	public function getSendRateLimitPeriodSeconds(): int;
 
-	// ========== CODE DELIVERY ==========
-
-	/**
-	 * Whether to skip sending a new code if a valid one already exists.
-	 * When true, users must wait for the existing code to expire or use it.
-	 *
-	 * @return bool true to skip sending if code exists
-	 */
-	public function skipSendIfCodeExists(): bool;
-
 	// ========== EMAIL SETTINGS ==========
 
 	/**

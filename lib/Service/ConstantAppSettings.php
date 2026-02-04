@@ -38,10 +38,6 @@ final class ConstantAppSettings implements IAppSettings {
 		return 60 * 10; // 10 minutes
 	}
 
-	public function skipSendIfCodeExists(): bool {
-		return false;
-	}
-
 	public function includeEmailHeader(): bool {
 		return true;
 	}

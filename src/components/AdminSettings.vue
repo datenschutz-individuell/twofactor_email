@@ -4,8 +4,7 @@
 -->
 
 <template>
-	<NcSettingsSection
-		:name="t('twofactor_email', 'Two-Factor Email')"
+	<NcSettingsSection :name="t('twofactor_email', 'Two-Factor Email')"
 		:description="t('twofactor_email', 'Configure two-factor email authentication settings.')">
 
 		<!-- CODE SETTINGS -->
@@ -14,8 +13,7 @@
 
 			<div class="setting-row">
 				<label for="code-length">{{ t('twofactor_email', 'Code length') }}</label>
-				<NcSelect
-					v-model="settings.codeLength"
+				<NcSelect v-model="settings.codeLength"
 					:options="codeLengthOptions"
 					:reduce="opt => opt.value"
 					input-id="code-length"
@@ -25,8 +23,7 @@
 
 			<div class="setting-row">
 				<label for="code-validity">{{ t('twofactor_email', 'Code validity') }}</label>
-				<NcSelect
-					v-model="settings.codeValidMinutes"
+				<NcSelect v-model="settings.codeValidMinutes"
 					:options="validityOptions"
 					:reduce="opt => opt.value"
 					input-id="code-validity"
@@ -36,8 +33,7 @@
 
 			<div class="setting-row">
 				<label for="max-attempts">{{ t('twofactor_email', 'Max failed attempts') }}</label>
-				<NcSelect
-					v-model="settings.maxVerificationAttempts"
+				<NcSelect v-model="settings.maxVerificationAttempts"
 					:options="attemptsOptions"
 					:reduce="opt => opt.value"
 					input-id="max-attempts"
@@ -50,8 +46,7 @@
 		<fieldset>
 			<legend>{{ t('twofactor_email', 'Code Format') }}</legend>
 
-			<NcCheckboxRadioSwitch
-				v-model="settings.useAlphanumericCodes"
+			<NcCheckboxRadioSwitch v-model="settings.useAlphanumericCodes"
 				type="switch"
 				@update:model-value="save">
 				{{ t('twofactor_email', 'Use alphanumeric codes (stronger)') }}
@@ -67,8 +62,7 @@
 
 			<div class="setting-row">
 				<label for="rate-limit-attempts">{{ t('twofactor_email', 'Max emails') }}</label>
-				<NcSelect
-					v-model="settings.rateLimitAttempts"
+				<NcSelect v-model="settings.rateLimitAttempts"
 					:options="rateLimitAttemptsOptions"
 					:reduce="opt => opt.value"
 					input-id="rate-limit-attempts"
@@ -78,8 +72,7 @@
 
 			<div class="setting-row">
 				<label for="rate-limit-period">{{ t('twofactor_email', 'Period duration') }}</label>
-				<NcSelect
-					v-model="settings.rateLimitPeriodMinutes"
+				<NcSelect v-model="settings.rateLimitPeriodMinutes"
 					:options="rateLimitPeriodOptions"
 					:reduce="opt => opt.value"
 					input-id="rate-limit-period"
@@ -88,27 +81,11 @@
 			</div>
 		</fieldset>
 
-		<!-- CODE DELIVERY -->
-		<fieldset>
-			<legend>{{ t('twofactor_email', 'Code Delivery') }}</legend>
-
-			<NcCheckboxRadioSwitch
-				v-model="settings.skipSendIfCodeExists"
-				type="switch"
-				@update:model-value="save">
-				{{ t('twofactor_email', "Don't send new code if valid code exists") }}
-			</NcCheckboxRadioSwitch>
-			<p class="hint">
-				{{ t('twofactor_email', 'User must wait for expiry or use existing code. Reduces email spam on page refresh.') }}
-			</p>
-		</fieldset>
-
 		<!-- EMAIL SETTINGS -->
 		<fieldset>
 			<legend>{{ t('twofactor_email', 'Email') }}</legend>
 
-			<NcCheckboxRadioSwitch
-				v-model="settings.includeEmailHeader"
+			<NcCheckboxRadioSwitch v-model="settings.includeEmailHeader"
 				type="switch"
 				@update:model-value="save">
 				{{ t('twofactor_email', 'Include logo in email header') }}
@@ -121,9 +98,7 @@
 
 			<div class="setting-row">
 				<label for="allowed-domains">{{ t('twofactor_email', 'Allowed email domains') }}</label>
-				<NcTextField
-					id="allowed-domains"
-					v-model="allowedDomainsText"
+				<NcTextField id="allowed-domains" v-model="allowedDomainsText"
 					:placeholder="t('twofactor_email', 'company.com, corp.example.org')"
 					@update:model-value="saveDomainsDebounced" />
 			</div>
@@ -131,8 +106,7 @@
 				{{ t('twofactor_email', 'Comma-separated list. Leave empty to allow all domains.') }}
 			</p>
 
-			<NcCheckboxRadioSwitch
-				v-model="settings.preferLdapEmail"
+			<NcCheckboxRadioSwitch v-model="settings.preferLdapEmail"
 				type="switch"
 				@update:model-value="save">
 				{{ t('twofactor_email', 'Prefer LDAP email (non-user-writable)') }}
@@ -156,7 +130,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'

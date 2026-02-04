@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Controller;
 
 use OCA\TwoFactorEMail\Service\ConfigurableAppSettings;
+use OCA\TwoFactorEMail\Settings\AdminSettings;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
 use OCP\AppFramework\Http\JSONResponse;
@@ -27,7 +28,7 @@ class AdminSettingsController extends Controller {
 	/**
 	 * Get all admin settings.
 	 */
-	#[AuthorizedAdminSetting(settings: \OCA\TwoFactorEMail\Settings\AdminSettings::class)]
+	#[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function get(): JSONResponse {
 		return new JSONResponse($this->settings->getAllSettings());
 	}
@@ -35,7 +36,7 @@ class AdminSettingsController extends Controller {
 	/**
 	 * Update admin settings.
 	 */
-	#[AuthorizedAdminSetting(settings: \OCA\TwoFactorEMail\Settings\AdminSettings::class)]
+	#[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function update(
 		?int $codeLength = null,
 		?int $codeValidMinutes = null,
@@ -43,7 +44,6 @@ class AdminSettingsController extends Controller {
 		?bool $useAlphanumericCodes = null,
 		?int $rateLimitAttempts = null,
 		?int $rateLimitPeriodMinutes = null,
-		?bool $skipSendIfCodeExists = null,
 		?bool $includeEmailHeader = null,
 		?array $allowedDomains = null,
 		?bool $preferLdapEmail = null,
@@ -65,9 +65,6 @@ class AdminSettingsController extends Controller {
 		}
 		if ($rateLimitPeriodMinutes !== null) {
 			$this->settings->setSendRateLimitPeriodSeconds($rateLimitPeriodMinutes * 60);
-		}
-		if ($skipSendIfCodeExists !== null) {
-			$this->settings->setSkipSendIfCodeExists($skipSendIfCodeExists);
 		}
 		if ($includeEmailHeader !== null) {
 			$this->settings->setIncludeEmailHeader($includeEmailHeader);
