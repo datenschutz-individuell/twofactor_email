@@ -20,6 +20,8 @@ final class LoginChallenge implements ILoginChallenge {
 		private ICodeStorage $codeStorage,
 		private IEMailSender $emailSender,
 		private IHasher $hasher,
+		private IVerificationAttemptTracker $attemptTracker,
+		private IAppSettings $settings,
 	) {
 	}
 
@@ -35,36 +37,47 @@ final class LoginChallenge implements ILoginChallenge {
 	 * One could always delete the code after verification. Allowing retries is more convenient for users (mistype).
 	 */
 	public function sendChallenge(IUser $user): bool {
-		// If there is still a valid code stored, don't generate and send another.
-		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
-		if (! is_null($storedCodeHash)) {
-			return false;
+		$userId = $user->getUID();
+
+		// If there is a still valid code, don't generate and send another.
+		// This prevents a DoS attack vector and thus obsoletes the use of ILimiter in EMailSender.
+		if (! is_null($this->codeStorage->readCode($userId))) {
+			return false; // No new e-mail sent
 		}
 
-		$generatedCode = $this->codeGenerator->generateChallengeCode();
+		$newCode = $this->codeGenerator->generateChallengeCode();
 		try {
-			$this->emailSender->sendChallengeEMail($user, $generatedCode);
-
-			// Only store the code if it could be sent.
-			$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode));
-			return true;
+			$this->emailSender->sendChallengeEMail($user, $newCode);
+			// Only store the code and reset failed attempts if it could be sent.
+			$this->codeStorage->writeCode($userId, $this->hasher->hash($newCode));
+			$this->attemptTracker->resetAttempts($userId);
+			return true; // New code sent by e-mail
 		} catch (EMailNotSet|SendEMailFailed) {
-			return false;
+			return false; // E-Mail could not be sent
 		}
 	}
 
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {
-		$submittedCode = trim($submittedCode);
-		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
+		$userId = $user->getUID();
+		// Normalize: trim whitespace and convert to uppercase for case-insensitive comparison
+		$submittedCode = strtoupper(trim($submittedCode));
+		$storedCodeHash = $this->codeStorage->readCode($userId);
+
 		if (is_null($storedCodeHash)) {
-			$isValid = false;
-		} else {
-			$isValid = $this->hasher->verify($submittedCode, $storedCodeHash);
+			return false; // There was no still valid code stored
 		}
 
-		if ($isValid) {
-			$this->codeStorage->deleteCode($user->getUID());
+		if ($this->hasher->verify($submittedCode, $storedCodeHash)) {
+			// Successful - delete the code and reset attempts
+			$this->codeStorage->deleteCode($userId);
+			$this->attemptTracker->resetAttempts($userId);
+			return true; // The code the user entered matched the stored one
+		} else {
+			// Failed - record attempt, delete code if limit was hit
+			if ($this->attemptTracker->recordFailedAttempt($userId)) {
+				$this->codeStorage->deleteCode($userId);
+			}
+			return false; // The code the user entered didn't match the stored one
 		}
-		return $isValid;
 	}
 }

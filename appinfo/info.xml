@@ -70,6 +70,7 @@ at the bottom of Personal Settings/Security).]]></description>
 	<activity>
 		<settings>
 			<setting>OCA\TwoFactorEMail\Activity\Setting</setting>
+			<setting>OCA\TwoFactorEMail\Settings\AdminSettings</setting>
 		</settings>
 		<providers>
 			<provider>OCA\TwoFactorEMail\Activity\Provider</provider>
