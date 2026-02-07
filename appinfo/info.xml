@@ -67,10 +67,12 @@ at the bottom of Personal Settings/Security).]]></description>
 	<commands>
 		<command>OCA\TwoFactorEMail\Command\CleanUp</command>
 	</commands>
+		<settings>
+			<setting>OCA\TwoFactorEMail\Settings\AdminSettings</setting>
+		</settings>
 	<activity>
 		<settings>
 			<setting>OCA\TwoFactorEMail\Activity\Setting</setting>
-			<setting>OCA\TwoFactorEMail\Settings\AdminSettings</setting>
 		</settings>
 		<providers>
 			<provider>OCA\TwoFactorEMail\Activity\Provider</provider>
