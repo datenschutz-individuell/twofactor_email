@@ -16,10 +16,4 @@ final class ConstantAppSettings implements IAppSettings {
 	public function getCodeValidSeconds(): int {
 		return 60 * 10; // 10 minutes
 	}
-	public function getSendRateLimitAttempts(): int {
-		return 10;
-	}
-	public function getSendRateLimitPeriodSeconds(): int {
-		return 60 * 10; // 10 minutes
-	}
 }
