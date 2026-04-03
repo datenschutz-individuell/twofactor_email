@@ -1,17 +1,16 @@
-# SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
+# SPDX-FileCopyrightText: 2024-2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
 # SPDX-License-Identifier: MIT
 
 name: Test
 
 permissions:
   contents: read
-
+  pull-requests: write
+  
 on:
   pull_request:
     branches:
       - main
-      - master
-      - stable*
 
 jobs:
   unit-tests:
