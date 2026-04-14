@@ -5,6 +5,12 @@
 # Changelog
 Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## 3.0.7-beta.1 (2026-04-14)
+
+### Security
+
+- Update dependencies to fix Axios security issue
+
 ## 3.0.6-beta.1 (2026-02-03)
 
 ### Changed
