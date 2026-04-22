@@ -7,10 +7,10 @@
 <template>
 	<div id="twofactor_email-login_setup">
 		<span v-if="store.error === 'no-email'" class="error">
-			{{ t('twofactor_email', 'You cannot enable two-factor authentication via e-mail. You need to set a primary e-mail address (in your personal settings) first.') }}
+			{{ t('twofactor_email', 'You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first.') }}
 		</span>
 		<span v-else-if="store.error === 'save-failed'" class="error">
-			{{ t('twofactor_email', 'Could not enable/disable two-factor authentication via e-mail.') }}
+			{{ t('twofactor_email', 'Could not enable/disable two-factor authentication via email.') }}
 		</span>
 		<span v-else-if="store.error" class="error">
 			{{ t('twofactor_email', 'Unhandled error!') }}
@@ -18,7 +18,7 @@
 		<div v-else-if="loading" class="loading" style="min-height: 50px" />
 		<div v-else>
 			<p>Successfully enabled</p>
-			<p>{{ t('twofactor_email', 'Codes will be sent to your primary e-mail address:') }} <b>{{ store.maskedEmail }}</b></p>
+			<p>{{ t('twofactor_email', 'Codes will be sent to your primary email address:') }} <b>{{ store.maskedEmail }}</b></p>
 			<form method="POST">
 				<button>{{ t('twofactor_email', 'Proceed') }}</button>
 			</form>

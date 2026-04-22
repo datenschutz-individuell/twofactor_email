@@ -22,13 +22,13 @@ interface IAppSettings {
 	public function getCodeValidSeconds(): int;
 
 	/**
-	 * How many e-mails may be sent during a certain period.
+	 * How many emails may be sent during a certain period.
 	 *
 	 * @return int number of attempts allowed
 	 */
 	public function getSendRateLimitAttempts(): int;
 	/**
-	 * Period in which the defined amount of e-mails may be sent.
+	 * Period in which the defined amount of emails may be sent.
 	 *
 	 * @return int seconds of sliding window
 	 */

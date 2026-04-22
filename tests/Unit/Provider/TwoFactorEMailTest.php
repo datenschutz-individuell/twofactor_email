@@ -78,7 +78,7 @@ class TwoFactorEMailTest extends TestCase {
 	}
 
 	public function testGetDisplayName(): void {
-		self::assertEquals('E-mail', $this->provider->getDisplayName());
+		self::assertEquals('Email', $this->provider->getDisplayName());
 	}
 
 	public function testGetDescription(): void {
@@ -86,7 +86,7 @@ class TwoFactorEMailTest extends TestCase {
 			->method('t')
 			->willReturnArgument(0);
 
-		self::assertEquals('Authenticate by e-mail', $this->provider->getDescription());
+		self::assertEquals('Authenticate by email', $this->provider->getDescription());
 	}
 
 	public function testGetLightIcon(): void {

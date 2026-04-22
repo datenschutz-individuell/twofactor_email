@@ -17,7 +17,7 @@ export function persist(enabled) {
 		state: enabled,
 	}
 
-	Logger.debug('sending two-factor e-mail state change request', data)
+	Logger.debug('sending two-factor email state change request', data)
 	return Axios.post(url, data)
 		.then(resp => {
 			if (resp.status !== 200) {

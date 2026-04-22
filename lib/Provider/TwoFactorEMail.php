@@ -53,17 +53,17 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	}
 
 	public function getDisplayName(): string {
-		return 'E-mail';
+		return 'Email';
 	}
 
 	public function getDescription(): string {
-		return $this->l10n->t('Authenticate by e-mail');
+		return $this->l10n->t('Authenticate by email');
 	}
 
 	/**
 	 * Get the template for rending the 2FA provider view.
-	 * This function is called from nextcloud when the user activated the e-mail 2FA.
-	 * It sends a new challenge code by e-mail and asks the user to enter it via the Template.
+	 * This function is called from nextcloud when the user activated the email 2FA.
+	 * It sends a new challenge code by email and asks the user to enter it via the Template.
 	 * If a user reloads that web page, a new code is generated and re-sent. Thus throttled.
 	 */
 	public function getTemplate(IUser $user): ITemplate {

@@ -33,7 +33,7 @@ final class Setting implements ISetting {
 	}
 
 	public function getName(): string {
-		return $this->l10n->t('E-mail');
+		return $this->l10n->t('Email');
 	}
 
 	public function getPriority(): int {

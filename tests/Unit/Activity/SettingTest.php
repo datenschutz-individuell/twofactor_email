@@ -31,9 +31,9 @@ class SettingTest extends TestCase {
 		$this->assertEquals('twofactor_email', $this->setting->getIdentifier());
 		$this->l10n->expects($this->once())
 			->method('t')
-			->with('E-mail')
-			->willReturn('E-Mail');
-		$this->assertEquals('E-Mail', $this->setting->getName());
+			->with('Email')
+			->willReturn('Email');
+		$this->assertEquals('Email', $this->setting->getName());
 		$this->assertEquals(10, $this->setting->getPriority());
 		$this->assertTrue($this->setting->isDefaultEnabledMail());
 		$this->assertTrue($this->setting->isDefaultEnabledStream());

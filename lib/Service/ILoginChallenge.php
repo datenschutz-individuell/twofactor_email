@@ -15,7 +15,7 @@ use OCP\IUser;
 
 interface ILoginChallenge {
 	/**
-	 * Generate a challenge code and send it to the user via e-mail.
+	 * Generate a challenge code and send it to the user via email.
 	 *
 	 * @param IUser $user UID
 	 * @return bool true if a new code was sent
@@ -25,10 +25,10 @@ interface ILoginChallenge {
 	public function sendChallenge(IUser $user): bool;
 
 	/**
-	 * Verify the challenge code sent to the user by e-mail against the one stored upon sending it.
+	 * Verify the challenge code sent to the user by email against the one stored upon sending it.
 	 *
 	 * @param IUser $user UID
-	 * @param string $submittedCode Authentication code received by e-mail
+	 * @param string $submittedCode Authentication code received by email
 	 * @return bool True if code is valid
 	 */
 	public function verifyChallenge(IUser $user, string $submittedCode): bool;

@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 use OCP\Util;
 
-// Without addScript, the settings section E-Mail remains empty.
+// Without addScript, the settings section Email remains empty.
 Util::addScript('twofactor_email', 'twofactor_email-personal_settings');
 // Without addStyle, the switch is rendered weirdly.
 Util::addStyle('twofactor_email', 'twofactor_email-personal_settings');
