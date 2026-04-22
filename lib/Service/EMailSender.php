@@ -33,14 +33,14 @@ final class EMailSender implements IEMailSender {
 			throw new EMailNotSet($user);
 		}
 
-		$this->logger->debug("sending e-mail message to $email.");
+		$this->logger->debug("sending email message to $email.");
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
 		$user_at_cloud = $user->getDisplayName() . ' @ ' . $this->defaults->getName();
 		$template->setSubject($this->l10n->t('Login attempt for %s', [$user_at_cloud]));
 		$template->addHeader();
 		$template->addHeading($this->l10n->t('Your two-factor authentication code is: %s', [$code]));
-		$template->addBodyText($this->l10n->t('If you tried to login, please enter that code on %s. If you did not, somebody else did and knows your your e-mail address or username – and your password!', [$this->defaults->getName()]));
+		$template->addBodyText($this->l10n->t('If you tried to login, please enter that code on %s. If you did not, somebody else did and knows your your email address or username – and your password!', [$this->defaults->getName()]));
 		$template->addFooter();
 
 		$message = $this->mailer->createMessage();
@@ -50,7 +50,7 @@ final class EMailSender implements IEMailSender {
 		try {
 			$this->mailer->send($message);
 		} catch (Exception $e) {
-			$this->logger->error('failed sending e-mail message to user ' . $user->getUID() . '.', ['exception' => $e]);
+			$this->logger->error('failed sending email message to user ' . $user->getUID() . '.', ['exception' => $e]);
 			throw new SendEMailFailed(previous: $e);
 		}
 	}

@@ -12,23 +12,23 @@
 						type="switch"
 						:loading="loading"
 						@update:model-value="onUpdate">
-					{{ t('twofactor_email', 'Use two-factor authentication via e-mail') }}
+					{{ t('twofactor_email', 'Use two-factor authentication via email') }}
 				</NcCheckboxRadioSwitch>
 			</p>
 			<p v-if="store.enabled">
-				{{ t('twofactor_email', 'Codes will be sent to your primary e-mail address:') }} <b>{{ store.email }}</b>
+				{{ t('twofactor_email', 'Codes will be sent to your primary email address:') }} <b>{{ store.email }}</b>
 			</p>
 		</div>
 		<div v-else>
 			<span class="notice">
-				{{ t('twofactor_email', 'You cannot enable two-factor authentication via e-mail. You need to set a primary e-mail address (in your personal settings) first.') }}
+				{{ t('twofactor_email', 'You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first.') }}
 			</span>
 		</div>
 		<span v-if="store.error === 'no-email'" class="error">
-			{{ t('twofactor_email', 'Apparently your previously configured e-mail address just vanished.') }}
+			{{ t('twofactor_email', 'Apparently your previously configured email address just vanished.') }}
 		</span>
 		<span v-else-if="store.error === 'save-failed'" class="error">
-			{{ t('twofactor_email', 'Could not enable/disable two-factor authentication via e-mail.') }}
+			{{ t('twofactor_email', 'Could not enable/disable two-factor authentication via email.') }}
 		</span>
 		<span v-else-if="store.error" class="error">
 			{{ t('twofactor_email', 'Unhandled error!') }}

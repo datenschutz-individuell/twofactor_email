@@ -1,0 +1,7 @@
+{ "translations": {
+    "E-mail" : "電子郵件",
+    "Proceed" : "繼續",
+    "Authentication code" : "驗證碼",
+    "Submit" : "提交"
+},"pluralForm" :"nplurals=1; plural=0;"
+}

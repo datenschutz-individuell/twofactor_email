@@ -14,8 +14,8 @@ export const usePersonalSettingsStore = defineStore('personalSettings', {
 	state: () => ({
 		enabled: false,
 		hasEmail: false,
-		maskedEmail: 'UNEXPECTED ERROR: no e-mail address set',
-		email: 'UNEXPECTED ERROR: no e-mail address set',
+		maskedEmail: 'UNEXPECTED ERROR: no email address set',
+		email: 'UNEXPECTED ERROR: no email address set',
 		error: false,
 	}),
 	actions: {

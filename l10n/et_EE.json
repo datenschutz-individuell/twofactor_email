@@ -1,0 +1,7 @@
+{ "translations": {
+    "E-mail" : "E-post",
+    "Proceed" : "Jätka",
+    "Authentication code" : "Autentimiskood",
+    "Submit" : "Saada"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

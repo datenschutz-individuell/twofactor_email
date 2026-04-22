@@ -21,7 +21,7 @@ Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), pro
 
 ### Added
 
-- Limit sending e-mails
+- Limit sending emails
 
 ### Changed
 
@@ -87,7 +87,7 @@ Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), pro
 
 ### Added
 
-- Users can set up the two-factor e-mail provider at login if 2FA is enforced
+- Users can set up the two-factor email provider at login if 2FA is enforced
 
 ### Changed
 

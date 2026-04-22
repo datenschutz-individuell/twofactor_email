@@ -18,10 +18,10 @@ enum Notification: string {
 
 	public function getSubjectText(): string {
 		return match ($this) {
-			Notification::ENABLED_BY_USER => 'You enabled e-mail two-factor authentication for your account',
-			Notification::DISABLED_BY_USER => 'You disabled e-mail two-factor authentication for your account',
-			Notification::ENABLED_BY_ADMIN => 'E-mail two-factor authentication was enabled by an admin',
-			Notification::DISABLED_BY_ADMIN => 'E-mail two-factor authentication was disabled by an admin',
+			Notification::ENABLED_BY_USER => 'You enabled email two-factor authentication for your account',
+			Notification::DISABLED_BY_USER => 'You disabled email two-factor authentication for your account',
+			Notification::ENABLED_BY_ADMIN => 'Email two-factor authentication was enabled by an admin',
+			Notification::DISABLED_BY_ADMIN => 'Email two-factor authentication was disabled by an admin',
 		};
 	}
 }

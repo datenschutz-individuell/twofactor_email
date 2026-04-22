@@ -26,12 +26,12 @@ final class CleanUp extends Command {
 	protected function configure(): void {
 		$this
 			->setName('twofactor_email:cleanup')
-			->setDescription('Remove expired two-factor e-mail codes.');
+			->setDescription('Remove expired two-factor email codes.');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$io = new SymfonyStyle($input, $output);
-		$io->title('Removing expired two-factor e-mail codes');
+		$io->title('Removing expired two-factor email codes');
 		$this->codeStorage->deleteExpired();
 		$io->success('Done.');
 		return 0;

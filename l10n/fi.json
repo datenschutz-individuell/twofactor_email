@@ -1,0 +1,7 @@
+{ "translations": {
+    "E-mail" : "Sähköposti",
+    "Proceed" : "Jatka",
+    "Authentication code" : "Tunnistautumiskoodi",
+    "Submit" : "Lähetä"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

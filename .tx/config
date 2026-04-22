@@ -1,0 +1,9 @@
+[main]
+host     = https://www.transifex.com
+lang_map = hu_HU: hu, nb_NO: nb, sk_SK: sk, th_TH: th, ja_JP: ja, bg_BG: bg, cs_CZ: cs, fi_FI: fi
+
+[o:nextcloud:p:nextcloud:r:twofactor_email]
+file_filter = translationfiles/<lang>/twofactor_email.po
+source_file = translationfiles/templates/twofactor_email.pot
+source_lang = en
+type        = PO

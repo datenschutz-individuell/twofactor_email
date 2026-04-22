@@ -1,4 +1,4 @@
-# Two-Factor E-Mail Provider for Nextcloud
+# Two-Factor Email Provider for Nextcloud
 
 [Nextcloud](https://nextcloud.com/) supports web logins with a second factor
 ([two factor authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication#Factors),
@@ -6,20 +6,20 @@
 installed. 2FA kicks in after the primary authentication stage (typically
 username and password) were successful. This provider challenges the user to
 enter a randomly generated authentication code (aka one-time password, OTP,
-currently 6 digits). It sends that code to the user's primary e-mail address and
+currently 6 digits). It sends that code to the user's primary email address and
 expects the user to enter it on an additional 2nd step web login page.
 
 ### Installation, activation and usage
 
-As with any 2FA provider, two-factor e-mail must be installed from the
+As with any 2FA provider, two-factor email must be installed from the
 [Nextcloud app store](https://apps.nextcloud.com/apps/twofactor_email) and
 enabled by a Nextcloud server admin. Additionally, the Nextcloud must have a
-working e-mail server configured.
+working email server configured.
 
 The user may set up any of the installed providers or even multiple. This
-provider uses e-mail to send the code and thus can only be enabled if an e-mail
+provider uses email to send the code and thus can only be enabled if an email
 address is set in 'Personal info'. Mind that a user may not be able to log in
-if that e-mail address is invalid (or e-mail server setup of the Nextcloud is
+if that email address is invalid (or email server setup of the Nextcloud is
 not working properly).
 
 Admins with console access may enable and disable this provider for specified
@@ -28,7 +28,7 @@ groups) via Admin Settings. This is a Nextcloud feature and not specific to
 this provider. If enforced, users with no 2FA are prompted to enable any
 installed provider (that supports AtLogin setup – this provider supports it
 since v3). If the admin installs this provider and enforces 2FA, it should be
-ensured that each user does have a valid e-mail address.
+ensured that each user does have a valid email address.
 
 Mind that, once a user enabled any 2FA provider, they can no longer use their
 password in applications that don't support the web based 2FA login flow. For

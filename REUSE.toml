@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 version = 1
 SPDX-PackageName = "twofactor_email"
-SPDX-PackageSupplier = "Two-Factor e-mail Support <twofactor-email@datenschutz-individuell.de>"
+SPDX-PackageSupplier = "Two-Factor email Support <twofactor-email@datenschutz-individuell.de>"
 SPDX-PackageDownloadLocation = "https://github.com/datenschutz-individuell/twofactor_email"
 
 [[annotations]]
@@ -12,7 +12,7 @@ SPDX-FileCopyrightText = "2024-2026 Olav and Niklas Seyfarth, Contributors <http
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
-path = ["l10n/**.js", "l10n/**.json", "l10n/**.php"]
+path = [".tx/config", "l10n/**.js", "l10n/**.json", "l10n/**.php"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Translators <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
