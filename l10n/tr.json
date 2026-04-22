@@ -1,0 +1,7 @@
+{ "translations": {
+    "E-mail" : "E-posta",
+    "Proceed" : "İlerle",
+    "Authentication code" : "Doğrulama kodu",
+    "Submit" : "Gönder"
+},"pluralForm" :"nplurals=2; plural=(n > 1);"
+}

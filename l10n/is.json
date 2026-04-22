@@ -1,0 +1,7 @@
+{ "translations": {
+    "E-mail" : "Tölvupóstfang",
+    "Proceed" : "Halda áfram",
+    "Authentication code" : "Auðkenningarkóði",
+    "Submit" : "Senda inn"
+},"pluralForm" :"nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);"
+}

@@ -1,0 +1,7 @@
+{ "translations": {
+    "E-mail" : "Имейл",
+    "Proceed" : "Продължете",
+    "Authentication code" : "Удостоверителен код",
+    "Submit" : "Изпращане"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
