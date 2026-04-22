@@ -1,7 +1,7 @@
 {
   "name": "twofactor_email",
   "description": "Two-Factor Email Provider",
-  "version": "3.0.7-beta.1",
+  "version": "3.0.8-beta.1",
   "type": "module",
   "author": {
     "name": "Christoph Wurst",
