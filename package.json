@@ -1,6 +1,6 @@
 {
   "name": "twofactor_email",
-  "description": "Two-Factor e-mail Provider",
+  "description": "Two-Factor Email Provider",
   "version": "3.0.7-beta.1",
   "type": "module",
   "author": {

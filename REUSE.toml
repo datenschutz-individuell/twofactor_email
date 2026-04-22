@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 version = 1
 SPDX-PackageName = "twofactor_email"
-SPDX-PackageSupplier = "Two-Factor e-mail Support <twofactor-email@datenschutz-individuell.de>"
+SPDX-PackageSupplier = "Two-Factor email Support <twofactor-email@datenschutz-individuell.de>"
 SPDX-PackageDownloadLocation = "https://github.com/datenschutz-individuell/twofactor_email"
 
 [[annotations]]
