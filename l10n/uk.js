@@ -1,7 +1,7 @@
 OC.L10N.register(
     "twofactor_email",
     {
-    "E-mail" : "Електронна пошта",
+    "Email" : "Ел.пошта",
     "Proceed" : "Продовжити",
     "Authentication code" : "Код автентифікації",
     "Submit" : "Відправити"

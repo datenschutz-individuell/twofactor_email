@@ -1,7 +1,6 @@
 OC.L10N.register(
     "twofactor_email",
     {
-    "Email" : "อีเมล",
-    "Submit" : "ส่ง"
+    "Email" : "Email"
 },
 "nplurals=1; plural=0;");

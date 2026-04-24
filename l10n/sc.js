@@ -1,7 +1,7 @@
 OC.L10N.register(
     "twofactor_email",
     {
-    "E-mail" : "Posta eletrònica",
+    "Email" : "Posta eletrònica",
     "Authentication code" : "Còdighe de autenticatzione",
     "Submit" : "Imbia"
 },

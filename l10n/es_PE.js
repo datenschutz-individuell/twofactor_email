@@ -1,7 +1,7 @@
 OC.L10N.register(
     "twofactor_email",
     {
-    "E-mail" : "Correo electrónico",
+    "Email" : "Correo electrónico",
     "Authentication code" : "Código de autenticación",
     "Submit" : "Enviar"
 },

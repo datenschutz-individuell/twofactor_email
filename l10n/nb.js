@@ -1,7 +1,7 @@
 OC.L10N.register(
     "twofactor_email",
     {
-    "E-mail" : "E-post",
+    "Email" : "E-post",
     "Proceed" : "Fortsett",
     "Authentication code" : "Autentiseringskode",
     "Submit" : "Send inn"

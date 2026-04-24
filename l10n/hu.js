@@ -1,7 +1,7 @@
 OC.L10N.register(
     "twofactor_email",
     {
-    "E-mail" : "E-mail",
+    "Email" : "E-mail",
     "Proceed" : "Folytatás",
     "Authentication code" : "Hitelesítőkód",
     "Submit" : "Beküldés"

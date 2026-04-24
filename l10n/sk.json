@@ -1,4 +1,5 @@
 { "translations": {
+    "Email" : "E-mail",
     "Proceed" : "Pokračovať",
     "Authentication code" : "Overovací kód",
     "Submit" : "Odoslať"

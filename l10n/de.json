@@ -1,9 +1,0 @@
-{ "translations": {
-    "E-mail" : "E-Mail",
-    "Login attempt for %s" : "Anmeldeversuch für %s",
-    "Unhandled error!" : "Unbehandelter Fehler",
-    "Proceed" : "Fortsetzen",
-    "Authentication code" : "Authentifizierungscode",
-    "Submit" : "Übermitteln"
-},"pluralForm" :"nplurals=2; plural=(n != 1);"
-}

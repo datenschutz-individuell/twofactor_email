@@ -1,6 +1,7 @@
 OC.L10N.register(
     "twofactor_email",
     {
+    "Email" : "E-mail",
     "Proceed" : "Pokračovať",
     "Authentication code" : "Overovací kód",
     "Submit" : "Odoslať"

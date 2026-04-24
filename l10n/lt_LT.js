@@ -1,7 +1,7 @@
 OC.L10N.register(
     "twofactor_email",
     {
-    "E-mail" : "El. paštas",
+    "Email" : "El. paštas",
     "Proceed" : "Tęsti",
     "Authentication code" : "Tapatybės nustatymo kodas",
     "Submit" : "Pateikti"
