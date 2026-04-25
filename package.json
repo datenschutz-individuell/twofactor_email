@@ -75,7 +75,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "prettier": "^3.8.3",
-    "vite": "^7.1.9"
+    "vite": "^8.0.10"
   },
   "prettier": {
     "singleQuote": true,
