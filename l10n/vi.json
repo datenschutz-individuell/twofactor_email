@@ -1,0 +1,7 @@
+{ "translations": {
+    "Email" : "Thư điện tử",
+    "Proceed" : "Tiến hành",
+    "Authentication code" : "Mã xác thực",
+    "Submit" : "Gửi"
+},"pluralForm" :"nplurals=1; plural=0;"
+}

@@ -1,0 +1,7 @@
+{ "translations": {
+    "Email" : "Posta elektronikoa",
+    "Proceed" : "Jarraitu",
+    "Authentication code" : "Autentifikazio kodea",
+    "Submit" : "Bidali"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
