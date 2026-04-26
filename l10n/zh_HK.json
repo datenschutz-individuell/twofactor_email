@@ -1,6 +1,21 @@
 { "translations": {
     "Email" : "電郵地址",
+    "Authenticate by email" : "透過電郵驗證",
+    "Login attempt for %s" : "正試圖登入 %s 帳號",
+    "Your two-factor authentication code is: %s" : "您的雙重認證代碼是：%s",
+    "If you tried to login, please enter that code on %s. If you did not, somebody else did and knows your your email address or username – and your password!" : "如果你嘗試登入，請在 %s 輸入該驗證碼。若你沒有這樣做，則代表有其他人已嘗試登入，並且知道你的電郵地址或用戶名稱，以及你的密碼！",
+    "Two-Factor email provider" : "雙重認證電郵提供者",
+    "Email two-factor provider" : "電郵雙重認證提供者",
+    "### A Two-Factor-Auth Provider using email\n\nNextcloud supports web logins with a second factor (two-factor authentication,\n2FA). To support a certain type of 2FA, a \"2FA provider\" server app must be\ninstalled. 2FA kicks in after the primary authentication stage (typically\nusername and password) were successful. This provider challenges the user to\nenter a randomly generated authentication code (aka one-time password, OTP,\ncurrently 6 digits). It sends that code to the user's primary email address\nand expects the user to enter it on an additional 2nd step web login page.\n\n### Installation, activation and usage\n\nAs with any 2FA provider, two-factor email must be installed and enabled by a\nNextcloud server admin. Additionally, the Nextcloud must have a working email\nserver configured.\n\nThe user may set up any of the installed providers or even multiple. This\nprovider uses email to send the code and thus can only be enabled if an email\naddress is set in 'Personal info'. Mind that a user may not be able to log in\nif that email address is invalid (or email server setup of the Nextcloud is\nnot working properly).\n\nAdmins with console access may enable and disable this provider for specified\nusers via \"occ\" command. Admins may also enforce 2FA for all users (or specific\ngroups) via \"Admin Settings\". This is a Nextcloud feature and not specific to\nthis provider. If enforced, users with no 2FA are prompted to enable any\ninstalled provider (if they support that feature). This provider supports it\nsince v3. If the admin installs this provider and enforces 2FA, it should be\nensured that each user does have a valid email address.\n\nMind that, once a user enabled any 2FA provider, they can no longer use their\npassword in applications that don't support the web based 2FA login flow. For\nsuch applications, the user needs to create and use app passwords (to be found\nat the bottom of \"Personal Settings/Security\")." : "### 使用電郵的雙重驗證（2FA）提供者\nNextcloud 支援在網頁登入時使用第二重驗證（雙重驗證，2FA）。要支援某一種2FA方式，必須安裝相應的「2FA 提供者」伺服器應用程式。當主要驗證階段（通常為用戶名稱及密碼）成功後，系統便會啟動2FA。此提供者會要求用戶輸入一組隨機產生的驗證碼（即一次性密碼，OTP，現為6位數）。該驗證碼會發送到用戶的主要電郵地址，並要求用戶在第二步的網頁登入頁面中輸入。\n\n\n### 安裝、啟用與使用\n與所有2FA提供者一樣，電郵雙重驗證需由 Nextcloud 伺服器管理員安裝並啟用。此外，系統必須已正確設定可運作的電郵伺服器。\n\n用戶可以設定任何已安裝的2FA提供者，甚至同時使用多個。本提供者透過電郵發送驗證碼，因此只有在「個人資料（Personal info）」中已設定電郵地址時才可啟用。請注意，若該電郵地址無效（或Nextcloud的電郵伺服器設定不正確），用戶可能無法登入。\n\n具備主機控制台存取權的管理員，可透過「occ」指令為指定用戶啟用或停用此提供者。管理員亦可在「管理員設定（Admin Settings）」中為所有用戶（或特定群組）強制啟用2FA。此為 Nextcloud 的內建功能，並非此提供者專屬。若啟用強制2FA，尚未設定2FA的用戶會被提示啟用任何已安裝且支援該功能的提供者（本提供者自 v3 起支援）。若管理員安裝此提供者並強制啟用2FA，應確保每位用戶均已設定有效的電郵地址。\n\n請注意，一旦用戶啟用任何2FA提供者，便無法再於不支援網頁式2FA登入流程的應用程式中使用原本的密碼。對於這類應用程式，用戶需建立並使用應用程式密碼（可於「個人設定 / 安全性」頁面底部找到）。",
+    "You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first." : "你無法透過電郵啟用雙重驗證。請先在個人設定中設定主要電郵地址。",
+    "Could not enable/disable two-factor authentication via email." : "無法透過電郵啟用或停用雙重驗證。",
+    "Unhandled error!" : "錯誤不詳！",
+    "Codes will be sent to your primary email address:" : "驗證碼將會發送至你的主要電郵地址：",
     "Proceed" : "進行",
+    "Use two-factor authentication via email" : "使用電郵進行雙重驗證",
+    "Apparently your previously configured email address just vanished." : "你之前設定的電郵地址似乎已經消失了。",
+    "A new authentication code was just sent. Please enter it:" : "新的驗證碼已經發送。請輸入該驗證碼：",
+    "Enter the authentication code that was sent to you:" : "請輸入已發送給你的驗證碼：",
     "Authentication code" : "驗證碼",
     "Submit" : "遞交"
 },"pluralForm" :"nplurals=1; plural=0;"
