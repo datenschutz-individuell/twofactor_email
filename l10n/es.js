@@ -2,6 +2,7 @@ OC.L10N.register(
     "twofactor_email",
     {
     "Email" : "Correo electrónico",
+    "Your two-factor authentication code is: %s" : "Su código de autenticación de dos factores es: %s",
     "Proceed" : "Proceder",
     "Authentication code" : "Código de autentificación",
     "Submit" : "Enviar"
