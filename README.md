@@ -67,14 +67,11 @@ changed for edge cases. I will only release it in the app store when I am
 pretty sure it doesn't break things.
 
 We refrained from the possibility to be able to set an alternate address. You
-are free to contribute code that implements is. Make sure it doesn't break
-existing functionality though.
-
-If you have deeper Nextcloud framework knowledge and ideas for features, I
-suggest you rather create PRs here in v3 than in v2. If you know how to switch
-this v3 app to vue3 using nextcloud-vue v9+, please contact me or create a PR.
-My biggest concern is to build this app without ANY security warnings for all
-officially supported Nextcloud versions.
+are free to contribute code that implements it. Make sure it doesn't break
+existing functionality though. And keep PRs to ONE functionality so that we
+may review them cleanly. Please contribute to v3 and not v2, since v2 is only
+maintained for compatibility reasons and will only receive fixes.
 
 I try to review PRs timely. I will also make sure that there's a v2 release
-for all officially supported Nextcloud versions until this app is released.
+for all officially supported Nextcloud versions until this app is released as
+"stable" version. See open tasks in the [roadmap](https://github.com/datenschutz-individuell/twofactor_email/issues/7) to "release".
