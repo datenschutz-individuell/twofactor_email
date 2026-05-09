@@ -5,10 +5,11 @@
 # Changelog
 Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
-## 3.0.9-beta.1 (2026-05-09)
+## 3.0.9-beta.2 (2026-05-10)
 
 ### Added
 
+- Support for Nextcloud 34
 - New translations: de, de_DE, en_GB, et_EE, ga, lt_LT, pl, pt_BR, ru, sv, uz, zh_HK, zh_TW – a BIG "Thank you!" to all translators on transifex!
 
 ## 3.0.8-beta.1 (2026-04-22)
