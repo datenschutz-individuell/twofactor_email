@@ -59,7 +59,7 @@ at the bottom of "Personal Settings/Security").]]></description>
 	<screenshot small-thumbnail="https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/screenshots/select-auth_thumb.webp">https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/master/screenshots/challenge.webp</screenshot>
 	<dependencies>
 		<php min-version="8.1" max-version="8.5" />
-		<nextcloud min-version="32" max-version="33" />
+		<nextcloud min-version="32" max-version="34" />
 	</dependencies>
 	<two-factor-providers>
 		<provider>OCA\TwoFactorEMail\Provider\TwoFactorEMail</provider>
