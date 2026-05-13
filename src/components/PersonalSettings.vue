@@ -24,7 +24,10 @@
 				{{ t('twofactor_email', 'You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first.') }}
 			</span>
 		</div>
-		<span v-if="store.error === 'no-email'" class="error">
+    <span v-if="store.error === 'password-confirmation-failed'" class="error">
+      {{ t('twofactor_email', 'Password confirmation failed. Please try again.') }}
+    </span>
+    <span v-else-if="store.error === 'no-email'" class="error">
 			{{ t('twofactor_email', 'Apparently your previously configured email address just vanished.') }}
 		</span>
 		<span v-else-if="store.error === 'save-failed'" class="error">
@@ -53,20 +56,39 @@ const loading = ref(false)
 
 async function onUpdate() {
 	if (loading.value) {
-		// Ignore event
 		Logger.debug('still loading -> ignoring event')
 		return
 	}
-	loading.value = true
+  loading.value = true
 
-	try {
-		await confirmPassword()
-		await store.save()
-	} catch (error) {
-		console.error(error)
-	} finally {
-		loading.value = false
-	}
+  // Save the current "enabled" value to be used in the frontend in case of an error in the backend.
+  // Since the toggle already happened (only then onUpdate is called), that's the inverted value.
+  const previousState = !store.enabled
+
+  // Reset possible previous errors upon consecutive retries
+  store.$patch({ error: null })
+
+  try {
+    await confirmPassword()
+  } catch (passwordError) {
+    // password required but not correct or not given, e.g. aborted
+    store.enabled = previousState
+    store.$patch({ error: 'password-confirmation-failed' })
+    Logger.error('Password confirmation failed', passwordError)
+    loading.value = false
+    return
+  }
+
+  try {
+    await store.save()
+  } catch (saveError) {
+    // backend error while trying to persist
+    store.enabled = previousState
+    store.$patch({ error: 'save-failed' })
+    Logger.error('Could not persist settings', saveError)
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
