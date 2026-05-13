@@ -91,11 +91,3 @@ async function onUpdate() {
   }
 }
 </script>
-
-<style scoped>
-.loading {
-	display: inline-block;
-	vertical-align: middle;
-	margin-inline: -2px 1px;
-}
-</style>
