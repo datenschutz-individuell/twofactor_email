@@ -69,23 +69,25 @@ async function onUpdate() {
   store.$patch({ error: null })
 
   try {
-		await confirmPassword()
-    // confirmPassword successful (either no password required or correct password given)
-    try {
-      await store.save()
-    } catch (saveError) {
-      // backend error while trying to persist
-      store.enabled = previousState
-      store.$patch({ error: 'save-failed' })
-      Logger.error('Could not persist settings', saveError)
-    }
+    await confirmPassword()
   } catch (passwordError) {
-    // confirmPassword unsuccessful (password required but not correct or not given, e.g. aborted)
+    // password required but not correct or not given, e.g. aborted
     store.enabled = previousState
     store.$patch({ error: 'password-confirmation-failed' })
     Logger.error('Password confirmation failed', passwordError)
-	} finally {
-		loading.value = false
-	}
+    loading.value = false
+    return
+  }
+
+  try {
+    await store.save()
+  } catch (saveError) {
+    // backend error while trying to persist
+    store.enabled = previousState
+    store.$patch({ error: 'save-failed' })
+    Logger.error('Could not persist settings', saveError)
+  } finally {
+    loading.value = false
+  }
 }
 </script>
