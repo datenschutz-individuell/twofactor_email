@@ -9,7 +9,7 @@ enter a randomly generated authentication code (aka one-time password, OTP,
 currently 6 digits). It sends that code to the user's primary email address and
 expects the user to enter it on an additional 2nd step web login page.
 
-### Installation, activation and usage
+## Installation, activation and usage
 
 As with any 2FA provider, two-factor email must be installed from the
 [Nextcloud app store](https://apps.nextcloud.com/apps/twofactor_email) and
@@ -36,42 +36,44 @@ such applications, the user needs to create and use
 [app passwords](https://docs.nextcloud.com/server/stable/user_manual/en/session_management.html#managing-devices)
 (to be found at the bottom of Personal Settings/Security).
 
-## Building yourself and call for help
+## State of the app
 
-To build the app, check out the repo and use [krankerl](https://github.com/ChristophWurst/krankerl/)
-package` or follow these steps:
+This version 3.x.x ("v3") is the successor of the deprecated [twofactor_email](https://github.com/nursoda/twofactor_email/)
+app 2.x.x ("v2"). v2 will remain in the [Nextcloud App Store](https://apps.nextcloud.com/apps/twofactor_email) alongside v3 as
+long as upcoming security issues may be fixed with reasonable effort. After
+that, or after all supported Nextcloud versions may use v3, it will be pulled
+from the App Store. v3 is based on [twofactor_totp](https://github.com/nextcloud/twofactor_totp/) but has been refactored.
+
+The code is considered stable now. It only lacks some polishing and there are
+plans to further enhance functionality and security. See open tasks in the
+[roadmap](https://github.com/datenschutz-individuell/twofactor_email/issues/7). It migrates existing v2 settings to v3. Thus, there should be little
+user disturbance. But the look slightly changed, and some behaviour changed or
+was enhanced.
+
+## Contributions welcome
+
+This app is a community effort. Any offers to help are welcome, whether it's
+code enhancements, refactoring, better test coverage, new features, security
+audits, translations or good documentation, examples, etc.
+
+Prior to creating a PR, please discuss your idea in the [ideas collection issue](https://github.com/datenschutz-individuell/twofactor_email/issues/8).
+Make sure your PR sticks to ONE change (so that we may review it cleanly), and
+that it doesn't break existing functionality. We will do our best to timely
+review and comment PRs.
+
+This app takes advantage of the transifex Nextcloud community. If the app is
+not yet available in your language, please consider to create a transifex
+account and join the [Nextcloud translators community](https://explore.transifex.com/nextcloud/).
+
+If you have any questions, please contact [the current maintainers](https://github.com/datenschutz-individuell/CONTRIBUTORS.md).
+
+## Building yourself
+
+To build the app, check out the repo and use `krankerl package` or follow these
+steps:
 
 * `composer i --no-dev`
 * `npm ci`
 * `npm run build` or `npm run dev` [more info](https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/npm.html)
 
-Any offers to help are welcome, whether it's development, better test coverage
-or implementing new features, but also good documentation, examples, security
-audits, translations / integration in translation tools, etc.
-
-Please contact [the current maintainers](https://github.com/datenschutz-individuell/CONTRIBUTORS.md).
-
-## State of the app
-
-This version 3 ("v3") of the currently official [twofactor_email](https://github.com/nursoda/twofactor_email/)
-app version 2 ("v2") (available in the [Nextcloud App Store](https://apps.nextcloud.com/apps/twofactor_email))
-is meant to someday soon replace v2. v3 is based on [twofactor_totp](https://github.com/nextcloud/twofactor_totp/).
-My idea was to only modify what's necessary and to cherrypick all changes that
-reflect the Nextcloud framework changes. It turned out, that this may not have
-been my best idea. The code is merely stable now, thus lacking some polishing.
-Currently, this is NOT production quality yet, but public beta!
-
-This new app now migrates existing v2 settings to v3. Thus, there should be
-little user disturbance. Nevertheless, the look slightly changed, and behaviour
-changed for edge cases. I will only release it in the app store when I am
-pretty sure it doesn't break things.
-
-We refrained from the possibility to be able to set an alternate address. You
-are free to contribute code that implements it. Make sure it doesn't break
-existing functionality though. And keep PRs to ONE functionality so that we
-may review them cleanly. Please contribute to v3 and not v2, since v2 is only
-maintained for compatibility reasons and will only receive fixes.
-
-I try to review PRs timely. I will also make sure that there's a v2 release
-for all officially supported Nextcloud versions until this app is released as
-"stable" version. See open tasks in the [roadmap](https://github.com/datenschutz-individuell/twofactor_email/issues/7) to "release".
+<small>[krankerl](https://github.com/ChristophWurst/krankerl/) is the tool proposed by Nextcloud to build apps.</small>
