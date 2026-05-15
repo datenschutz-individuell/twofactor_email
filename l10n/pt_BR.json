@@ -13,6 +13,7 @@
     "Codes will be sent to your primary email address:" : "Os códigos serão enviados para o seu endereço de e-mail principal:",
     "Proceed" : "Prosseguir",
     "Use two-factor authentication via email" : "Usar a autenticação de dois fatores por e-mail",
+    "Password confirmation failed. Please try again." : "A confirmação da senha falhou. Por favor, tente novamente.",
     "Apparently your previously configured email address just vanished." : "Parece que o endereço de e-mail que você havia configurado anteriormente simplesmente desapareceu.",
     "A new authentication code was just sent. Please enter it:" : "Acabamos de enviar um novo código de autenticação. Digite-o:",
     "Enter the authentication code that was sent to you:" : "Digite o código de autenticação que lhe foi enviado:",

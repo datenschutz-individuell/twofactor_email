@@ -13,6 +13,7 @@
     "Codes will be sent to your primary email address:" : "Kodai bus išsiųsti į jūsų pagrindinį el. pašto adresą:",
     "Proceed" : "Tęsti",
     "Use two-factor authentication via email" : "Naudokite dviejų veiksnių autentifikavimą el. paštu",
+    "Password confirmation failed. Please try again." : "Slaptažodžio patvirtinimas nepavyko. Bandykite dar kartą.",
     "Apparently your previously configured email address just vanished." : "Matyt, jūsų anksčiau sukonfigūruotas el. pašto adresas tiesiog dingo.",
     "A new authentication code was just sent. Please enter it:" : "Tik ką buvo išsiųstas naujas patvirtinimo kodas. Įveskite jį:",
     "Enter the authentication code that was sent to you:" : "Įveskite jums atsiųstą autentifikavimo kodą:",

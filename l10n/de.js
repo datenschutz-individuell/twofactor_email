@@ -15,6 +15,7 @@ OC.L10N.register(
     "Codes will be sent to your primary email address:" : "Codes werden an deine primäre E-Mail-Adresse gesendet:",
     "Proceed" : "Fortsetzen",
     "Use two-factor authentication via email" : "Zwei-Faktor-Authentifizierung mittels E-Mail benutzen",
+    "Password confirmation failed. Please try again." : "Passwortbestätigung fehlgeschlagen. Bitte erneut versuchen.",
     "Apparently your previously configured email address just vanished." : "Anscheinend ist deine zuvor eingerichtete E-Mail-Adresse einfach verschwunden.",
     "A new authentication code was just sent. Please enter it:" : "Gerade wurde ein neuer Bestätigungscode gesendet. Bitte diesen eingeben:",
     "Enter the authentication code that was sent to you:" : "Gebe den Bestätigungscode ein, den du erhalten hast:",

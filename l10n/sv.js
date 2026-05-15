@@ -15,6 +15,7 @@ OC.L10N.register(
     "Codes will be sent to your primary email address:" : "Koderna skickas till din primära e-postadress:",
     "Proceed" : "Fortsätt",
     "Use two-factor authentication via email" : "Använd tvåfaktorsautentisering via e-post",
+    "Password confirmation failed. Please try again." : "Lösenordsbekräftelse misslyckades. Försök igen.",
     "Apparently your previously configured email address just vanished." : "Det verkar som om din tidigare angivna e-postadress plötsligt har försvunnit.",
     "A new authentication code was just sent. Please enter it:" : "En ny verifieringskod har just skickats. Ange den här:",
     "Enter the authentication code that was sent to you:" : "Ange den verifieringskod som du har fått:",

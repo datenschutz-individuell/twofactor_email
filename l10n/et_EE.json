@@ -13,6 +13,7 @@
     "Codes will be sent to your primary email address:" : "Autentimiskoodid saadetakse sinu põhilisele e-postiaadressile:",
     "Proceed" : "Jätka",
     "Use two-factor authentication via email" : "Kasuta kaheastmelist autentimist e-posti abil",
+    "Password confirmation failed. Please try again." : "Salasõna kinnitamine ei õnnestunud. Palun proovi uuesti.",
     "Apparently your previously configured email address just vanished." : "Tundub, et sinu poolt varem seadistatud e-posti aadress on kuidagi kadunud.",
     "A new authentication code was just sent. Please enter it:" : "Just saatsime sulle uue autentimiskoodi. Palun sisesta ta siia:",
     "Enter the authentication code that was sent to you:" : "Sisesta sulle saadetud autentimiskood:",
