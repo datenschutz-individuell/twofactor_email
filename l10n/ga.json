@@ -13,6 +13,7 @@
     "Codes will be sent to your primary email address:" : "Seolfar cóid chuig do phríomhsheoladh ríomhphoist:",
     "Proceed" : "Lean ar aghaidh",
     "Use two-factor authentication via email" : "Bain úsáid as fíordheimhniú dhá fhachtóir trí ríomhphost",
+    "Password confirmation failed. Please try again." : "Theip ar dheimhniú an phasfhocail. Déan iarracht arís.",
     "Apparently your previously configured email address just vanished." : "Is cosúil gur imigh do sheoladh ríomhphoist a bhí cumraithe roimhe seo as radharc.",
     "A new authentication code was just sent. Please enter it:" : "Seoladh cód fíordheimhnithe nua díreach. Cuir isteach é le do thoil:",
     "Enter the authentication code that was sent to you:" : "Cuir isteach an cód fíordheimhnithe a seoladh chugat:",
