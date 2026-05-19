@@ -13,6 +13,7 @@
     "Codes will be sent to your primary email address:" : "驗證碼將會寄送至您的主要電子郵件地址：",
     "Proceed" : "繼續",
     "Use two-factor authentication via email" : "使用電子郵件進行兩階段驗證",
+    "Password confirmation failed. Please try again." : "密碼確認失敗。請重試。",
     "Apparently your previously configured email address just vanished." : "看來您先前設定的電子郵件地址不知為何消失了。",
     "A new authentication code was just sent. Please enter it:" : "已寄送新的驗證碼。請輸入：",
     "Enter the authentication code that was sent to you:" : "請輸入已寄送給您的驗證碼：",
