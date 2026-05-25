@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Controller;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
+use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
-use OCP\AppFramework\Http\Attribute\PasswordConfirmationRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
 use OCP\IAppConfig;
@@ -27,7 +27,8 @@ final class AdminSettingsController extends ALoginSetupController {
 	public function __construct(
 		string $appName,
 		IRequest $request,
-		private IAppConfig $appConfig,
+        private IAppConfig $appConfig,
+        private IAppSettings $appSettings,
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -37,7 +38,7 @@ final class AdminSettingsController extends ALoginSetupController {
         $this->appConfig->setValueInt(Application::APP_ID, 'code_valid_minutes', $codeValidMinutes);
 
 		return new JSONResponse([
-			'codeValidMinutes' => $this->appConfig->getValueInt(Application::APP_ID, 'code_valid_minutes'),
+			'codeValidMinutes' => $this->appSettings->getCodeValidMinutes(),
 		]);
 	}
 }

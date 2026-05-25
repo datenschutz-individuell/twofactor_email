@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Settings;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
-use OCA\TwoFactorEMail\Service\ConstantAppSettings;
+use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IAppConfig;
@@ -19,15 +19,14 @@ use OCP\Settings\ISettings;
 
 class AdminSettings implements ISettings {
     public function __construct(
-        private ConstantAppSettings $constantAppSettings,
+        private IAppSettings $appSettings,
         private IInitialState $initialState,
-        private IAppConfig $appConfig,
-        private IL10N $l10n,
+        private IL10N         $l10n,
     ) {
     }
 
     public function getForm(): TemplateResponse {
-        $this->initialState->provideInitialState('codeValidMinutes', $this->appConfig->getValueInt(Application::APP_ID, 'code_valid_minutes', $this->constantAppSettings->getCodeValidMinutes()));
+        $this->initialState->provideInitialState('codeValidMinutes', $this->appSettings->getCodeValidMinutes());
         return new TemplateResponse(Application::APP_ID, 'AdminSettings', renderAs: TemplateResponse::RENDER_AS_BLANK);
     }
 

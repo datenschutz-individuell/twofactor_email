@@ -9,12 +9,21 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Service;
 
-final class ConstantAppSettings implements IAppSettings {
-	public function getCodeLength(): int {
+use OCA\TwoFactorEMail\AppInfo\Application;
+use OCP\IAppConfig;
+
+final class AppSettings implements IAppSettings {
+
+    public function __construct(
+        private IAppConfig $appConfig,
+    ) {
+    }
+
+    public function getCodeLength(): int {
 		return 6;
 	}
 	public function getCodeValidMinutes(): int {
-		return 10;
+        return $this->appConfig->getValueInt(Application::APP_ID, 'code_valid_minutes', 10);
 	}
 	public function getSendRateLimitAttempts(): int {
 		return 10;

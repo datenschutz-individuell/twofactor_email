@@ -14,7 +14,7 @@ use OCA\TwoFactorEMail\Listener\EMailDeleted;
 use OCA\TwoFactorEMail\Listener\StateChangeActivity;
 use OCA\TwoFactorEMail\Listener\StateChangeRegistryUpdater;
 use OCA\TwoFactorEMail\Service\CodeStorage;
-use OCA\TwoFactorEMail\Service\ConstantAppSettings;
+use OCA\TwoFactorEMail\Service\AppSettings;
 use OCA\TwoFactorEMail\Service\EMailAddressMasker;
 use OCA\TwoFactorEMail\Service\EMailSender;
 use OCA\TwoFactorEMail\Service\IAppSettings;
@@ -43,7 +43,7 @@ final class Application extends App implements IBootstrap {
 	public function register(IRegistrationContext $context): void {
 		include_once __DIR__ . '/../../vendor/autoload.php';
 
-		$context->registerServiceAlias(IAppSettings::class, ConstantAppSettings::class);
+		$context->registerServiceAlias(IAppSettings::class, AppSettings::class);
 		$context->registerServiceAlias(ILoginChallenge::class, LoginChallenge::class);
 		$context->registerServiceAlias(ICodeGenerator::class, NumericalCodeGenerator::class);
 		$context->registerServiceAlias(ICodeStorage::class, CodeStorage::class);
