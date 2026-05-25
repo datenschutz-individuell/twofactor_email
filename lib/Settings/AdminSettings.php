@@ -27,7 +27,7 @@ class AdminSettings implements ISettings {
     }
 
     public function getForm(): TemplateResponse {
-        $this->initialState->provideInitialState('codeValidMinutes', $this->appConfig->getValueInt(Application::APP_ID, 'code_valid_minutes', $this->constantAppSettings->getCodeValidSeconds() * 60));
+        $this->initialState->provideInitialState('codeValidMinutes', $this->appConfig->getValueInt(Application::APP_ID, 'code_valid_minutes', $this->constantAppSettings->getCodeValidMinutes()));
         return new TemplateResponse(Application::APP_ID, 'AdminSettings', renderAs: TemplateResponse::RENDER_AS_BLANK);
     }
 

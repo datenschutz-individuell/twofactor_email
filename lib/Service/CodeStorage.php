@@ -22,7 +22,7 @@ final class CodeStorage implements ICodeStorage {
 	}
 
 	public function readCode(string $userId): ?string {
-		$expiresBefore = time() - $this->settings->getCodeValidSeconds();
+		$expiresBefore = time() - $this->settings->getCodeValidMinutes() * 60;
 		$createdAt = $this->config->getValueInt($userId, Application::APP_ID, self::KEY_CREATED_AT);
 		if ($createdAt < $expiresBefore) {
 			$this->deleteCode($userId);
@@ -49,7 +49,7 @@ final class CodeStorage implements ICodeStorage {
 	}
 
 	public function deleteExpired(): void {
-		$expiresBefore = time() - $this->settings->getCodeValidSeconds();
+		$expiresBefore = time() - $this->settings->getCodeValidMinutes();
 		$creationTime = $this->config->getValuesByUsers(Application::APP_ID, self::KEY_CREATED_AT, ValueType::INT);
 
 		foreach ($creationTime as $userId => $createdAt) {

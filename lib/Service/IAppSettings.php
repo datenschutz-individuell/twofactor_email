@@ -17,9 +17,9 @@ interface IAppSettings {
 	/**
 	 * How long shall a stored 2FA code be valid.
 	 *
-	 * @return int seconds of validity
+	 * @return int minutes of validity
 	 */
-	public function getCodeValidSeconds(): int;
+	public function getCodeValidMinutes(): int;
 
 	/**
 	 * How many emails may be sent during a certain period.
