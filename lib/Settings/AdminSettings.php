@@ -13,20 +13,24 @@ use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
-use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\Settings\ISettings;
 
 class AdminSettings implements ISettings {
     public function __construct(
-        private IAppSettings $appSettings,
+        private IAppSettings  $appSettings,
         private IInitialState $initialState,
         private IL10N         $l10n,
     ) {
     }
 
     public function getForm(): TemplateResponse {
-        $this->initialState->provideInitialState('codeValidMinutes', $this->appSettings->getCodeValidMinutes());
+        $this->initialState->provideInitialState('codeLength',                 $this->appSettings->getCodeLength());
+        $this->initialState->provideInitialState('codeValidMinutes',           $this->appSettings->getCodeValidMinutes());
+        $this->initialState->provideInitialState('sendRateLimitAttempts',      $this->appSettings->getSendRateLimitAttempts());
+        $this->initialState->provideInitialState('sendRateLimitPeriodSeconds', $this->appSettings->getSendRateLimitPeriodSeconds());
+        $this->initialState->provideInitialState('eMailTemplate',              $this->appSettings->getEMailTemplate());
+
         return new TemplateResponse(Application::APP_ID, 'AdminSettings', renderAs: TemplateResponse::RENDER_AS_BLANK);
     }
 

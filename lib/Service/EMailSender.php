@@ -19,39 +19,49 @@ use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
 
 final class EMailSender implements IEMailSender {
-	public function __construct(
-		private LoggerInterface $logger,
-		private IL10N $l10n,
-		private IMailer $mailer,
-		private Defaults $defaults,
-	) {
-	}
+    public function __construct(
+        private LoggerInterface $logger,
+        private IL10N           $l10n,
+        private IMailer         $mailer,
+        private Defaults        $defaults,
+        private IAppSettings    $appSettings,  // ← new: provides the configurable email template
+    ) {
+    }
 
-	public function sendChallengeEMail(IUser $user, string $code): void {
-		$email = $user->getEMailAddress();
-		if ($email === null) {
-			throw new EMailNotSet($user);
-		}
+    public function sendChallengeEMail(IUser $user, string $code): void {
+        $email = $user->getEMailAddress();
+        if ($email === null) {
+            throw new EMailNotSet($user);
+        }
 
-		$this->logger->debug("sending email message to $email.");
+        $this->logger->debug("sending email message to $email.");
 
-		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
-		$user_at_cloud = $user->getDisplayName() . ' @ ' . $this->defaults->getName();
-		$template->setSubject($this->l10n->t('Login attempt for %s', [$user_at_cloud]));
-		$template->addHeader();
-		$template->addHeading($this->l10n->t('Your two-factor authentication code is: %s', [$code]));
-		$template->addBodyText($this->l10n->t('If you tried to login, please enter that code on %s. If you did not, somebody else did and knows your your email address or username – and your password!', [$this->defaults->getName()]));
-		$template->addFooter();
+        $cloud = $this->defaults->getName();
+        $userAtCloud = $user->getDisplayName() . ' @ ' . $cloud;
 
-		$message = $this->mailer->createMessage();
-		$message->setTo([ $email => $user->getDisplayName() ]);
-		$message->useTemplate($template);
+        // Replace placeholders in the admin-configurable template
+        $bodyText = str_replace(
+            ['{code}', '{user}', '{cloud}'],
+            [$code, $user->getDisplayName(), $cloud],
+            $this->appSettings->getEMailTemplate()
+        );
 
-		try {
-			$this->mailer->send($message);
-		} catch (Exception $e) {
-			$this->logger->error('failed sending email message to user ' . $user->getUID() . '.', ['exception' => $e]);
-			throw new SendEMailFailed(previous: $e);
-		}
-	}
+        $template = $this->mailer->createEMailTemplate('twofactor_email.send');
+        $template->setSubject($this->l10n->t('Login attempt for %s', [$userAtCloud]));
+        $template->addHeader();
+        $template->addHeading($this->l10n->t('Your two-factor authentication code is: %s', [$code]));
+        $template->addBodyText($bodyText);
+        $template->addFooter();
+
+        $message = $this->mailer->createMessage();
+        $message->setTo([$email => $user->getDisplayName()]);
+        $message->useTemplate($template);
+
+        try {
+            $this->mailer->send($message);
+        } catch (Exception $e) {
+            $this->logger->error('failed sending email message to user ' . $user->getUID() . '.', ['exception' => $e]);
+            throw new SendEMailFailed(previous: $e);
+        }
+    }
 }

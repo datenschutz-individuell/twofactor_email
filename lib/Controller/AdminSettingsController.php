@@ -15,30 +15,62 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Controller;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
-use OCA\TwoFactorEMail\Service\IAppSettings;
+use OCA\TwoFactorEMail\Service\IAppSettings; // superseeds IAppConfig: loads settings from DB, else uses default
 use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
-use OCP\IAppConfig;
+use OCP\IAppConfig; // (still) necessary to write (typed) settings since IAppConfig does not (yet) implement setters
 use OCP\IRequest;
 
 final class AdminSettingsController extends ALoginSetupController {
 
-	public function __construct(
-		string $appName,
-		IRequest $request,
-        private IAppConfig $appConfig,
+    public function __construct(
+        string       $appName,
+        IRequest     $request,
+        private IAppConfig   $appConfig,
         private IAppSettings $appSettings,
-	) {
-		parent::__construct($appName, $request);
-	}
+    ) {
+        parent::__construct($appName, $request);
+    }
 
-	#[AuthorizedAdminSetting(settings: 'OCA\TwoFactorEMail\Settings\AdminSettings')]
-	public function update(int $codeValidMinutes): JSONResponse {
-        $this->appConfig->setValueInt(Application::APP_ID, 'code_valid_minutes', $codeValidMinutes);
+    #[AuthorizedAdminSetting(settings: 'OCA\TwoFactorEMail\Settings\AdminSettings')]
+    public function update(
+        int    $codeLength,
+        int    $codeValidMinutes,
+        int    $sendRateLimitAttempts,
+        int    $sendRateLimitPeriodSeconds,
+        string $eMailTemplate,
+    ): JSONResponse {
+        $this->appConfig->setValueInt(Application::APP_ID,    'code_length',                    $codeLength);
+        $this->appConfig->setValueInt(Application::APP_ID,    'code_valid_minutes',             $codeValidMinutes);
+        $this->appConfig->setValueInt(Application::APP_ID,    'send_rate_limit_attempts',       $sendRateLimitAttempts);
+        $this->appConfig->setValueInt(Application::APP_ID,    'send_rate_limit_period_seconds', $sendRateLimitPeriodSeconds);
+        $this->appConfig->setValueString(Application::APP_ID, 'email_template',                 $eMailTemplate);
 
-		return new JSONResponse([
-			'codeValidMinutes' => $this->appSettings->getCodeValidMinutes(),
-		]);
-	}
+        return new JSONResponse([
+            'codeLength'                 => $this->appSettings->getCodeLength(),
+            'codeValidMinutes'           => $this->appSettings->getCodeValidMinutes(),
+            'sendRateLimitAttempts'      => $this->appSettings->getSendRateLimitAttempts(),
+            'sendRateLimitPeriodSeconds' => $this->appSettings->getSendRateLimitPeriodSeconds(),
+            'eMailTemplate'              => $this->appSettings->getEMailTemplate(),
+        ]);
+    }
+
+    #[AuthorizedAdminSetting(settings: 'OCA\TwoFactorEMail\Settings\AdminSettings')]
+    public function reset(): JSONResponse {
+        $this->appConfig->deleteKey(Application::APP_ID, 'code_length');
+        $this->appConfig->deleteKey(Application::APP_ID, 'code_valid_minutes');
+        $this->appConfig->deleteKey(Application::APP_ID, 'send_rate_limit_attempts');
+        $this->appConfig->deleteKey(Application::APP_ID, 'send_rate_limit_period_seconds');
+        $this->appConfig->deleteKey(Application::APP_ID, 'email_template');
+
+        // Return the effective defaults so the frontend can update immediately
+        return new JSONResponse([
+            'codeLength'                 => $this->appSettings->getCodeLength(),
+            'codeValidMinutes'           => $this->appSettings->getCodeValidMinutes(),
+            'sendRateLimitAttempts'      => $this->appSettings->getSendRateLimitAttempts(),
+            'sendRateLimitPeriodSeconds' => $this->appSettings->getSendRateLimitPeriodSeconds(),
+            'eMailTemplate'              => $this->appSettings->getEMailTemplate(),
+        ]);
+    }
 }

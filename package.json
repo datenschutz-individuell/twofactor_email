@@ -20,14 +20,13 @@
       "url": "https://github.com/seyfahni"
     }
   ],
-  "contributors":
-    [
-      {
-        "name": "Nico Kluge (dev to clone from twofactor_totp)",
-        "email": "nico.kluge@klugecoded.com",
-        "url": "https://www.klugecoded.com/"
-      }
-    ],
+  "contributors": [
+    {
+      "name": "Nico Kluge (dev to clone from twofactor_totp)",
+      "email": "nico.kluge@klugecoded.com",
+      "url": "https://www.klugecoded.com/"
+    }
+  ],
   "license": "AGPL-3.0-or-later",
   "homepage": "https://github.com/datenschutz-individuell/twofactor_email",
   "bugs": {
@@ -51,13 +50,13 @@
     "@nextcloud/auth": "^2.6.0",
     "@nextcloud/axios": "^2.5.1",
     "@nextcloud/initial-state": "^3.0.0",
-    "@nextcloud/logger": "^3.0.2",
     "@nextcloud/l10n": "^3.4.0",
+    "@nextcloud/logger": "^3.0.2",
     "@nextcloud/password-confirmation": "^6.0.0",
     "@nextcloud/router": "^3.0.1",
     "@nextcloud/vue": "^9.0.0",
-    "vue": "^3.5.22",
-    "pinia": "^3.0.3"
+    "pinia": "^3.0.3",
+    "vue": "^3.5.22"
   },
   "browserslist": [
     "extends @nextcloud/browserslist-config"
@@ -67,6 +66,7 @@
     "npm": "^11.0.0"
   },
   "devDependencies": {
+    "@mdi/js": "^7.4.47",
     "@nextcloud/browserslist-config": "^3.0.1",
     "@nextcloud/eslint-config": "^8.4.2",
     "@nextcloud/prettier-config": "^1.2.0",

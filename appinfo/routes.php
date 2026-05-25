@@ -8,20 +8,26 @@ declare(strict_types=1);
  */
 
 /*
- * Nextcloud USES the class 'StateController(.php)' as the 'name' refers to 'State' here.
- * 'update' is a method thereof.
+ * Nextcloud USES the class 'StateController(.php)' as the 'name' refers to 'State' here. So they must match, and
+ * the controller MUST be named <(route)name>Controller.php. 'update' is a method thereof.
  */
 
 return [
 	'routes' => [
         [
             'name' => 'State#update',
-            'url' => '/personal_settings/state',
+            'url' => '/personal/save',
             'verb' => 'POST',
-        ],		[
+        ],
+        [
             'name' => 'AdminSettings#update',
-            'url' => '/settings/admin',
+            'url' => '/admin/save',
             'verb' => 'POST',
+        ],
+        [
+            'name' => 'AdminSettings#reset',
+            'url' => '/admin/reset',
+            'verb' => 'POST'
         ],
 	]
 ];
