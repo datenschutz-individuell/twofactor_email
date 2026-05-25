@@ -33,7 +33,6 @@ final class AdminSettingsController extends ALoginSetupController {
 	}
 
 	#[AuthorizedAdminSetting(settings: 'OCA\TwoFactorEMail\Settings\AdminSettings')]
-	#[PasswordConfirmationRequired]
 	public function update(int $codeValidMinutes): JSONResponse {
         $this->appConfig->setValueInt(Application::APP_ID, 'code_valid_minutes', $codeValidMinutes);
 
