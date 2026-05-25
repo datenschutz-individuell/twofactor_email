@@ -10,7 +10,9 @@
                    label="Code Validity in Minutes"
                    type="number"
                    :loading="loading"
-                   @update:model-value="onUpdate">
+                   :success="store.success === true"
+                   :error="store.success === false"
+                   @change:model-value="onUpdate">
       </NcTextField>
     </NcSettingsSection>
   </div>

@@ -5,8 +5,8 @@
 
 import { createPinia, defineStore } from 'pinia'
 import { loadState } from '@nextcloud/initial-state'
-
-import {persist, persistAdminSettings} from './services/StateManager.js'
+import Logger from "./Logger.js"
+import { persist, persistAdminSettings } from './services/StateManager.js'
 
 export const pinia = createPinia()
 
@@ -51,6 +51,7 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 	state: () => ({
 		codeValidMinutes: null,
 		error: false,
+		success: null,
 	}),
 	actions: {
 		/**
@@ -71,14 +72,12 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 			const result = await persistAdminSettings({
 				codeValidMinutes: this.codeValidMinutes,
 			})
+
 			this.$patch({
 				codeValidMinutes: result.codeValidMinutes ?? this.codeValidMinutes,
 				error: result.error,
+				success: typeof result.error !== 'string',
 			})
-		},
-		async enable() {
-			this.enabled = true
-			await this.save()
 		},
 	},
 })
