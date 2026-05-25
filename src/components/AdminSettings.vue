@@ -6,7 +6,12 @@
 <template>
   <div id="twofactor_email-admin_settings">
     <NcSettingsSection :name="t('twofactor_email', 'Two-Factor email provider')">
-      <NcTextField v-model="store.codeValidMinutes" type="number" label="Code Validity in Minutes"></NcTextField>
+      <NcTextField v-model="store.codeValidMinutes"
+                   label="Code Validity in Minutes"
+                   type="number"
+                   :loading="loading"
+                   @update:model-value="onUpdate">
+      </NcTextField>
     </NcSettingsSection>
   </div>
 </template>
