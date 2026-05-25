@@ -6,7 +6,7 @@
 import { createPinia, defineStore } from 'pinia'
 import { loadState } from '@nextcloud/initial-state'
 
-import { persist } from './services/StateManager.js'
+import {persist, persistAdminSettings} from './services/StateManager.js'
 
 export const pinia = createPinia()
 
@@ -37,6 +37,42 @@ export const usePersonalSettingsStore = defineStore('personalSettings', {
 			const result = await persist(this.enabled)
 			this.$patch({
 				enabled: result.enabled ?? this.enabled,
+				error: result.error,
+			})
+		},
+		async enable() {
+			this.enabled = true
+			await this.save()
+		},
+	},
+})
+
+export const useAdminSettingsStore = defineStore('adminSettings', {
+	state: () => ({
+		codeValidMinutes: null,
+		error: false,
+	}),
+	actions: {
+		/**
+		 * Loads the initial state from Nextcloud into the Store.
+		 * Only tries to fetch the given keys.
+		 * All initial state keys must be the same as in the store.
+		 *
+		 * @param {string} keys keys to load from initial state
+		 */
+		loadInitialState(...keys) {
+			const initialState = {}
+			for (const key of keys) {
+				initialState[key] = loadState('twofactor_email', key)
+			}
+			this.$patch(initialState)
+		},
+		async save() {
+			const result = await persistAdminSettings({
+				codeValidMinutes: this.codeValidMinutes,
+			})
+			this.$patch({
+				codeValidMinutes: result.codeValidMinutes ?? this.codeValidMinutes,
 				error: result.error,
 			})
 		},

@@ -29,3 +29,19 @@ export function persist(enabled) {
 			return { error: 'save-failed' }
 		})
 }
+
+export function persistAdminSettings(settings) {
+	const url = generateUrl('/apps/twofactor_email/settings/admin')
+
+	Logger.debug('sending two-factor email admin settings', settings)
+	return Axios.post(url, settings)
+		.then(resp => {
+			if (resp.status !== 200) {
+				return { error: 'save-failed' }
+			} else {
+				return resp.data
+			}
+		}).catch(_ => {
+			return { error: 'save-failed' }
+		})
+}

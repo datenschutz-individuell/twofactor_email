@@ -14,10 +14,14 @@ declare(strict_types=1);
 
 return [
 	'routes' => [
-		[
-			'name' => 'State#update',
-			'url' => '/personal_settings/state',
-			'verb' => 'POST',
-		],
+        [
+            'name' => 'State#update',
+            'url' => '/personal_settings/state',
+            'verb' => 'POST',
+        ],		[
+            'name' => 'AdminSettings#update',
+            'url' => '/settings/admin',
+            'verb' => 'POST',
+        ],
 	]
 ];
