@@ -16,6 +16,7 @@ namespace OCA\TwoFactorEMail\Controller;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Service\IAppSettings; // superseeds IAppConfig: loads settings from DB, else uses default
+use OCA\TwoFactorEMail\Settings\AdminSettings;
 use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
@@ -33,7 +34,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		parent::__construct($appName, $request);
 	}
 
-	#[AuthorizedAdminSetting(settings: 'OCA\TwoFactorEMail\Settings\AdminSettings')]
+    #[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function update(
 		int $codeLength,
 		int $codeValidMinutes,
@@ -56,7 +57,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		]);
 	}
 
-	#[AuthorizedAdminSetting(settings: 'OCA\TwoFactorEMail\Settings\AdminSettings')]
+    #[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function reset(): JSONResponse {
 		$this->appConfig->deleteKey(Application::APP_ID, 'code_length');
 		$this->appConfig->deleteKey(Application::APP_ID, 'code_valid_minutes');
