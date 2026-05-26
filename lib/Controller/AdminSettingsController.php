@@ -34,7 +34,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		parent::__construct($appName, $request);
 	}
 
-    #[AuthorizedAdminSetting(settings: AdminSettings::class)]
+	#[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function update(
 		int $codeLength,
 		int $codeValidMinutes,
@@ -57,7 +57,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		]);
 	}
 
-    #[AuthorizedAdminSetting(settings: AdminSettings::class)]
+	#[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function reset(): JSONResponse {
 		$this->appConfig->deleteKey(Application::APP_ID, 'code_length');
 		$this->appConfig->deleteKey(Application::APP_ID, 'code_valid_minutes');
