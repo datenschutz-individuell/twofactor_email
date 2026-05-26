@@ -26,8 +26,8 @@
         <label class="email-template-field__label">
           {{ t('twofactor_email', 'Email Template') }}
         </label>
-        <NcTextArea class="email-template-field__textarea"
-                    v-model="fields.eMailTemplate.inputValue"
+        <NcTextArea v-model="fields.eMailTemplate.inputValue"
+                    class="email-template-field__textarea"
                     :label="t('twofactor_email', 'Email Template')"
                     :hide-label="true"
                     :loading="fields.eMailTemplate.loading"
@@ -96,7 +96,7 @@ const fields = reactive(
  * The min="1" attribute handles values after entry; this blocks them
  * during typing so invalid characters never appear in the field.
  *
- * @param {KeyboardEvent} event
+ * @param {KeyboardEvent} event - The keyboard event from the input field
  */
 function blockInvalidNumericInput(event) {
   if (event.key === '-' || event.key === 'e') {
@@ -105,10 +105,8 @@ function blockInvalidNumericInput(event) {
 }
 
 async function onReset() {
-  console.log('onReset called')
   resetting.value = true
   const result = await store.reset()
-  console.log('reset result:', result)
   if (typeof result?.error !== 'string') {
     // Sync all inputValue refs with the freshly loaded defaults
     for (const key of allFields.map(f => f.key)) {

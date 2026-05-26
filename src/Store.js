@@ -93,9 +93,7 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 			return result
 		},
 		async reset() {
-			console.log('store.reset called')
 			const result = await resetAdminSettings()
-			console.log('resetAdminSettings result:', result)
 			if (typeof result.error !== 'string') {
 				this.$patch({
 					codeLength:                 result.codeLength,

@@ -36,11 +36,11 @@ interface IAppSettings {
 	 */
 	public function getSendRateLimitPeriodSeconds(): int;
 
-    /**
-     * Plain-text email template used when sending the 2FA challenge email.
-     * Supports the placeholders {code}, {user}, {cloud}.
-     *
-     * @return string email template
-     */
-    public function getEMailTemplate(): string;
+	/**
+	 * Plain-text email template used when sending the 2FA challenge email.
+	 * Supports the placeholders {code}, {user}, {cloud}.
+	 *
+	 * @return string email template
+	 */
+	public function getEMailTemplate(): string;
 }
