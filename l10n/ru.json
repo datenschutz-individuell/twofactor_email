@@ -13,6 +13,7 @@
     "Codes will be sent to your primary email address:" : "Коды будут отправлены на ваш основной адрес электронной почты:",
     "Proceed" : "Перейти",
     "Use two-factor authentication via email" : "Используйте двухфакторную аутентификацию через электронную почту",
+    "Password confirmation failed. Please try again." : "Подтверждение пароля не удалось. Пожалуйста, попробуйте ещё раз.",
     "Apparently your previously configured email address just vanished." : "Судя по всему, ваш ранее настроенный адрес электронной почты просто исчез.",
     "A new authentication code was just sent. Please enter it:" : "Только что был отправлен новый код аутентификации. Пожалуйста, введите его:",
     "Enter the authentication code that was sent to you:" : "Введите код аутентификации, который был вам отправлен:",
