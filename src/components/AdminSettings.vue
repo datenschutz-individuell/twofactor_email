@@ -5,7 +5,8 @@
 
 <template>
   <div id="twofactor_email-admin_settings">
-    <NcSettingsSection :name="t('twofactor_email', 'Two-Factor email provider')">
+    <NcSettingsSection :name="t('twofactor_email', 'Two-Factor email provider')"
+					   :description="t('twofactor_email', 'These system wide settings are saved automatically shortly after the last keypress.')">
 
       <!-- Numeric fields: min="1" prevents zero and negative values at the browser level;
            @keydown guard blocks direct keyboard entry of '-' and 'e' (scientific notation) -->
