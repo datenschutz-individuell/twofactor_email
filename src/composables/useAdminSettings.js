@@ -30,7 +30,7 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
     const successRefs = Object.fromEntries(
         fieldKeys.map(key => [key, ref(null)])
     )
-    let successTimers = Object.fromEntries(
+    const successTimers = Object.fromEntries(
         fieldKeys.map(key => [key, null])
     )
 
@@ -92,7 +92,7 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 
     // Watch each input value and restart the shared debounce timer
     for (const key of fieldKeys) {
-        watch(inputValues[key], () => schedulesave())
+        watch(inputValues[key], () => scheduleSave())
     }
 
     return { inputValues, loading, successRefs }
