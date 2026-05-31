@@ -8,7 +8,7 @@ declare(strict_types=1);
  */
 
 /*
- * This class may NOT be renamed to e.g. 'State.php' since Nextcloud USES the class suffix 'Controller'.
+ * This class may NOT be renamed to e.g. 'AdminSettings.php' since Nextcloud USES the class suffix 'Controller'.
  * See routes.php.
  */
 
