@@ -11,29 +11,31 @@
            @keydown guard blocks direct keyboard entry of '-' and 'e' (scientific notation) -->
       <div class="numeric-fields-grid">
         <NcTextField v-for="field in numericFields"
-                   :key="field.key"
-                   v-model="fields[field.key].inputValue"
-                   :label="field.label"
-                   type="number"
-                   min="1"
-                   :loading="fields[field.key].loading"
-                   :success="fields[field.key].success === true"
-                   :error="fields[field.key].success === false"
-                   @keydown="blockInvalidNumericInput" />
+                     :key="field.key"
+                     v-model="inputValues[field.key]"
+                     :label="field.label"
+                     type="number"
+                     min="1"
+                     :loading="loading"
+                     :success="successRefs[field.key] === true"
+                     :error="successRefs[field.key] === false"
+                     @keydown="blockInvalidNumericInput" />
       </div>
+
       <!-- Email template: monospace textarea with code-editor appearance -->
       <div class="email-template-field">
         <label class="email-template-field__label">
           {{ t('twofactor_email', 'Email Template') }}
         </label>
-        <NcTextArea v-model="fields.eMailTemplate.inputValue"
+        <NcTextArea v-model="inputValues.eMailTemplate"
                     class="email-template-field__textarea"
                     :label="t('twofactor_email', 'Email Template')"
                     :hide-label="true"
-                    :loading="fields.eMailTemplate.loading"
-                    :success="fields.eMailTemplate.success === true"
-                    :error="fields.eMailTemplate.success === false" />
+                    :loading="loading"
+                    :success="successRefs.eMailTemplate === true"
+                    :error="successRefs.eMailTemplate === false" />
       </div>
+
       <div class="reset-section">
         <NcButton type="tertiary-no-background"
                   :disabled="resetting"
@@ -50,7 +52,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcSettingsSection from '@nextcloud/vue/components/NcSettingsSection'
@@ -59,7 +61,7 @@ import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import { mdiUndo } from '@mdi/js'
 import { t } from '@nextcloud/l10n'
 import { useAdminSettingsStore } from '../Store.js'
-import { useFieldWithAutosave } from '../composables/useAdminSettingsForm.js'
+import { useAdminSettings } from '../composables/useAdminSettings.js'
 
 const resetting = ref(false)
 
@@ -79,14 +81,12 @@ const textAreaFields = [
   { key: 'eMailTemplate' },
 ]
 
-// ── Initialize all fields with autosave composable ─────────────────────────
-
 const allFields = [...numericFields, ...textAreaFields]
 
-const fields = reactive(
-    Object.fromEntries(
-        allFields.map(({ key }) => [key, useFieldWithAutosave(store, key)])
-    )
+// ── Initialize shared autosave composable ──────────────────────────────────
+const { inputValues, loading, successRefs } = useAdminSettings(
+    store,
+    allFields.map(f => f.key)
 )
 
 // ── Input sanitization for numeric fields ──────────────────────────────────
@@ -108,9 +108,9 @@ async function onReset() {
   resetting.value = true
   const result = await store.reset()
   if (typeof result?.error !== 'string') {
-    // Sync all inputValue refs with the freshly loaded defaults
+    // Sync all inputValues with the freshly loaded defaults
     for (const key of allFields.map(f => f.key)) {
-      fields[key].inputValue = store[key]
+      inputValues[key].value = store[key]
     }
   }
   resetting.value = false
