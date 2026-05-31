@@ -87,13 +87,13 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
      * Returns an array of field keys that failed validation,
      * or an empty array if all values are valid.
      *
-     * @returns {string[]} field keys with validation errors
+     * @return {string[]} field keys with validation errors
      */
     function validate() {
         const errors = []
         const requiredPlaceholders = ['{code}', '{cloud}']
         const missingPlaceholders = requiredPlaceholders.filter(
-            p => !inputValues['eMailTemplate'].includes(p)
+            p => !inputValues.eMailTemplate.includes(p)
         )
         if (missingPlaceholders.length > 0) {
             errors.push('eMailTemplate')
