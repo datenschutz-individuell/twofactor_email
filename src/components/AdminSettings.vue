@@ -119,6 +119,7 @@ async function onReset() {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px 16px;
+  margin-bottom: 24px;
 }
 
 /* Stack to single column on narrow screens */
@@ -132,20 +133,14 @@ async function onReset() {
   margin-top: 8px;
 }
 
-.email-template-field__label {
-  display: block;
-  margin-bottom: 4px;
-  font-weight: 500;
-  color: var(--color-text-maxcontrast);
-  font-size: 14px;
-}
-
 /* Force monospace / code-editor appearance on the inner textarea element */
 .email-template-field__textarea :deep(textarea) {
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 13px;
   line-height: 1.6;
   min-height: 220px;
+  margin-top: 24px;
+  margin-bottom: 8px;
   resize: vertical;
   tab-size: 2;
   white-space: pre-wrap;
