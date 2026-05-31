@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import Logger from '../Logger.js'
 
 /**
@@ -19,7 +19,7 @@ import Logger from '../Logger.js'
  * @param {number} debounceMs  - Debounce delay in milliseconds
  * @param {number} successMs   - How long the success indicator remains visible
  */
-export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs = 1200) {  // ← renamed + new signature
+export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs = 1200) {
     // One shared loading state — only one request in flight at a time
     const loading = ref(false)
 
@@ -36,6 +36,28 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 
     // Shared debounce timer — restarted by any field change
     let debounceTimer = null
+
+    // Sync inputValues once the store is populated by loadInitialState.
+    // The watch on inputValues is deferred to nextTick so that this initial
+    // sync does not trigger scheduleSave.
+    for (const key of fieldKeys) {
+        watch(
+            () => store[key],
+            (val) => {
+                if (inputValues[key].value === null && val !== null) {
+                    inputValues[key].value = val
+                }
+            },
+            { immediate: true }
+        )
+    }
+
+    // Register user-change watches only after the initial render cycle
+    nextTick(() => {
+        for (const key of fieldKeys) {
+            watch(inputValues[key], () => scheduleSave())
+        }
+    })
 
     /**
      * Schedules a save after the debounce delay. Any field change restarts
@@ -88,11 +110,6 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
         } finally {
             loading.value = false
         }
-    }
-
-    // Watch each input value and restart the shared debounce timer
-    for (const key of fieldKeys) {
-        watch(inputValues[key], () => scheduleSave())
     }
 
     return { inputValues, loading, successRefs }
