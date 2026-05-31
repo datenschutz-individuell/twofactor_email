@@ -24,6 +24,7 @@ final class EMailSender implements IEMailSender {
 		private IL10N $l10n,
 		private IMailer $mailer,
 		private Defaults $defaults,
+		private IAppSettings $appSettings,
 	) {
 	}
 
@@ -35,16 +36,25 @@ final class EMailSender implements IEMailSender {
 
 		$this->logger->debug("sending email message to $email.");
 
+		$cloud = $this->defaults->getName();
+		$userAtCloud = $user->getDisplayName() . ' @ ' . $cloud;
+
+		// Replace placeholders in the admin-configurable template
+		$bodyText = str_replace(
+			['{code}', '{user}', '{cloud}'],
+			[$code, $user->getDisplayName(), $cloud],
+			$this->appSettings->getEMailTemplate()
+		);
+
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
-		$user_at_cloud = $user->getDisplayName() . ' @ ' . $this->defaults->getName();
-		$template->setSubject($this->l10n->t('Login attempt for %s', [$user_at_cloud]));
+		$template->setSubject($this->l10n->t('Login attempt for %s', [$userAtCloud]));
 		$template->addHeader();
 		$template->addHeading($this->l10n->t('Your two-factor authentication code is: %s', [$code]));
-		$template->addBodyText($this->l10n->t('If you tried to login, please enter that code on %s. If you did not, somebody else did and knows your your email address or username – and your password!', [$this->defaults->getName()]));
+		$template->addBodyText($bodyText);
 		$template->addFooter();
 
 		$message = $this->mailer->createMessage();
-		$message->setTo([ $email => $user->getDisplayName() ]);
+		$message->setTo([$email => $user->getDisplayName()]);
 		$message->useTemplate($template);
 
 		try {

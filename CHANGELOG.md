@@ -5,6 +5,13 @@
 # Changelog
 Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## 3.1.0 (2026-05-31)
+
+### Added
+
+- Allow admin to modify app settings via web interface
+- New translations from transifex: tr
+
 ## 3.0.10 (2026-05-13)
 
 ### Changed

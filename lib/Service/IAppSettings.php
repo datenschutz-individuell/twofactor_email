@@ -14,12 +14,13 @@ interface IAppSettings {
 	 * @return int number of digits
 	 */
 	public function getCodeLength(): int;
+
 	/**
 	 * How long shall a stored 2FA code be valid.
 	 *
-	 * @return int seconds of validity
+	 * @return int minutes of validity
 	 */
-	public function getCodeValidSeconds(): int;
+	public function getCodeValidMinutes(): int;
 
 	/**
 	 * How many emails may be sent during a certain period.
@@ -27,10 +28,19 @@ interface IAppSettings {
 	 * @return int number of attempts allowed
 	 */
 	public function getSendRateLimitAttempts(): int;
+
 	/**
 	 * Period in which the defined amount of emails may be sent.
 	 *
 	 * @return int seconds of sliding window
 	 */
 	public function getSendRateLimitPeriodSeconds(): int;
+
+	/**
+	 * Plain-text email template used when sending the 2FA challenge email.
+	 * Supports the placeholders {code}, {user}, {cloud}.
+	 *
+	 * @return string email template
+	 */
+	public function getEMailTemplate(): string;
 }
