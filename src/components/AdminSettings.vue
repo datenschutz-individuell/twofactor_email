@@ -25,9 +25,6 @@
 
       <!-- Email template: monospace textarea with code-editor appearance -->
       <div class="email-template-field">
-        <label class="email-template-field__label">
-          {{ t('twofactor_email', 'Email Template') }}
-        </label>
         <NcTextArea v-model="inputValues.eMailTemplate"
                     class="email-template-field__textarea"
                     :label="t('twofactor_email', 'Email Template')"
