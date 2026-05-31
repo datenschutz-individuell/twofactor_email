@@ -28,10 +28,5 @@
 				<referencedClass name="Doctrine\DBAL\Statement" />
 			</errorLevel>
 		</UndefinedDocblockClass>
-		<InvalidArgument>
-			<errorLevel type="suppress">
-				<file name="lib/Controller/AdminSettingsController.php" />
-			</errorLevel>
-		</InvalidArgument>
 	</issueHandlers>
 </psalm>
