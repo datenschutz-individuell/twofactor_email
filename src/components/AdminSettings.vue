@@ -27,7 +27,8 @@
       <div class="email-template-field">
         <NcTextArea v-model="inputValues.eMailTemplate"
                     class="email-template-field__textarea"
-                    :label="t('twofactor_email', 'Email Template')"
+                    :label="t('twofactor_email', 'Email Template (plain text)')"
+					:helper-text="t('twofactor_email', 'The email template text to be sent to the user. It MUST contain the placeholders `{code} and `{cloud}`.')"
                     :hide-label="true"
                     :loading="loading"
                     :success="successRefs.eMailTemplate === true"
@@ -67,9 +68,9 @@ const store = useAdminSettingsStore()
 store.loadInitialState('codeLength', 'codeValidMinutes', 'sendRateLimitAttempts', 'sendRateLimitPeriodSeconds', 'eMailTemplate')
 
 const numericFields = [
-  { key: 'codeLength',                 label: t('twofactor_email', 'Code Length') },
+  { key: 'codeLength',                 label: t('twofactor_email', 'Code Length (Characters)') },
   { key: 'codeValidMinutes',           label: t('twofactor_email', 'Code Validity (Minutes)') },
-  { key: 'sendRateLimitAttempts',      label: t('twofactor_email', 'Send Rate Limit Attempts') },
+  { key: 'sendRateLimitAttempts',      label: t('twofactor_email', 'Send Rate Limit (Attempts)') },
   { key: 'sendRateLimitPeriodSeconds', label: t('twofactor_email', 'Send Rate Limit Period (Seconds)') },
 ]
 

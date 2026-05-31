@@ -82,9 +82,40 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
         }, debounceMs)
     }
 
+    /**
+     * Validates all input values before saving.
+     * Returns an array of field keys that failed validation,
+     * or an empty array if all values are valid.
+     *
+     * @returns {string[]} field keys with validation errors
+     */
+    function validate() {
+        const errors = []
+        const requiredPlaceholders = ['{code}', '{cloud}']
+        const missingPlaceholders = requiredPlaceholders.filter(
+            p => !inputValues['eMailTemplate'].includes(p)
+        )
+        if (missingPlaceholders.length > 0) {
+            errors.push('eMailTemplate')
+            Logger.warn(`Email template missing required placeholders: ${missingPlaceholders.join(', ')}`)
+        }
+        return errors
+    }
+
     async function scheduleAndSave() {
         loading.value = true
         store.$patch({ error: null })
+
+        // Validate before saving — set error state on failing fields and abort
+        const invalidFields = validate()
+        if (invalidFields.length > 0) {
+            for (const key of invalidFields) {
+                successRefs[key] = false
+            }
+            loading.value = false
+            return
+        }
+
         try {
             // Write all current inputValues into the store before saving
             for (const key of fieldKeys) {
