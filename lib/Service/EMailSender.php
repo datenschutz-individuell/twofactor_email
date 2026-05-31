@@ -24,7 +24,7 @@ final class EMailSender implements IEMailSender {
 		private IL10N $l10n,
 		private IMailer $mailer,
 		private Defaults $defaults,
-		private IAppSettings $appSettings,  // ← new: provides the configurable email template
+		private IAppSettings $appSettings,
 	) {
 	}
 
