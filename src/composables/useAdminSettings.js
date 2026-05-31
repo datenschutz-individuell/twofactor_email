@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, reactive } from 'vue'
 import Logger from '../Logger.js'
 
 /**
@@ -23,13 +23,15 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
     // One shared loading state — only one request in flight at a time
     const loading = ref(false)
 
-    // Per-field input values and success indicators
-    const inputValues = Object.fromEntries(
-        fieldKeys.map(key => [key, ref(store[key])])
-    )
-    const successRefs = Object.fromEntries(
-        fieldKeys.map(key => [key, ref(null)])
-    )
+    // Per-field input values and success indicators.
+    // reactive() wrapping enables automatic ref unwrapping in templates
+    // and allows watch(() => inputValues[key]) to track changes correctly.
+    const inputValues = reactive(Object.fromEntries(
+        fieldKeys.map(key => [key, store[key]])
+    ))
+    const successRefs = reactive(Object.fromEntries(
+        fieldKeys.map(key => [key, null])
+    ))
     const successTimers = Object.fromEntries(
         fieldKeys.map(key => [key, null])
     )
@@ -44,8 +46,8 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
         watch(
             () => store[key],
             (val) => {
-                if (inputValues[key].value === null && val !== null) {
-                    inputValues[key].value = val
+                if (inputValues[key] === null && val !== null) {
+                    inputValues[key] = val
                 }
             },
             { immediate: true }
@@ -55,7 +57,7 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
     // Register user-change watches only after the initial render cycle
     nextTick(() => {
         for (const key of fieldKeys) {
-            watch(inputValues[key], () => scheduleSave())
+            watch(() => inputValues[key], () => scheduleSave())
         }
     })
 
@@ -86,25 +88,25 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
         try {
             // Write all current inputValues into the store before saving
             for (const key of fieldKeys) {
-                store[key] = inputValues[key].value
+                store[key] = inputValues[key]
             }
             const result = await store.save()
             // Set per-field success based on shared result
             for (const key of fieldKeys) {
                 if (typeof result?.error !== 'string') {
                     clearTimeout(successTimers[key])
-                    successRefs[key].value = true
+                    successRefs[key] = true
                     successTimers[key] = setTimeout(() => {
-                        successRefs[key].value = null
+                        successRefs[key] = null
                     }, successMs)
                 } else {
-                    successRefs[key].value = false
+                    successRefs[key] = false
                 }
             }
         } catch (saveError) {
             store.$patch({ error: 'save-failed' })
             for (const key of fieldKeys) {
-                successRefs[key].value = false
+                successRefs[key] = false
             }
             Logger.error('Could not persist admin settings', saveError)
         } finally {

@@ -68,8 +68,6 @@ const resetting = ref(false)
 const store = useAdminSettingsStore()
 store.loadInitialState('codeLength', 'codeValidMinutes', 'sendRateLimitAttempts', 'sendRateLimitPeriodSeconds', 'eMailTemplate')
 
-// ── Field configuration ────────────────────────────────────────────────────
-
 const numericFields = [
   { key: 'codeLength',                 label: t('twofactor_email', 'Code Length') },
   { key: 'codeValidMinutes',           label: t('twofactor_email', 'Code Validity (Minutes)') },
@@ -83,13 +81,10 @@ const textAreaFields = [
 
 const allFields = [...numericFields, ...textAreaFields]
 
-// ── Initialize shared autosave composable ──────────────────────────────────
 const { inputValues, loading, successRefs } = useAdminSettings(
     store,
     allFields.map(f => f.key)
 )
-
-// ── Input sanitization for numeric fields ──────────────────────────────────
 
 /**
  * Blocks '-' (minus) and 'e' (scientific notation) in number inputs.
@@ -105,15 +100,19 @@ function blockInvalidNumericInput(event) {
 }
 
 async function onReset() {
-  resetting.value = true
-  const result = await store.reset()
-  if (typeof result?.error !== 'string') {
-    // Sync all inputValues with the freshly loaded defaults
-    for (const key of allFields.map(f => f.key)) {
-      inputValues[key].value = store[key]
-    }
-  }
-  resetting.value = false
+	resetting.value = true
+	try {
+		const result = await store.reset()
+		if (typeof result?.error !== 'string') {
+			for (const key of allFields.map(f => f.key)) {
+				inputValues[key] = store[key]
+			}
+		}
+	} catch (e) {
+		console.error('reset failed:', e)
+	} finally {
+		resetting.value = false
+	}
 }
 </script>
 
