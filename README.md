@@ -42,13 +42,14 @@ This version 3.x.x ("v3") is the successor of the deprecated [twofactor_email](h
 app 2.x.x ("v2"). v2 will remain in the [Nextcloud App Store](https://apps.nextcloud.com/apps/twofactor_email) alongside v3 as
 long as upcoming security issues may be fixed with reasonable effort. After
 that, or after all supported Nextcloud versions may use v3, it will be pulled
-from the App Store. v3 is based on [twofactor_totp](https://github.com/nextcloud/twofactor_totp/) but has been refactored. v2 is installable on NC ≤33, v3 on NC ≥32.
+from the App Store. v3 is based on [twofactor_totp](https://github.com/nextcloud/twofactor_totp/) but has been refactored.
+v2 is installable on NC ≤33, v3 on NC ≥32.
 
-The code is considered stable now. It only lacks some polishing and there are
-plans to further enhance functionality and security. See open tasks in the
-[roadmap](https://github.com/datenschutz-individuell/twofactor_email/issues/7). It migrates existing v2 settings to v3. Thus, there should be little
-user disturbance. But the look slightly changed, and some behaviour changed or
-was enhanced.
+The code is stable now. There are plans to further enhancements. See open tasks in the
+[roadmap](https://github.com/datenschutz-individuell/twofactor_email/issues/7). It keeps the status of whether this provider is enabled for a specific
+user or not when migrating from v2 to v3. However, from 3.1.1 onwards, v2 codes are no
+longer migrated to v3 since most of them were obsolete. Mind that the look and some
+behaviour changed or was enhanced.
 
 ## Contributions welcome
 

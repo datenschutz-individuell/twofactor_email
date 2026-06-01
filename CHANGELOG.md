@@ -5,6 +5,13 @@
 # Changelog
 Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## 3.1.1 (2026-06-01)
+
+### Fixed
+
+- When updating the app from v2 to v3, authentication codes are no longer migrated, see
+  https://github.com/datenschutz-individuell/twofactor_email/issues/69#issuecomment-4588492017
+
 ## 3.1.0 (2026-05-31)
 
 ### Added
