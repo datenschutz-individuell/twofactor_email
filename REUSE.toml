@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024-2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
+# SPDX-FileCopyrightText: 2024 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 version = 1
 SPDX-PackageName = "twofactor_email"
@@ -6,9 +6,13 @@ SPDX-PackageSupplier = "Two-Factor email Support <twofactor-email@datenschutz-in
 SPDX-PackageDownloadLocation = "https://github.com/datenschutz-individuell/twofactor_email"
 
 [[annotations]]
-path = ["README.md", "CONTRIBUTORS.md", "SECURITY.md", "composer.json", "composer.lock", "package-lock.json", "package.json", "psalm.xml", "vendor-bin/cs-fixer/composer.json", "vendor-bin/cs-fixer/composer.lock", ".github/CODEOWNERS", ".github/renovate.json"]
+path = [".github/CODEOWNERS", ".github/renovate.json",
+        "CHANGELOG.md", "CONTRIBUTORS.md", "README.md", "SECURITY.md",
+        "composer.json", "composer.lock", "package.json", "package-lock.json",
+        "vendor-bin/cs-fixer/composer.json", "vendor-bin/cs-fixer/composer.lock",
+        "psalm.xml"]
 precedence = "aggregate"
-SPDX-FileCopyrightText = "2024-2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>"
+SPDX-FileCopyrightText = "2024 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
