@@ -20,7 +20,6 @@ use OCP\AppFramework\Services\IInitialState;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUser;
-use OCP\Security\RateLimiting\ILimiter;
 use OCP\Template\ITemplateManager;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -28,17 +27,11 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 class TwoFactorEMailTest extends TestCase {
-	private IEMailAddressMasker&MockObject $masker;
 	private ITemplateManager&MockObject $templateManager;
 	private IL10N&MockObject $l10n;
-	private LoggerInterface&MockObject $logger;
 	private IInitialState&MockObject $initialState;
 	private IURLGenerator&MockObject $urlGenerator;
-	private ContainerInterface&MockObject $container;
-	private ILimiter&MockObject $limiter;
-	private ILoginChallenge&MockObject $challengeService;
 	private IStateManager&MockObject $stateManager;
-	private IAppSettings&MockObject $settings;
 
 	private TwoFactorEMail $provider;
 
@@ -48,28 +41,28 @@ class TwoFactorEMailTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->masker = $this->createMock(IEMailAddressMasker::class);
+		$masker = $this->createMock(IEMailAddressMasker::class);
 		$this->templateManager = $this->createMock(ITemplateManager::class);
 		$this->l10n = $this->createMock(IL10N::class);
-		$this->logger = $this->createMock(LoggerInterface::class);
+		$logger = $this->createMock(LoggerInterface::class);
 		$this->initialState = $this->createMock(IInitialState::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
-		$this->container = $this->createMock(ContainerInterface::class);
-		$this->challengeService = $this->createMock(ILoginChallenge::class);
+		$container = $this->createMock(ContainerInterface::class);
+		$challengeService = $this->createMock(ILoginChallenge::class);
 		$this->stateManager = $this->createMock(IStateManager::class);
-		$this->settings = $this->createMock(IAppSettings::class);
+		$settings = $this->createMock(IAppSettings::class);
 
 		$this->provider = new TwoFactorEMail(
-			$this->masker,
+			$masker,
 			$this->templateManager,
 			$this->l10n,
-			$this->logger,
+			$logger,
 			$this->initialState,
 			$this->urlGenerator,
-			$this->container,
-			$this->challengeService,
+			$container,
+			$challengeService,
 			$this->stateManager,
-			$this->settings,
+			$settings,
 		);
 	}
 
@@ -111,6 +104,9 @@ class TwoFactorEMailTest extends TestCase {
 		self::assertEquals('/path/to/app-dark.svg', $icon);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testGetPersonalSettingsDisabledWithoutEMail(): void {
 		$expected = new PersonalSettings($this->templateManager);
 
@@ -135,6 +131,9 @@ class TwoFactorEMailTest extends TestCase {
 		self::assertEquals($expected, $actual);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testGetPersonalSettingsEnabledWithEMail(): void {
 		$expected = new PersonalSettings($this->templateManager);
 
@@ -159,6 +158,9 @@ class TwoFactorEMailTest extends TestCase {
 		self::assertEquals($expected, $actual);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testDeactivate(): void {
 		$user = $this->createMock(IUser::class);
 		$this->stateManager->expects($this->once())

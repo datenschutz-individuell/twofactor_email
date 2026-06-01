@@ -12,11 +12,13 @@ namespace OCA\TwoFactorEMail\Test\Acceptance;
 use ChristophWurst\Nextcloud\Testing\Selenium;
 use ChristophWurst\Nextcloud\Testing\TestCase;
 use ChristophWurst\Nextcloud\Testing\TestUser;
+use Exception;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\TimeoutException;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
-use OC;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\IUser;
 
@@ -29,6 +31,9 @@ class TwoFactorEMailAcceptanceTest extends TestCase {
 
 	private IUser $user;
 
+	/**
+	 * @throws Exception
+	 */
 	public function setUp(): void {
 		parent::setUp();
 
@@ -36,6 +41,10 @@ class TwoFactorEMailAcceptanceTest extends TestCase {
 		$this->user->setSystemEMailAddress('test@localhost');
 	}
 
+	/**
+	 * @throws NoSuchElementException
+	 * @throws TimeoutException
+	 */
 	public function testEnableTwoFactorEmail(): void {
 		$this->webDriver->get('http://localhost:8080/index.php/login');
 		self::assertStringContainsString('Nextcloud', $this->webDriver->getTitle());
@@ -69,13 +78,21 @@ class TwoFactorEMailAcceptanceTest extends TestCase {
 		});
 
 		/** @var IStateManager $providerState */
-		$providerState = OC::$server->query(IStateManager::class);
+		/** @noinspection PhpFullyQualifiedNameUsageInspection */
+		/** @noinspection PhpUndefinedClassInspection */
+		$providerState = \OC::$server->query(IStateManager::class);
 		self::assertTrue($providerState->isEnabled($this->user));
 	}
 
+	/**
+	 * @throws NoSuchElementException
+	 * @throws TimeoutException
+	 */
 	public function testLoginShouldFailWithWrongOTP(): void {
 		/** @var IStateManager $stateManager */
-		$stateManager = OC::$server->query(IStateManager::class);
+		/** @noinspection PhpFullyQualifiedNameUsageInspection */
+		/** @noinspection PhpUndefinedClassInspection */
+		$stateManager = \OC::$server->query(IStateManager::class);
 		$stateManager->enable($this->user);
 
 		$this->webDriver->get('http://localhost:8080/index.php/login');

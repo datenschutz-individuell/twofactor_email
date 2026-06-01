@@ -6,10 +6,13 @@
  */
 
 if (file_exists(__DIR__ . '/../../../lib/base.php')) {
+	/** @noinspection PhpIncludeInspection */
 	require_once __DIR__ . '/../../../lib/base.php';
+	/** @noinspection PhpIncludeInspection */
 	require_once __DIR__ . '/../../../tests/bootstrap.php';
 
-	\OC_App::loadApp('twofactor_email');
+	/** @noinspection PhpUndefinedClassInspection */
+	OC_App::loadApp('twofactor_email');
 } else {
 	spl_autoload_register(function (string $class) {
 		if (str_starts_with($class, 'OCP\\') || str_starts_with($class, 'NCU\\')) {

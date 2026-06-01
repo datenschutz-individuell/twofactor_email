@@ -12,8 +12,12 @@ namespace OCA\TwoFactorEMail\Test\Unit\Event;
 use ChristophWurst\Nextcloud\Testing\TestCase;
 use OCA\TwoFactorEMail\Event\StateChanged;
 use OCP\IUser;
+use PHPUnit\Framework\MockObject\Exception;
 
 class StateChangedTest extends TestCase {
+	/**
+	 * @throws Exception
+	 */
 	public function testEnabled() {
 		$user = $this->createMock(IUser::class);
 		$event = new StateChanged($user, true);
@@ -21,6 +25,9 @@ class StateChangedTest extends TestCase {
 		$this->assertTrue($event->isEnabled());
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testDisabled() {
 		$user = $this->createMock(IUser::class);
 		$event = new StateChanged($user, false);

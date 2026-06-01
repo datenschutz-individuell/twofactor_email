@@ -17,7 +17,7 @@
 
 ### Original Authors
 
-* [Christoph Wurst](mailto:Christoph Wurst <christoph@winzerhof-wurst.at>) ([christophwurst](christophwurst))
+* [Christoph Wurst](mailto:Christoph Wurst <christoph@winzerhof-wurst.at>) ([christophwurst](https://github.com/christophwurst))
   Author of [twofactor_totp](https://github.com/nextcloud/twofactor_totp) that ≥3.0.0 was cloned from
 * [Roeland Jago Douma](mailto:Roeland Jago Douma <roeland@famdouma.nl>) ([rullzer](https://github.com/rullzer))
   Original author of twofactor_email ≤3.0.0

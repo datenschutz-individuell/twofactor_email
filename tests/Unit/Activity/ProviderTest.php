@@ -15,6 +15,7 @@ use OCP\Activity\IEvent;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\L10N\IFactory;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class ProviderTest extends TestCase {
@@ -23,6 +24,9 @@ class ProviderTest extends TestCase {
 
 	private Provider $provider;
 
+	/**
+	 * @throws Exception
+	 */
 	protected function setUp(): void {
 		parent::setUp();
 
@@ -32,6 +36,9 @@ class ProviderTest extends TestCase {
 		$this->provider = new Provider($this->l10n, $this->urlGenerator);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testParseUnrelated() {
 		$lang = 'ru';
 		$event = $this->createMock(IEvent::class);
@@ -54,6 +61,7 @@ class ProviderTest extends TestCase {
 
 	/**
 	 * @dataProvider subjectData
+	 * @throws Exception
 	 */
 	public function testParse(Notification $subject) {
 		$lang = 'ru';

@@ -1,7 +1,7 @@
 # Two-Factor Email Provider for Nextcloud
 
 [Nextcloud](https://nextcloud.com/) supports web logins with a second factor
-([two factor authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication#Factors),
+([two-factor authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication#Factors),
 2FA). To support a certain type of 2FA, a "2FA provider" (server-)app must be
 installed. 2FA kicks in after the primary authentication stage (typically
 username and password) were successful. This provider challenges the user to

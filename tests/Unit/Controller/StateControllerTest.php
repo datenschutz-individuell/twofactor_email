@@ -14,31 +14,37 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserSession;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class StateControllerTest extends TestCase {
-	private IRequest&MockObject $request;
 	private IUserSession&MockObject $userSession;
 	private IStateManager&MockObject $stateManager;
 
 	private StateController $controller;
 
+	/**
+	 * @throws Exception
+	 */
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->request = $this->createMock(IRequest::class);
+		$request = $this->createMock(IRequest::class);
 		$this->userSession = $this->createMock(IUserSession::class);
 		$this->stateManager = $this->createMock(IStateManager::class);
 
 		$this->controller = new StateController(
 			Application::APP_ID,
-			$this->request,
+			$request,
 			$this->userSession,
 			$this->stateManager,
 		);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testDisable() {
 		$user = $this->createMock(IUser::class);
 		$this->userSession->expects($this->once())
@@ -55,6 +61,9 @@ class StateControllerTest extends TestCase {
 		$this->assertEquals($expected, $this->controller->update(false));
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testEnableWithoutEmail() {
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->once())
@@ -75,6 +84,9 @@ class StateControllerTest extends TestCase {
 		$this->assertEquals($expected, $this->controller->update(true));
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testEnableWithEmail() {
 		$user = $this->createMock(IUser::class);
 		$user->expects($this->once())

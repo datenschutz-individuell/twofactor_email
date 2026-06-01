@@ -14,6 +14,7 @@ use OCA\TwoFactorEMail\Provider\TwoFactorEMail;
 use OCP\Authentication\TwoFactorAuth\IRegistry;
 use OCP\EventDispatcher\Event;
 use OCP\IUser;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class StateChangeRegistryUpdaterTest extends TestCase {
@@ -23,6 +24,9 @@ class StateChangeRegistryUpdaterTest extends TestCase {
 	private IRegistry|MockObject $registry;
 	private TwoFactorEMail|MockObject $provider;
 
+	/**
+	 * @throws Exception
+	 */
 	protected function setUp(): void {
 		parent::setUp();
 
@@ -42,6 +46,9 @@ class StateChangeRegistryUpdaterTest extends TestCase {
 		$this->listener->handle($event);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testProviderEnabledEvent() {
 		$user = $this->createMock(IUser::class);
 		$event = new StateChanged($user, true);
@@ -52,6 +59,9 @@ class StateChangeRegistryUpdaterTest extends TestCase {
 		$this->listener->handle($event);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testProviderDisabledEvent() {
 		$user = $this->createMock(IUser::class);
 		$event = new StateChanged($user, false);

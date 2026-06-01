@@ -15,6 +15,7 @@ use OCA\TwoFactorEMail\Listener\StateChangeActivity;
 use OCP\Activity\IEvent;
 use OCP\Activity\IManager;
 use OCP\IUser;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class StateChangeActivityTest extends TestCase {
@@ -23,6 +24,9 @@ class StateChangeActivityTest extends TestCase {
 
 	private IManager|MockObject $activityManager;
 
+	/**
+	 * @throws Exception
+	 */
 	protected function setUp(): void {
 		parent::setUp();
 
@@ -31,6 +35,9 @@ class StateChangeActivityTest extends TestCase {
 		$this->listener = new StateChangeActivity($this->activityManager);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testHandleStateEvent() {
 		$uid = 'user234';
 		$user = $this->createMock(IUser::class);
