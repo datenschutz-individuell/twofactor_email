@@ -1,10 +1,7 @@
 <?xml version="1.0"?>
 <psalm
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         errorLevel="3"
         phpVersion="8.1"
-        xmlns="https://getpsalm.org/schema/config"
-        xsi:schemaLocation="https://getpsalm.org/schema/config https://raw.githubusercontent.com/vimeo/psalm/master/config.xsd"
         findUnusedCode="false"
         ensureOverrideAttribute="false"
         autoloader="tests/bootstrap.php"
@@ -19,6 +16,4 @@
             <directory name="vendor/phpunit/php-code-coverage"/>
         </ignoreFiles>
     </extraFiles>
-    <issueHandlers>
-    </issueHandlers>
 </psalm>

@@ -4,7 +4,7 @@
 
 * [Datenschutz Individuell](mailto:Datenschutz
   Individuell <kontakt@datenschutz-individuell.de>) (https://www.datenschutz-individuell.de)
-  Sponsor of the development of twofactor_email ≥3.0.0
+  Development sponsor for twofactor_email ≥3.0.0
 
 ### Current Maintainer
 

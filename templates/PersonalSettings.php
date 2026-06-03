@@ -13,7 +13,7 @@ use OCP\Util;
 Util::addScript('twofactor_email', 'twofactor_email-personal_settings');
 // Without addStyle, the switch is rendered weirdly.
 Util::addStyle('twofactor_email', 'twofactor_email-personal_settings');
-// It was not sufficient to just addScript or addStyle without file, or with arbitrary file name,
+// It was not enough to just addScript or addStyle without a file, or with arbitrary file name,
 // the file parameter must be exactly the … div id? There seems to be some NC magic here…
 ?>
 

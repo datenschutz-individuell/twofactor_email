@@ -40,7 +40,7 @@ class StateControllerTest extends TestCase {
 			'enabled' => false,
 		]);
 
-		$this->assertEquals($expected, $this->controller->update(false));
+		$this->assertEquals($expected, $this->controller->save(false));
 	}
 
 	/**
@@ -63,7 +63,7 @@ class StateControllerTest extends TestCase {
 			'error' => 'no-email',
 		]);
 
-		$this->assertEquals($expected, $this->controller->update(true));
+		$this->assertEquals($expected, $this->controller->save(true));
 	}
 
 	/**
@@ -85,7 +85,7 @@ class StateControllerTest extends TestCase {
 			'enabled' => true,
 		]);
 
-		$this->assertEquals($expected, $this->controller->update(true));
+		$this->assertEquals($expected, $this->controller->save(true));
 	}
 
 	/**

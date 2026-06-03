@@ -24,7 +24,6 @@ use OCP\Template\ITemplateManager;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 
 class TwoFactorEMailTest extends TestCase {
 	private ITemplateManager&MockObject $templateManager;
@@ -148,7 +147,6 @@ class TwoFactorEMailTest extends TestCase {
 		$masker = $this->createMock(IEMailAddressMasker::class);
 		$this->templateManager = $this->createMock(ITemplateManager::class);
 		$this->l10n = $this->createMock(IL10N::class);
-		$logger = $this->createMock(LoggerInterface::class);
 		$this->initialState = $this->createMock(IInitialState::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$container = $this->createMock(ContainerInterface::class);
@@ -160,7 +158,6 @@ class TwoFactorEMailTest extends TestCase {
 			$masker,
 			$this->templateManager,
 			$this->l10n,
-			$logger,
 			$this->initialState,
 			$this->urlGenerator,
 			$container,

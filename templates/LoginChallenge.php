@@ -46,7 +46,7 @@ $error = $_['error'] ?? null; // caught and passed in Provider/TwoFactorEMail.ph
 		} else {
 			p($l->t('Enter the authentication code that was sent to you:'));
 		}
-		?></p>
+	?></p>
 	<form method="POST" class="twofactor_email-challenge-form">
 		<input type="text"<?= $minmax ?> name="challenge" required="required" autofocus autocomplete="one-time-code"
 			   inputmode="numeric" autocapitalize="off" placeholder="<?php p($l->t('Authentication code')) ?>">

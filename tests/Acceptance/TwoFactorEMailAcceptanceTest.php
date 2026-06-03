@@ -19,6 +19,7 @@ use Facebook\WebDriver\Exception\TimeoutException;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
+use OC;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\IUser;
 
@@ -78,9 +79,7 @@ class TwoFactorEMailAcceptanceTest extends TestCase {
 		});
 
 		/** @var IStateManager $providerState */
-		/** @noinspection PhpFullyQualifiedNameUsageInspection */
-		/** @noinspection PhpUndefinedClassInspection */
-		$providerState = \OC::$server->query(IStateManager::class);
+		$providerState = OC::$server->get(IStateManager::class);
 		self::assertTrue($providerState->isEnabled($this->user));
 	}
 
@@ -90,9 +89,7 @@ class TwoFactorEMailAcceptanceTest extends TestCase {
 	 */
 	public function testLoginShouldFailWithWrongOTP(): void {
 		/** @var IStateManager $stateManager */
-		/** @noinspection PhpFullyQualifiedNameUsageInspection */
-		/** @noinspection PhpUndefinedClassInspection */
-		$stateManager = \OC::$server->query(IStateManager::class);
+		$stateManager = OC::$server->get(IStateManager::class);
 		$stateManager->enable($this->user);
 
 		$this->webDriver->get('http://localhost:8080/index.php/login');

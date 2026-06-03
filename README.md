@@ -6,8 +6,8 @@
 installed. 2FA kicks in after the primary authentication stage (typically
 username and password) were successful. This provider challenges the user to
 enter a randomly generated authentication code (aka one-time password, OTP,
-currently 6 digits). It sends that code to the user's primary email address and
-expects the user to enter it on an additional 2nd step web login page.
+currently six digits). It sends that code to the user's primary email address
+and expects the user to enter it on an additional second step web login page.
 
 ## Installation, activation and usage
 
@@ -31,7 +31,7 @@ since v3). If the admin installs this provider and enforces 2FA, it should be
 ensured that each user does have a valid email address.
 
 Mind that, once a user enabled any 2FA provider, they can no longer use their
-password in applications that don't support the web based 2FA login flow. For
+password in applications that don't support the web-based 2FA login flow. For
 such applications, the user needs to create and use
 [app passwords](https://docs.nextcloud.com/server/stable/user_manual/en/session_management.html#managing-devices)
 (to be found at the bottom of Personal Settings/Security).
@@ -48,7 +48,7 @@ from the App Store. v3 is based on [twofactor_totp](https://github.com/nextcloud
 refactored.
 v2 is installable on NC ≤33, v3 on NC ≥32.
 
-The code is stable now. There are plans to further enhancements. See open tasks in the
+The code is stable now. There are plans for further enhancements. See open tasks in the
 [roadmap](https://github.com/datenschutz-individuell/twofactor_email/issues/7). It keeps the status of whether this
 provider is enabled for a specific
 user or not when migrating from v2 to v3. However, from 3.1.1 onwards, v2 codes are no
@@ -62,13 +62,13 @@ code enhancements, refactoring, better test coverage, new features, security
 audits, translations or good documentation, examples, etc.
 
 Prior to creating a PR, please discuss your idea in
-the [ideas collection issue](https://github.com/datenschutz-individuell/twofactor_email/issues/8).
+the [idea collection](https://github.com/datenschutz-individuell/twofactor_email/issues/8).
 Make sure your PR sticks to ONE change (so that we may review it cleanly), and
 that it doesn't break existing functionality. We will do our best to timely
 review and comment PRs.
 
 This app takes advantage of the transifex Nextcloud community. If the app is
-not yet available in your language, please consider to create a transifex
+not yet available in your language, please consider creating a transifex
 account and join the [Nextcloud translators community](https://explore.transifex.com/nextcloud/).
 
 If you have any questions, please

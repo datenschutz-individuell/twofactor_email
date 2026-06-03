@@ -11,6 +11,7 @@ use ChristophWurst\Nextcloud\Testing\TestCase;
 use OCA\TwoFactorEMail\Event\StateChanged;
 use OCA\TwoFactorEMail\Listener\StateChangeRegistryUpdater;
 use OCA\TwoFactorEMail\Provider\TwoFactorEMail;
+use OCP\Authentication\TwoFactorAuth\IProvider;
 use OCP\Authentication\TwoFactorAuth\IRegistry;
 use OCP\EventDispatcher\Event;
 use OCP\IUser;
@@ -67,7 +68,7 @@ class StateChangeRegistryUpdaterTest extends TestCase {
 		parent::setUp();
 
 		$this->registry = $this->createMock(IRegistry::class);
-		$this->provider = $this->createMock(TwoFactorEMail::class);
+		$this->provider = $this->createMock(IProvider::class);
 
 		$this->listener = new StateChangeRegistryUpdater($this->registry, $this->provider);
 	}

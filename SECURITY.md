@@ -18,6 +18,7 @@ See [CONTRIBUTORS](https://github.com/datenschutz-individuell/twofactor_email/bl
 
 ## Bounty
 
-I cannot provide any bounty for reporting. But if you feel that it would affect many users or Nextcloud as platform, you
-may use their channel to report it, see the [security](https://nextcloud.com/security/) on the Nextcloud website.
-Currently, they use Hacker One as reporting platform and provide a bounty if the report meets their criteria. 
+I cannot provide any bounty for reporting. But if you feel that it would affect many users or Nextcloud as a platform,
+you may use their channel to report it, see the [security](https://nextcloud.com/security/) on the Nextcloud website. They used to use Hacker One
+as a reporting platform and provide a bounty if the report met their criteria. Due to too many AI generated reports,
+they abandoned that programme.
