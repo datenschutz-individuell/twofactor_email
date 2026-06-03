@@ -42,10 +42,17 @@ const loading = ref(true)
 onMounted(async () => {
 	try {
 		await store.enable()
+
+		// Show errors by disabling "loading"
+		if (store.error) {
+			loading.value = false
+		}
 	} catch (error) {
 		console.error(error)
+		store.$patch({ error: 'save-failed' })
 	} finally {
 		loading.value = false
 	}
 })
+
 </script>

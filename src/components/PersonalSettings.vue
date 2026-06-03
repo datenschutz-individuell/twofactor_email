@@ -82,6 +82,10 @@ async function onUpdate() {
 
 	try {
 		await store.save()
+		// Reset the UI switch if StateController sends HTTP error code
+		if (store.error) {
+			store.enabled = previousState
+		}
 	} catch (saveError) {
 		// backend error while trying to persistState
 		store.enabled = previousState

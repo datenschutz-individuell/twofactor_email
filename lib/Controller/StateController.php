@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Controller;
 
 use OCA\TwoFactorEMail\Service\IStateManager;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\PasswordConfirmationRequired;
 use OCP\AppFramework\Http\JSONResponse;
@@ -37,23 +38,25 @@ final class StateController extends ALoginSetupController {
 	#[PasswordConfirmationRequired]
 	public function save(bool $state): JSONResponse {
 		$user = $this->userSession->getUser();
+
 		if ($user === null) {
 			return new JSONResponse([
 				'error' => 'no-user',
-			]);
+			], Http::STATUS_UNAUTHORIZED);
 		}
+
 		if ($state) {
 			if ($user->getEMailAddress() === null) {
 				return new JSONResponse([
 					'enabled' => false,
 					'error' => 'no-email',
-				]);
-			} else {
-				$this->stateManager->enable($user);
+				], Http::STATUS_PRECONDITION_FAILED);
 			}
+			$this->stateManager->enable($user);
 		} else {
 			$this->stateManager->disable($user);
 		}
+
 		return new JSONResponse([
 			'enabled' => $state,
 		]);

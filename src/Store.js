@@ -33,12 +33,16 @@ export const usePersonalSettingsStore = defineStore('personalSettings', {
 			this.$patch(initialState)
 		},
 		async save() {
+			const previousState = this.enabled
 			const result = await persistState(this.enabled)
+
 			this.$patch({
-				enabled: result.enabled ?? this.enabled,
+				// Reset the switch on error
+				enabled: result.error ? !previousState : (result.enabled ?? this.enabled),
 				error: result.error,
 			})
 		},
+
 		async enable() {
 			this.enabled = true
 			await this.save()
