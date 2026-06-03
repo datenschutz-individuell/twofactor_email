@@ -22,7 +22,7 @@ final class AppSettings implements IAppSettings {
 		. 'or username – and your password!';
 
 	public function __construct(
-		private IAppConfig $appConfig,
+		private readonly IAppConfig $appConfig,
 	) {
 	}
 
@@ -32,14 +32,6 @@ final class AppSettings implements IAppSettings {
 
 	public function getCodeValidMinutes(): int {
 		return $this->appConfig->getValueInt(Application::APP_ID, 'code_valid_minutes', 10);
-	}
-
-	public function getSendRateLimitAttempts(): int {
-		return $this->appConfig->getValueInt(Application::APP_ID, 'send_rate_limit_attempts', 10);
-	}
-
-	public function getSendRateLimitPeriodSeconds(): int {
-		return $this->appConfig->getValueInt(Application::APP_ID, 'send_rate_limit_period_seconds', 600);
 	}
 
 	public function getEMailTemplate(): string {

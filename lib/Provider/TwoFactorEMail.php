@@ -29,22 +29,24 @@ use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\Template\ITemplate;
 use OCP\Template\ITemplateManager;
+use OCP\Template\TemplateNotFoundException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use RuntimeException;
 
-class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSettings, IDeactivatableByAdmin, IActivatableByAdmin, IActivatableAtLogin {
+final class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSettings, IDeactivatableByAdmin, IActivatableByAdmin, IActivatableAtLogin {
 
 	public function __construct(
-		private IEMailAddressMasker $emailAddressMasker,
-		private ITemplateManager $templateManager,
-		private IL10N $l10n,
-		private LoggerInterface $logger,
-		private IInitialState $initialStateService,
-		private IURLGenerator $urlGenerator,
-		private ContainerInterface $container,
-		private ILoginChallenge $challengeService,
-		private IStateManager $stateManager,
-		private IAppSettings $settings,
+		private readonly IEMailAddressMasker $emailAddressMasker,
+		private readonly ITemplateManager $templateManager,
+		private readonly IL10N $l10n,
+		private readonly IInitialState $initialStateService,
+		private readonly IURLGenerator $urlGenerator,
+		private readonly ContainerInterface $container,
+		private readonly ILoginChallenge $challengeService,
+		private readonly IStateManager $stateManager,
+		private readonly IAppSettings $settings,
 	) {
 	}
 
@@ -67,11 +69,15 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	 * If a user reloads that web page, a new code is generated and re-sent. Thus throttled.
 	 */
 	public function getTemplate(IUser $user): ITemplate {
-		$template = $this->templateManager->getTemplate(Application::APP_ID, 'LoginChallenge');
+		try {
+			$template = $this->templateManager->getTemplate(Application::APP_ID, 'LoginChallenge');
+		} catch (TemplateNotFoundException $e) {
+			throw new RuntimeException('LoginChallenge template not found', previous: $e);
+		}
 
 		$newCodeWasSent = $this->challengeService->sendChallenge($user);
 
-		// In order to use information in the LoginChallenge.php template, we must provide them here
+		// To use these settings in the LoginChallenge.php template, we must provide them here.
 		$template->assign('codeLength', $this->settings->getCodeLength());
 		$template->assign('newCodeWasSent', $newCodeWasSent);
 		// Return the template for the challenge view (LoginChallenge.php file in the templates folder of the app)
@@ -84,19 +90,20 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 
 	/**
 	 * Decides whether 2FA is enabled for the given user.
-	 * The Nextcloud stores two-factor provider states for every user in the oc_twofactor_providers table.
-	 * If no entry for an installed provider exists for a user then this method will be called.
-	 * The result will then be written to that table by Nextcloud.
+	 * Nextcloud keeps an enabled/disabled state for each two-factor provider and each user.
+	 * They are read from and written to the DB table oc_twofactor_providers.
+	 * If no entry exists for the provider "email" and the given user, this method is called during the login flow.
+	 * Nextcloud then saves the current state.
 	 */
 	public function isTwoFactorAuthEnabledForUser(IUser $user): bool {
 		return $this->stateManager->isEnabled($user);
 	}
 
-	public function getLightIcon(): String {
+	public function getLightIcon(): string {
 		return $this->urlGenerator->imagePath(Application::APP_ID, 'app.svg');
 	}
 
-	public function getDarkIcon(): String {
+	public function getDarkIcon(): string {
 		return $this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg');
 	}
 
@@ -118,6 +125,10 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 		$this->stateManager->enable($user, true);
 	}
 
+	/**
+	 * @throws NotFoundExceptionInterface
+	 * @throws ContainerExceptionInterface
+	 */
 	public function getLoginSetup(IUser $user): ILoginSetupProvider {
 		$maskedEmail = $this->emailAddressMasker->maskForUI($user->getEMailAddress() ?? '');
 		$this->initialStateService->provideInitialState('maskedEmail', $maskedEmail);

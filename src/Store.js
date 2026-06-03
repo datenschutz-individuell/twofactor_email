@@ -5,7 +5,7 @@
 
 import { createPinia, defineStore } from 'pinia'
 import { loadState } from '@nextcloud/initial-state'
-import { persist, persistAdminSettings, resetAdminSettings } from './services/StateManager.js'
+import { persistAdminSettings, persistState, resetAdminSettings } from './services/StateManager.js'
 
 export const pinia = createPinia()
 
@@ -33,7 +33,7 @@ export const usePersonalSettingsStore = defineStore('personalSettings', {
 			this.$patch(initialState)
 		},
 		async save() {
-			const result = await persist(this.enabled)
+			const result = await persistState(this.enabled)
 			this.$patch({
 				enabled: result.enabled ?? this.enabled,
 				error: result.error,
@@ -48,13 +48,10 @@ export const usePersonalSettingsStore = defineStore('personalSettings', {
 
 export const useAdminSettingsStore = defineStore('adminSettings', {
 	state: () => ({
-		codeLength:                 null,
-		codeValidMinutes:           null,
-		sendRateLimitAttempts:      null,
-		sendRateLimitPeriodSeconds: null,
-		eMailTemplate:              null,
-		error:                      false,
-		// success removed: managed per field in useFieldWithAutosave
+		codeLength: null,
+		codeValidMinutes: null,
+		eMailTemplate: null,
+		error: false,
 	}),
 	actions: {
 		/**
@@ -73,20 +70,16 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 		},
 		async save() {
 			const result = await persistAdminSettings({
-				codeLength:                 this.codeLength,
-				codeValidMinutes:           this.codeValidMinutes,
-				sendRateLimitAttempts:      this.sendRateLimitAttempts,
-				sendRateLimitPeriodSeconds: this.sendRateLimitPeriodSeconds,
-				eMailTemplate:              this.eMailTemplate,
+				codeLength: this.codeLength,
+				codeValidMinutes: this.codeValidMinutes,
+				eMailTemplate: this.eMailTemplate,
 			})
 
 			this.$patch({
-				codeLength:                 result.codeLength                 ?? this.codeLength,
-				codeValidMinutes:           result.codeValidMinutes           ?? this.codeValidMinutes,
-				sendRateLimitAttempts:      result.sendRateLimitAttempts      ?? this.sendRateLimitAttempts,
-				sendRateLimitPeriodSeconds: result.sendRateLimitPeriodSeconds ?? this.sendRateLimitPeriodSeconds,
-				eMailTemplate:              result.eMailTemplate              ?? this.eMailTemplate,
-				error:                      result.error,
+				codeLength: result.codeLength ?? this.codeLength,
+				codeValidMinutes: result.codeValidMinutes ?? this.codeValidMinutes,
+				eMailTemplate: result.eMailTemplate ?? this.eMailTemplate,
+				error: result.error,
 			})
 
 			// Return result so useFieldWithAutosave can evaluate success/error per field
@@ -96,12 +89,10 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 			const result = await resetAdminSettings()
 			if (typeof result.error !== 'string') {
 				this.$patch({
-					codeLength:                 result.codeLength,
-					codeValidMinutes:           result.codeValidMinutes,
-					sendRateLimitAttempts:      result.sendRateLimitAttempts,
-					sendRateLimitPeriodSeconds: result.sendRateLimitPeriodSeconds,
-					eMailTemplate:              result.eMailTemplate,
-					error:                      null,
+					codeLength: result.codeLength,
+					codeValidMinutes: result.codeValidMinutes,
+					eMailTemplate: result.eMailTemplate,
+					error: null,
 				})
 			}
 			return result

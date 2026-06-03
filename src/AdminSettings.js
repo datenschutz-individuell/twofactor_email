@@ -9,5 +9,5 @@ import { pinia } from './Store.js'
 import AdminSettings from './components/AdminSettings.vue'
 
 const View = createApp(AdminSettings)
-    .use(pinia)
+	.use(pinia)
 View.mount('#twofactor_email-admin_settings')

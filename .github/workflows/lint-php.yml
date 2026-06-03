@@ -37,7 +37,7 @@ jobs:
     needs: matrix
     strategy:
       matrix:
-        php-versions: ${{fromJson(needs.matrix.outputs.php-versions)}}
+        php-versions: ${{fromJSON(needs.matrix.outputs.php-versions)}}
 
     name: php-lint
 

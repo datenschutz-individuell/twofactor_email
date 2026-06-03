@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Service;
 
-use OCA\TwoFactorEMail\Exception\EMailNotSet;
-use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCP\IUser;
 
 interface ILoginChallenge {
@@ -19,8 +17,6 @@ interface ILoginChallenge {
 	 *
 	 * @param IUser $user UID
 	 * @return bool true if a new code was sent
-	 * @throws EMailNotSet
-	 * @throws SendEMailFailed
 	 */
 	public function sendChallenge(IUser $user): bool;
 

@@ -7,10 +7,10 @@ SPDX-PackageDownloadLocation = "https://github.com/datenschutz-individuell/twofa
 
 [[annotations]]
 path = [".github/CODEOWNERS", ".github/renovate.json",
-        "CHANGELOG.md", "CONTRIBUTORS.md", "README.md", "SECURITY.md",
-        "composer.json", "composer.lock", "package.json", "package-lock.json",
-        "vendor-bin/cs-fixer/composer.json", "vendor-bin/cs-fixer/composer.lock",
-        "psalm.xml"]
+    "CHANGELOG.md", "CONTRIBUTORS.md", "README.md", "SECURITY.md",
+    "composer.json", "composer.lock", "package.json", "package-lock.json",
+    "vendor-bin/cs-fixer/composer.json", "vendor-bin/cs-fixer/composer.lock",
+    "psalm.xml"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2024 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>"
 SPDX-License-Identifier = "AGPL-3.0-or-later"

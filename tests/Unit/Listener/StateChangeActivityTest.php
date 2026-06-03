@@ -27,17 +27,6 @@ class StateChangeActivityTest extends TestCase {
 	/**
 	 * @throws Exception
 	 */
-	protected function setUp(): void {
-		parent::setUp();
-
-		$this->activityManager = $this->createMock(IManager::class);
-
-		$this->listener = new StateChangeActivity($this->activityManager);
-	}
-
-	/**
-	 * @throws Exception
-	 */
 	public function testHandleStateEvent() {
 		$uid = 'user234';
 		$user = $this->createMock(IUser::class);
@@ -68,5 +57,16 @@ class StateChangeActivityTest extends TestCase {
 			->with($activityEvent);
 
 		$this->listener->handle($event);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->activityManager = $this->createMock(IManager::class);
+
+		$this->listener = new StateChangeActivity($this->activityManager);
 	}
 }

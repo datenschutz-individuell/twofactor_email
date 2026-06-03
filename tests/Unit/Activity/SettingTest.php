@@ -18,17 +18,6 @@ class SettingTest extends TestCase {
 
 	private Setting $setting;
 
-	/**
-	 * @throws Exception
-	 */
-	protected function setUp(): void {
-		parent::setUp();
-
-		$this->l10n = $this->createMock(IL10N::class);
-
-		$this->setting = new Setting($this->l10n);
-	}
-
 	public function testAll() {
 		$this->assertFalse($this->setting->canChangeMail());
 		$this->assertFalse($this->setting->canChangeStream());
@@ -41,5 +30,16 @@ class SettingTest extends TestCase {
 		$this->assertEquals(10, $this->setting->getPriority());
 		$this->assertTrue($this->setting->isDefaultEnabledMail());
 		$this->assertTrue($this->setting->isDefaultEnabledStream());
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->l10n = $this->createMock(IL10N::class);
+
+		$this->setting = new Setting($this->l10n);
 	}
 }

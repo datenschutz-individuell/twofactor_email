@@ -12,6 +12,7 @@ require_once './vendor-bin/cs-fixer/vendor/autoload.php';
 use Nextcloud\CodingStandard\Config;
 
 $config = new Config();
+/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 $config
 	->getFinder()
 	->ignoreVCSIgnored(true)
@@ -19,6 +20,7 @@ $config
 	->notPath('l10n')
 	->notPath('lib/Vendor')
 	->notPath('src')
+	->notPath('stubs')
 	->notPath('vendor')
 	->in(__DIR__);
 return $config;

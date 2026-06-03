@@ -21,18 +21,16 @@ use OCP\EventDispatcher\IEventListener;
 final class StateChangeRegistryUpdater implements IEventListener {
 
 	public function __construct(
-		private IRegistry $registry,
-		private TwoFactorEMail $provider,
+		private readonly IRegistry $registry,
+		private readonly TwoFactorEMail $provider,
 	) {
 	}
 
 	public function handle(Event $event): void {
-		if ($event instanceof StateChanged) {
-			if ($event->isEnabled()) {
-				$this->registry->enableProviderFor($this->provider, $event->getUser());
-			} else {
-				$this->registry->disableProviderFor($this->provider, $event->getUser());
-			}
+		if ($event->isEnabled()) {
+			$this->registry->enableProviderFor($this->provider, $event->getUser());
+		} else {
+			$this->registry->disableProviderFor($this->provider, $event->getUser());
 		}
 	}
 }

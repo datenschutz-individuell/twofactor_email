@@ -24,18 +24,6 @@ class StateChangeRegistryUpdaterTest extends TestCase {
 	private IRegistry|MockObject $registry;
 	private TwoFactorEMail|MockObject $provider;
 
-	/**
-	 * @throws Exception
-	 */
-	protected function setUp(): void {
-		parent::setUp();
-
-		$this->registry = $this->createMock(IRegistry::class);
-		$this->provider = $this->createMock(TwoFactorEMail::class);
-
-		$this->listener = new StateChangeRegistryUpdater($this->registry, $this->provider);
-	}
-
 	public function testIgnoresGenericEvent() {
 		$event = new Event();
 		$this->registry->expects($this->never())
@@ -70,5 +58,17 @@ class StateChangeRegistryUpdaterTest extends TestCase {
 			->with($this->provider, $user);
 
 		$this->listener->handle($event);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->registry = $this->createMock(IRegistry::class);
+		$this->provider = $this->createMock(TwoFactorEMail::class);
+
+		$this->listener = new StateChangeRegistryUpdater($this->registry, $this->provider);
 	}
 }

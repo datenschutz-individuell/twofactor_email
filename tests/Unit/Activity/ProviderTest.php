@@ -24,16 +24,13 @@ class ProviderTest extends TestCase {
 
 	private Provider $provider;
 
-	/**
-	 * @throws Exception
-	 */
-	protected function setUp(): void {
-		parent::setUp();
-
-		$this->l10n = $this->createMock(IFactory::class);
-		$this->urlGenerator = $this->createMock(IURLGenerator::class);
-
-		$this->provider = new Provider($this->l10n, $this->urlGenerator);
+	public static function subjectData(): array {
+		return [
+			[Notification::ENABLED_BY_USER],
+			[Notification::DISABLED_BY_USER],
+			[Notification::ENABLED_BY_ADMIN],
+			[Notification::DISABLED_BY_ADMIN],
+		];
 	}
 
 	/**
@@ -48,15 +45,6 @@ class ProviderTest extends TestCase {
 		$this->expectException(InvalidArgumentException::class);
 
 		$this->provider->parse($lang, $event);
-	}
-
-	public static function subjectData(): array {
-		return [
-			[Notification::ENABLED_BY_USER],
-			[Notification::DISABLED_BY_USER],
-			[Notification::ENABLED_BY_ADMIN],
-			[Notification::DISABLED_BY_ADMIN],
-		];
 	}
 
 	/**
@@ -93,5 +81,17 @@ class ProviderTest extends TestCase {
 			->method('setSubject');
 
 		$this->provider->parse($lang, $event);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->l10n = $this->createMock(IFactory::class);
+		$this->urlGenerator = $this->createMock(IURLGenerator::class);
+
+		$this->provider = new Provider($this->l10n, $this->urlGenerator);
 	}
 }

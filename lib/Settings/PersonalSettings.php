@@ -13,14 +13,21 @@ use OCA\TwoFactorEMail\AppInfo\Application;
 use OCP\Authentication\TwoFactorAuth\IPersonalProviderSettings;
 use OCP\Template\ITemplate;
 use OCP\Template\ITemplateManager;
+use OCP\Template\TemplateNotFoundException;
+use RuntimeException;
 
 final class PersonalSettings implements IPersonalProviderSettings {
 
 	public function __construct(
-		private ITemplateManager $templateManager,
+		private readonly ITemplateManager $templateManager,
 	) {
 	}
+
 	public function getBody(): ITemplate {
-		return $this->templateManager->getTemplate(Application::APP_ID, 'PersonalSettings');
+		try {
+			return $this->templateManager->getTemplate(Application::APP_ID, 'PersonalSettings');
+		} catch (TemplateNotFoundException $e) {
+			throw new RuntimeException('PersonalSettings template not found', previous: $e);
+		}
 	}
 }

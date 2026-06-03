@@ -35,37 +35,6 @@ class TwoFactorEMailTest extends TestCase {
 
 	private TwoFactorEMail $provider;
 
-	/**
-	 * @throws Exception
-	 */
-	protected function setUp(): void {
-		parent::setUp();
-
-		$masker = $this->createMock(IEMailAddressMasker::class);
-		$this->templateManager = $this->createMock(ITemplateManager::class);
-		$this->l10n = $this->createMock(IL10N::class);
-		$logger = $this->createMock(LoggerInterface::class);
-		$this->initialState = $this->createMock(IInitialState::class);
-		$this->urlGenerator = $this->createMock(IURLGenerator::class);
-		$container = $this->createMock(ContainerInterface::class);
-		$challengeService = $this->createMock(ILoginChallenge::class);
-		$this->stateManager = $this->createMock(IStateManager::class);
-		$settings = $this->createMock(IAppSettings::class);
-
-		$this->provider = new TwoFactorEMail(
-			$masker,
-			$this->templateManager,
-			$this->l10n,
-			$logger,
-			$this->initialState,
-			$this->urlGenerator,
-			$container,
-			$challengeService,
-			$this->stateManager,
-			$settings,
-		);
-	}
-
 	public function testGetId(): void {
 		self::assertEquals('email', $this->provider->getId());
 	}
@@ -168,5 +137,36 @@ class TwoFactorEMailTest extends TestCase {
 			->with($user);
 
 		$this->provider->disableFor($user);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$masker = $this->createMock(IEMailAddressMasker::class);
+		$this->templateManager = $this->createMock(ITemplateManager::class);
+		$this->l10n = $this->createMock(IL10N::class);
+		$logger = $this->createMock(LoggerInterface::class);
+		$this->initialState = $this->createMock(IInitialState::class);
+		$this->urlGenerator = $this->createMock(IURLGenerator::class);
+		$container = $this->createMock(ContainerInterface::class);
+		$challengeService = $this->createMock(ILoginChallenge::class);
+		$this->stateManager = $this->createMock(IStateManager::class);
+		$settings = $this->createMock(IAppSettings::class);
+
+		$this->provider = new TwoFactorEMail(
+			$masker,
+			$this->templateManager,
+			$this->l10n,
+			$logger,
+			$this->initialState,
+			$this->urlGenerator,
+			$container,
+			$challengeService,
+			$this->stateManager,
+			$settings,
+		);
 	}
 }

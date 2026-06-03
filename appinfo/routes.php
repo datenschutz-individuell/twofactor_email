@@ -7,24 +7,22 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-/*
- * Nextcloud USES the class 'StateController(.php)' as the 'name' refers to 'State' here. So they must match, and
- * the controller MUST be named <(route)name>Controller.php. 'update' is a method thereof.
- */
-
 return [
 	'routes' => [
 		[
-			'name' => 'State#update',
-			'url' => '/personal/save',
+			// Nextcloud expects a class StateController in 'StateController.php' with a 'save' method.
+			'name' => 'State#save',
+			'url' => '/state/save',
 			'verb' => 'POST',
 		],
 		[
-			'name' => 'AdminSettings#update',
+			// Nextcloud expects a class AdminSettingsController in 'AdminSettingsController.php' with a 'save' method.
+			'name' => 'AdminSettings#save',
 			'url' => '/admin/save',
 			'verb' => 'POST',
 		],
 		[
+			// Nextcloud expects a class AdminSettingsController in 'AdminSettingsController.php' with a 'reset' method.
 			'name' => 'AdminSettings#reset',
 			'url' => '/admin/reset',
 			'verb' => 'POST'

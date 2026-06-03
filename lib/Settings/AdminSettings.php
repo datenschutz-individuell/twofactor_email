@@ -16,19 +16,17 @@ use OCP\AppFramework\Services\IInitialState;
 use OCP\IL10N;
 use OCP\Settings\IDelegatedSettings;
 
-class AdminSettings implements IDelegatedSettings {
+final class AdminSettings implements IDelegatedSettings {
 	public function __construct(
-		private IAppSettings $appSettings,
-		private IInitialState $initialState,
-		private IL10N $l10n,
+		private readonly IAppSettings $appSettings,
+		private readonly IInitialState $initialState,
+		private readonly IL10N $l10n,
 	) {
 	}
 
 	public function getForm(): TemplateResponse {
 		$this->initialState->provideInitialState('codeLength', $this->appSettings->getCodeLength());
 		$this->initialState->provideInitialState('codeValidMinutes', $this->appSettings->getCodeValidMinutes());
-		$this->initialState->provideInitialState('sendRateLimitAttempts', $this->appSettings->getSendRateLimitAttempts());
-		$this->initialState->provideInitialState('sendRateLimitPeriodSeconds', $this->appSettings->getSendRateLimitPeriodSeconds());
 		$this->initialState->provideInitialState('eMailTemplate', $this->appSettings->getEMailTemplate());
 
 		return new TemplateResponse(Application::APP_ID, 'AdminSettings', renderAs: TemplateResponse::RENDER_AS_BLANK);
@@ -46,9 +44,6 @@ class AdminSettings implements IDelegatedSettings {
 		return $this->l10n->t('Email');
 	}
 
-	public function getAuthorizedGroupIds(): array {
-		return []; // an empty array means "real admins only, no delegated/group admins"
-	}
 
 	public function getAuthorizedAppConfig(): array {
 		return [];  // no app config keys delegated to non-admins

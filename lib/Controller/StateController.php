@@ -27,15 +27,15 @@ final class StateController extends ALoginSetupController {
 	public function __construct(
 		string $appName,
 		IRequest $request,
-		private IUserSession $userSession,
-		private IStateManager $stateManager,
+		private readonly IUserSession $userSession,
+		private readonly IStateManager $stateManager,
 	) {
 		parent::__construct($appName, $request);
 	}
 
 	#[NoAdminRequired]
 	#[PasswordConfirmationRequired]
-	public function update(bool $state): JSONResponse {
+	public function save(bool $state): JSONResponse {
 		$user = $this->userSession->getUser();
 		if ($user === null) {
 			return new JSONResponse([

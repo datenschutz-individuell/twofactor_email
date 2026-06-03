@@ -16,8 +16,8 @@ use OCP\IUser;
 
 final class StateManager implements IStateManager {
 	public function __construct(
-		private IEventDispatcher $eventDispatcher,
-		private IRegistry $registry,
+		private readonly IEventDispatcher $eventDispatcher,
+		private readonly IRegistry $registry,
 	) {
 	}
 

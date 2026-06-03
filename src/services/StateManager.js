@@ -8,11 +8,20 @@ import { generateUrl } from '@nextcloud/router'
 import Logger from '../Logger.js'
 
 /**
- * @param {boolean} enabled Enable or disable?
- * @return {Promise}
+ * @typedef {{
+ *   enabled: boolean,
+ *   error: string|boolean
+ * }} PersistStateResult
  */
-export function persist(enabled) {
-	const url = generateUrl('/apps/twofactor_email/personal/save')
+
+/**
+ * Makes the backend save the twofactor "email" enabled/disabled state.
+ *
+ * @param {boolean} enabled Enable or disable?
+ * @return {Promise<PersistStateResult>}
+ */
+export function persistState(enabled) {
+	const url = generateUrl('/apps/twofactor_email/state/save')
 	const data = {
 		state: enabled,
 	}
@@ -30,6 +39,21 @@ export function persist(enabled) {
 		})
 }
 
+/**
+ * @typedef {{
+ *   codeLength: number,
+ *   codeValidMinutes: number,
+ *   eMailTemplate: string,
+ *   error: boolean
+ * }} PersistAdminSettingsResult
+ */
+
+/**
+ * Makes the backend save the admin settings.
+ *
+ * @param {object} settings The admin settings to save
+ * @return {Promise<PersistAdminSettingsResult>}
+ */
 export function persistAdminSettings(settings) {
 	const url = generateUrl('/apps/twofactor_email/admin/save')
 
@@ -46,6 +70,11 @@ export function persistAdminSettings(settings) {
 		})
 }
 
+/**
+ * Resets the admin settings to their default values.
+ *
+ * @return {Promise<PersistAdminSettingsResult>}
+ */
 export function resetAdminSettings() {
 	const url = generateUrl('/apps/twofactor_email/admin/reset')
 

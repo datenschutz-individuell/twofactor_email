@@ -18,6 +18,7 @@
 /psalm.xml
 /screenshots
 /src
+/stubs
 /stylelint.config.cjs
 /tests
 /vendor/bin

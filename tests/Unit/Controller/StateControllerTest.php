@@ -27,24 +27,6 @@ class StateControllerTest extends TestCase {
 	/**
 	 * @throws Exception
 	 */
-	protected function setUp(): void {
-		parent::setUp();
-
-		$request = $this->createMock(IRequest::class);
-		$this->userSession = $this->createMock(IUserSession::class);
-		$this->stateManager = $this->createMock(IStateManager::class);
-
-		$this->controller = new StateController(
-			Application::APP_ID,
-			$request,
-			$this->userSession,
-			$this->stateManager,
-		);
-	}
-
-	/**
-	 * @throws Exception
-	 */
 	public function testDisable() {
 		$user = $this->createMock(IUser::class);
 		$this->userSession->expects($this->once())
@@ -104,5 +86,23 @@ class StateControllerTest extends TestCase {
 		]);
 
 		$this->assertEquals($expected, $this->controller->update(true));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$request = $this->createMock(IRequest::class);
+		$this->userSession = $this->createMock(IUserSession::class);
+		$this->stateManager = $this->createMock(IStateManager::class);
+
+		$this->controller = new StateController(
+			Application::APP_ID,
+			$request,
+			$this->userSession,
+			$this->stateManager,
+		);
 	}
 }

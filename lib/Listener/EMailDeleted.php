@@ -20,12 +20,12 @@ use OCP\EventDispatcher\IEventListener;
 final class EMailDeleted implements IEventListener {
 
 	public function __construct(
-		private IStateManager $service,
+		private readonly IStateManager $service,
 	) {
 	}
 
 	public function handle(Event $event): void {
-		if ($event instanceof UserUpdatedEvent && $event->getUser()->getEMailAddress() === null) {
+		if ($event->getUser()->getEMailAddress() === null) {
 			$this->service->disable($event->getUser());
 		}
 	}

@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { ref, watch, nextTick, reactive } from 'vue'
+import { nextTick, reactive, ref, watch } from 'vue'
 import Logger from '../Logger.js'
 
 /**
- * Manages a single shared debounce timer and loading state across all admin
+ * Manages a single shared debounced timer and loading state across all admin
  * settings fields, with per-field success feedback. Eliminates race conditions
  * that arise when each field triggers its own independent save request.
  *
@@ -20,130 +20,139 @@ import Logger from '../Logger.js'
  * @param {number} successMs   - How long the success indicator remains visible
  */
 export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs = 1200) {
-    // One shared loading state — only one request in flight at a time
-    const loading = ref(false)
+	// One shared loading state — only one request in flight at a time
+	const loading = ref(false)
 
-    // Per-field input values and success indicators.
-    // reactive() wrapping enables automatic ref unwrapping in templates
-    // and allows watch(() => inputValues[key]) to track changes correctly.
-    const inputValues = reactive(Object.fromEntries(
-        fieldKeys.map(key => [key, store[key]])
-    ))
-    const successRefs = reactive(Object.fromEntries(
-        fieldKeys.map(key => [key, null])
-    ))
-    const successTimers = Object.fromEntries(
-        fieldKeys.map(key => [key, null])
-    )
+	// Per-field input values and success indicators.
+	// reactive() wrapping enables automatic ref unwrapping in templates
+	// and allows watch(() => inputValues[key]) to track changes correctly.
+	const inputValues = reactive(Object.fromEntries(
+		fieldKeys.map(key => [key, store[key]]),
+	))
+	const successRefs = reactive(Object.fromEntries(
+		fieldKeys.map(key => [key, null]),
+	))
+	const successTimers = Object.fromEntries(
+		fieldKeys.map(key => [key, null]),
+	)
 
-    // Shared debounce timer — restarted by any field change
-    let debounceTimer = null
+	// Shared debounce timer — restarted by any field change
+	let debounceTimer = null
 
-    // Sync inputValues once the store is populated by loadInitialState.
-    // The watch on inputValues is deferred to nextTick so that this initial
-    // sync does not trigger scheduleSave.
-    for (const key of fieldKeys) {
-        watch(
-            () => store[key],
-            (val) => {
-                if (inputValues[key] === null && val !== null) {
-                    inputValues[key] = val
-                }
-            },
-            { immediate: true }
-        )
-    }
+	// Sync inputValues once the store is populated by loadInitialState.
+	// The watch on inputValues is deferred to nextTick so that this initial
+	// sync does not trigger scheduleSave.
+	for (const key of fieldKeys) {
+		watch(
+			() => store[key],
+			(val) => {
+				if (inputValues[key] === null && val !== null) {
+					inputValues[key] = val
+				}
+			},
+			{ immediate: true },
+		)
+	}
 
-    // Register user-change watches only after the initial render cycle
-    nextTick(() => {
-        for (const key of fieldKeys) {
-            watch(() => inputValues[key], () => scheduleSave())
-        }
-    })
+	// Register user-change watches only after the initial render cycle
+	nextTick().then(() => {
+		for (const key of fieldKeys) {
+			watch(() => inputValues[key], () => scheduleSave())
+		}
+	})
 
-    /**
-     * Schedules a save after the debounce delay. Any field change restarts
-     * the shared timer, so only one request fires after the last keystroke.
-     */
-    function scheduleSave() {
-        clearTimeout(debounceTimer)
-        debounceTimer = setTimeout(() => {
-            if (loading.value) {
-                // A save is already in flight; re-schedule after it completes
-                const unwatch = watch(loading, (isLoading) => {
-                    if (!isLoading) {
-                        unwatch()
-                        scheduleAndSave()
-                    }
-                })
-                return
-            }
-            scheduleAndSave()
-        }, debounceMs)
-    }
+	/**
+	 * Runs scheduleAndSave and logs any unexpected errors.
+	 * Used instead of bare scheduleAndSave() calls to avoid ignored Promise warnings.
+	 */
+	function triggerSave() {
+		scheduleAndSave().catch(e => Logger.error('Unexpected error in scheduleAndSave', e))
+	}
 
-    /**
-     * Validates all input values before saving.
-     * Returns an array of field keys that failed validation,
-     * or an empty array if all values are valid.
-     *
-     * @return {string[]} field keys with validation errors
-     */
-    function validate() {
-        const errors = []
-        const requiredPlaceholders = ['{code}', '{cloud}']
-        const missingPlaceholders = requiredPlaceholders.filter(
-            p => !inputValues.eMailTemplate.includes(p)
-        )
-        if (missingPlaceholders.length > 0) {
-            errors.push('eMailTemplate')
-            Logger.warn(`Email template missing required placeholders: ${missingPlaceholders.join(', ')}`)
-        }
-        return errors
-    }
+	/**
+	 * Schedules a save after the debounced delay.
+	 * Any field change restarts the shared timer, so only one request fires after the last keystroke.
+	 */
+	function scheduleSave() {
+		clearTimeout(debounceTimer)
+		debounceTimer = setTimeout(() => {
+			if (loading.value) {
+				// A save is already in flight; re-schedule after it completes
+				const unwatch = watch(loading, (isLoading) => {
+					if (!isLoading) {
+						unwatch()
+						triggerSave()
+					}
+				})
+				return
+			}
+			triggerSave()
+		}, debounceMs)
+	}
 
-    async function scheduleAndSave() {
-        loading.value = true
-        store.$patch({ error: null })
+	/**
+	 * Validates all input values before saving.
+	 * Returns an array of field keys that failed validation,
+	 * or an empty array if all values are valid.
+	 *
+	 * @return {string[]} field keys with validation errors
+	 */
+	function validate() {
+		const errors = []
+		const requiredPlaceholders = ['{code}', '{cloud}']
+		// noinspection JSUnresolvedVariable
+		const missingPlaceholders = requiredPlaceholders.filter(
+			p => !(inputValues.eMailTemplate ?? '').includes(p),
+		)
+		if (missingPlaceholders.length > 0) {
+			errors.push('eMailTemplate')
+			Logger.warn(`Email template missing required placeholders: ${missingPlaceholders.join(', ')}`)
+		}
+		return errors
+	}
 
-        // Validate before saving — set error state on failing fields and abort
-        const invalidFields = validate()
-        if (invalidFields.length > 0) {
-            for (const key of invalidFields) {
-                successRefs[key] = false
-            }
-            loading.value = false
-            return
-        }
+	async function scheduleAndSave() {
+		loading.value = true
+		store.$patch({ error: null })
 
-        try {
-            // Write all current inputValues into the store before saving
-            for (const key of fieldKeys) {
-                store[key] = inputValues[key]
-            }
-            const result = await store.save()
-            // Set per-field success based on shared result
-            for (const key of fieldKeys) {
-                if (typeof result?.error !== 'string') {
-                    clearTimeout(successTimers[key])
-                    successRefs[key] = true
-                    successTimers[key] = setTimeout(() => {
-                        successRefs[key] = null
-                    }, successMs)
-                } else {
-                    successRefs[key] = false
-                }
-            }
-        } catch (saveError) {
-            store.$patch({ error: 'save-failed' })
-            for (const key of fieldKeys) {
-                successRefs[key] = false
-            }
-            Logger.error('Could not persist admin settings', saveError)
-        } finally {
-            loading.value = false
-        }
-    }
+		// Validate before saving — set error state on failing fields and abort
+		const invalidFields = validate()
+		if (invalidFields.length > 0) {
+			for (const key of invalidFields) {
+				successRefs[key] = false
+			}
+			loading.value = false
+			return
+		}
 
-    return { inputValues, loading, successRefs }
+		try {
+			// Write all current inputValues into the store before saving
+			for (const key of fieldKeys) {
+				store[key] = inputValues[key]
+			}
+			const result = await store.save()
+			// Set per-field success based on the shared result
+			for (const key of fieldKeys) {
+				if (typeof result?.error !== 'string') {
+					clearTimeout(successTimers[key])
+					successRefs[key] = true
+					successTimers[key] = setTimeout(() => {
+						successRefs[key] = null
+					}, successMs)
+				} else {
+					successRefs[key] = false
+				}
+			}
+		} catch (saveError) {
+			store.$patch({ error: 'save-failed' })
+			for (const key of fieldKeys) {
+				successRefs[key] = false
+			}
+			Logger.error('Could not persist admin settings', saveError)
+		} finally {
+			loading.value = false
+		}
+	}
+
+	return { inputValues, loading, successRefs }
 }

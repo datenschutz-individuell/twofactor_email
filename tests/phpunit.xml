@@ -10,6 +10,9 @@
         <include>
             <directory>../lib</directory>
         </include>
+        <exclude>
+            <directory>../stubs</directory>
+        </exclude>
     </source>
     <coverage>
         <report>

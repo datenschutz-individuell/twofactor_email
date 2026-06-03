@@ -16,36 +16,34 @@ use OCP\Migration\SimpleMigrationStep;
 use Throwable;
 
 /*
- * twofactor_email from 3.0.3-beta.2 (2025-08-19) to 3.1.0 (2026-05-31) migrated v2 authentication codes.
- * Thanks to a user issue report, we got aware that there is a logic error and that we over-engineered:
- * v2 saved codes without timestamp to limit their validity. It also did not delete codes, not even after use.
- * We migrated all saved codes. Most of them probably were issued long ago and used already.
+ * twofactor_email v2 saved codes without a timestamp to limit their validity. It also did not delete codes.
+ * So most codes stored were obsolete since they probably were issued long ago and used already. Nevertheless,
+ * twofactor_email from 3.0.3-beta.2 (2025-08-19) to 3.1.0 (2026-05-31) migrated ALL v2 authentication codes.
  *
  * Not deleting codes in v2 was not a security issue since it was not possible to use the 2FA login flow with
- * twofactor_email without creating, storing (overwriting) and sending a new code.
- * However, since 3.0.5-beta.4 (2026-01-31) codes are no longer sent every time a user logs in and chooses
- * Email as Two-Factor provider. We implemented rate limiting to thwart DoS attacks. Codes are now only created
- * and sent after SendRateLimitPeriodSeconds seconds (which defaults to 600).
+ * twofactor_email without creating, storing (overwriting) and sending a new code. However, codes are no longer
+ * sent every time a user logs in and chooses the Email Two-Factor provider. We implemented rate limiting to
+ * thwart DoS attacks. Since 3.0.5-beta.4 (2026-01-31) codes are only created and sent if no valid code exists.
  *
  * If an instance was migrated from 2.x.x to 3.0.5-beta.4 … 3.1.0, all (already-used and not-yet-used) codes
  * were migrated and stored in the new v3 key format along with the codeCreatedAt timestamp which was set to
- * the time the migration was executed. For these version users may not be sent a code from the update until
- * 10 minutes after (due to rate limiting).
+ * the time the migration was executed. For these versions, users may not send a code from the update until
+ * 10 minutes after (due to implicit rate limiting by the default validity).
  *
- * Since there is no way to fix this in an additional migration (which is the way migrations are meant to be
- * used), we modified this migration to at least reduce impact for updates/migrations from v2 to v3 that happen
- * in the future, upgrading to a version ≥3.1.1.
+ * Since there is no way to fix this in an additional migration, we modified this migration. By that, users
+ * will no longer be impacted when updating from v2 to ≥3.1.1.
  *
- * We only had a few users trying out the very early stage of this app. Only there we introduced a new DB scheme.
- * There is no point in dropping a table that never existed for regular users. Since we change this migration due
- * to reasons explained above anyway, we also remove the superfluous changeSchema.
+ * Since we changed this migration due to reasons explained above, we also removed a superfluous changeSchema:
+ * We only had a few test users trying out a very early alpha release of this app. Only in these alphas, we
+ * introduced a new DB scheme. There is no point in dropping a table that never existed for regular users.
  */
+
 final class Version03000400Date20250829000000 extends SimpleMigrationStep {
 	private const APP_ID = 'twofactor_email';
 	private const V2_KEY_CODE = 'authentication_code';
 
 	public function __construct(
-		private IUserConfig $userConfig,
+		private readonly IUserConfig $userConfig,
 	) {
 	}
 
