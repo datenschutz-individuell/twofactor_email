@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Controller;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
+use OCA\TwoFactorEMail\Service\AppSettingsDefaults;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Settings\AdminSettings;
 use OCP\AppFramework\Http;
@@ -57,9 +58,9 @@ final class AdminSettingsController extends ALoginSetupController {
 			return new JSONResponse(['error' => implode(', ', $errors)], Http::STATUS_BAD_REQUEST);
 		}
 
-		$this->appConfig->setValueInt(Application::APP_ID, 'code_length', $codeLength);
-		$this->appConfig->setValueInt(Application::APP_ID, 'code_valid_minutes', $codeValidMinutes);
-		$this->appConfig->setValueString(Application::APP_ID, 'email_template', $eMailTemplate);
+		$this->appConfig->setValueInt(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_CODE_LENGTH, $codeLength);
+		$this->appConfig->setValueInt(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_CODE_VALID_MINUTES, $codeValidMinutes);
+		$this->appConfig->setValueString(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_TEMPLATE, $eMailTemplate);
 
 		return new JSONResponse([
 			'codeLength' => $this->appSettings->getCodeLength(),
@@ -83,29 +84,25 @@ final class AdminSettingsController extends ALoginSetupController {
 		string $eMailTemplate,
 	): array {
 		$errors = [];
-
 		if ($codeLength < self::MIN_CODE_LENGTH || $codeLength > self::MAX_CODE_LENGTH) {
 			$errors[] = 'code-length-out-of-range';
 		}
-
 		if ($codeValidMinutes < self::MIN_CODE_VALID_MINUTES || $codeValidMinutes > self::MAX_CODE_VALID_MINUTES) {
 			$errors[] = 'code-valid-minutes-out-of-range';
 		}
-
 		if (strlen($eMailTemplate) > self::MAX_EMAIL_TEMPLATE_LENGTH) {
 			$errors[] = 'email-template-too-long';
 		}
-
 		return $errors;
 	}
 
 	#[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function reset(): JSONResponse {
-		$this->appConfig->deleteKey(Application::APP_ID, 'code_length');
-		$this->appConfig->deleteKey(Application::APP_ID, 'code_valid_minutes');
-		$this->appConfig->deleteKey(Application::APP_ID, 'email_template');
+		// Delete all keys so the defaults take effect immediately
+		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_CODE_LENGTH);
+		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_CODE_VALID_MINUTES);
+		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_TEMPLATE);
 
-		// Return the effective defaults so the frontend can update immediately
 		return new JSONResponse([
 			'codeLength' => $this->appSettings->getCodeLength(),
 			'codeValidMinutes' => $this->appSettings->getCodeValidMinutes(),
