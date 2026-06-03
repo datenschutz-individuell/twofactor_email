@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Provider;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
+use OCA\TwoFactorEMail\Exception\EMailNotSet;
+use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Service\IEMailAddressMasker;
 use OCA\TwoFactorEMail\Service\ILoginChallenge;
@@ -75,11 +77,23 @@ final class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPerson
 			throw new RuntimeException('LoginChallenge template not found', previous: $e);
 		}
 
-		$newCodeWasSent = $this->challengeService->sendChallenge($user);
+		$newCodeWasSent = false;
+		$error = null;
+
+		try {
+			// Trigger the challenge dispatching process
+			$newCodeWasSent = $this->challengeService->sendChallenge($user);
+		} catch (EMailNotSet) {
+			$error = 'no-email';
+		} catch (SendEMailFailed) {
+			$error = 'send-failed';
+		}
 
 		// To use these settings in the LoginChallenge.php template, we must provide them here.
 		$template->assign('codeLength', $this->settings->getCodeLength());
 		$template->assign('newCodeWasSent', $newCodeWasSent);
+		$template->assign('error', $error);
+
 		// Return the template for the challenge view (LoginChallenge.php file in the templates folder of the app)
 		return $template;
 	}

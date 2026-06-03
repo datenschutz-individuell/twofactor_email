@@ -26,20 +26,32 @@ if (!empty($codeLength)) {
 }
 
 $newCodeWasSent = $_['newCodeWasSent']; // provided in Provider/TwoFactorEMail.php
+$error = $_['error'] ?? null; // caught and passed in Provider/TwoFactorEMail.php
 ?>
 <img class="two-factor-icon twofactor_email-challenge-icon"
 	 src="<?php print_unescaped(image_path('twofactor_email', 'app.svg')); ?>" alt="Icon depicting a letter and a user">
-<p><?php
-	if ($newCodeWasSent) {
-		p($l->t('A new authentication code was just sent. Please enter it:'));
-	} else {
-		p($l->t('Enter the authentication code that was sent to you:'));
-	}
-?></p>
-<form method="POST" class="twofactor_email-challenge-form">
-	<input type="text"<?= $minmax ?> name="challenge" required="required" autofocus autocomplete="one-time-code"
-		   inputmode="numeric" autocapitalize="off" placeholder="<?php p($l->t('Authentication code')) ?>">
-	<button class="primary two-factor-submit" type="submit">
-		<?php p($l->t('Submit')); ?>
-	</button>
-</form>
+
+<?php if ($error === 'no-email'): ?>
+	<p class="warning">
+		<?php p($l->t('An error occurred: No email address is configured in your personal settings. Please contact your administrator.')); ?>
+	</p>
+<?php elseif ($error === 'send-failed'): ?>
+	<p class="warning">
+		<?php p($l->t('The verification email could not be sent. Please try again later or contact your administrator.')); ?>
+	</p>
+<?php else: ?>
+	<p><?php
+		if ($newCodeWasSent) {
+			p($l->t('A new authentication code was just sent. Please enter it:'));
+		} else {
+			p($l->t('Enter the authentication code that was sent to you:'));
+		}
+		?></p>
+	<form method="POST" class="twofactor_email-challenge-form">
+		<input type="text"<?= $minmax ?> name="challenge" required="required" autofocus autocomplete="one-time-code"
+			   inputmode="numeric" autocapitalize="off" placeholder="<?php p($l->t('Authentication code')) ?>">
+		<button class="primary two-factor-submit" type="submit">
+			<?php p($l->t('Submit')); ?>
+		</button>
+	</form>
+<?php endif; ?>
