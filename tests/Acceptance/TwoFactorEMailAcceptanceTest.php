@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
- * SPDX-License-Identifier: AGPL-3.0-only
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
 namespace OCA\TwoFactorEMail\Test\Acceptance;
@@ -12,7 +12,10 @@ namespace OCA\TwoFactorEMail\Test\Acceptance;
 use ChristophWurst\Nextcloud\Testing\Selenium;
 use ChristophWurst\Nextcloud\Testing\TestCase;
 use ChristophWurst\Nextcloud\Testing\TestUser;
+use Exception;
 use Facebook\WebDriver\Exception\ElementNotInteractableException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\TimeoutException;
 use Facebook\WebDriver\WebDriver;
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverExpectedCondition;
@@ -29,6 +32,9 @@ class TwoFactorEMailAcceptanceTest extends TestCase {
 
 	private IUser $user;
 
+	/**
+	 * @throws Exception
+	 */
 	public function setUp(): void {
 		parent::setUp();
 
@@ -36,6 +42,10 @@ class TwoFactorEMailAcceptanceTest extends TestCase {
 		$this->user->setSystemEMailAddress('test@localhost');
 	}
 
+	/**
+	 * @throws NoSuchElementException
+	 * @throws TimeoutException
+	 */
 	public function testEnableTwoFactorEmail(): void {
 		$this->webDriver->get('http://localhost:8080/index.php/login');
 		self::assertStringContainsString('Nextcloud', $this->webDriver->getTitle());
@@ -69,13 +79,17 @@ class TwoFactorEMailAcceptanceTest extends TestCase {
 		});
 
 		/** @var IStateManager $providerState */
-		$providerState = OC::$server->query(IStateManager::class);
+		$providerState = OC::$server->get(IStateManager::class);
 		self::assertTrue($providerState->isEnabled($this->user));
 	}
 
+	/**
+	 * @throws NoSuchElementException
+	 * @throws TimeoutException
+	 */
 	public function testLoginShouldFailWithWrongOTP(): void {
 		/** @var IStateManager $stateManager */
-		$stateManager = OC::$server->query(IStateManager::class);
+		$stateManager = OC::$server->get(IStateManager::class);
 		$stateManager->enable($this->user);
 
 		$this->webDriver->get('http://localhost:8080/index.php/login');

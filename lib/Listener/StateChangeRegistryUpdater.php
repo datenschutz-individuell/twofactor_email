@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
- * SPDX-License-Identifier: AGPL-3.0-only
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
 namespace OCA\TwoFactorEMail\Listener;
@@ -21,18 +21,19 @@ use OCP\EventDispatcher\IEventListener;
 final class StateChangeRegistryUpdater implements IEventListener {
 
 	public function __construct(
-		private IRegistry $registry,
-		private TwoFactorEMail $provider,
+		private readonly IRegistry $registry,
+		private readonly TwoFactorEMail $provider,
 	) {
 	}
 
 	public function handle(Event $event): void {
-		if ($event instanceof StateChanged) {
-			if ($event->isEnabled()) {
-				$this->registry->enableProviderFor($this->provider, $event->getUser());
-			} else {
-				$this->registry->disableProviderFor($this->provider, $event->getUser());
-			}
+		if (!$event instanceof StateChanged) {
+			return;
+		}
+		if ($event->isEnabled()) {
+			$this->registry->enableProviderFor($this->provider, $event->getUser());
+		} else {
+			$this->registry->disableProviderFor($this->provider, $event->getUser());
 		}
 	}
 }

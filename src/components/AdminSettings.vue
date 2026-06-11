@@ -4,50 +4,52 @@
 -->
 
 <template>
-  <div id="twofactor_email-admin_settings">
-    <NcSettingsSection :name="t('twofactor_email', 'Two-Factor email provider')"
-					   :description="t('twofactor_email', 'These system wide settings are saved automatically shortly after the last keypress.')">
+	<div id="twofactor_email-admin_settings">
+		<NcSettingsSection :name="t('twofactor_email', 'Two-Factor email provider')"
+						   :description="t('twofactor_email', 'These system wide settings are saved automatically shortly after the last keypress.')">
 
-      <!-- Numeric fields: min="1" prevents zero and negative values at the browser level;
-           @keydown guard blocks direct keyboard entry of '-' and 'e' (scientific notation) -->
-      <div class="numeric-fields-grid">
-        <NcTextField v-for="field in numericFields"
-                     :key="field.key"
-                     v-model="inputValues[field.key]"
-                     :label="field.label"
-                     type="number"
-                     min="1"
-                     :loading="loading"
-                     :success="successRefs[field.key] === true"
-                     :error="successRefs[field.key] === false"
-                     @keydown="blockInvalidNumericInput" />
-      </div>
+			<!-- Numeric fields: min="1" prevents zero and negative values at the browser level;
+				 @keydown guard blocks direct keyboard entry of '-' and 'e' (scientific notation) -->
+			<div class="numeric-fields-grid">
+				<NcTextField v-for="field in numericFields"
+							 :key="field.key"
+							 v-model="inputValues[field.key]"
+							 :error="successRefs[field.key] === false"
+							 :label="field.label"
+							 :loading="loading"
+							 :success="successRefs[field.key] === true"
+							 min="1"
+							 type="number"
+							 @keydown="blockInvalidNumericInput" />
+			</div>
 
-      <!-- Email template: monospace textarea with code-editor appearance -->
-      <div class="email-template-field">
-        <NcTextArea v-model="inputValues.eMailTemplate"
-                    class="email-template-field__textarea"
-                    :label="t('twofactor_email', 'Email Template (plain text)')"
-					:helper-text="t('twofactor_email', 'The email template text to be sent to the user. It MUST contain the placeholders `{code} and `{cloud}`.')"
-                    :hide-label="true"
-                    :loading="loading"
-                    :success="successRefs.eMailTemplate === true"
-                    :error="successRefs.eMailTemplate === false" />
-      </div>
+			<!-- Email template: monospace textarea with code-editor appearance -->
+			<div class="email-template-field">
+				<NcTextArea v-for="field in textAreaFields"
+							:key="field.key"
+							v-model="inputValues[field.key]"
+							:error="successRefs[field.key] === false"
+							:helper-text="t('twofactor_email', 'The email template text to be sent to the user. It MUST contain the placeholders `{code} and `{cloud}`.')"
+							:hide-label="true"
+							:label="t('twofactor_email', 'Email Template (plain text)')"
+							:loading="loading"
+							:success="successRefs[field.key] === true"
+							class="email-template-field__textarea" />
+			</div>
 
-      <div class="reset-section">
-        <NcButton type="tertiary-no-background"
-                  :disabled="resetting"
-                  @click="onReset">
-          <template #icon>
-            <NcIconSvgWrapper :path="mdiUndo" :size="20" />
-          </template>
-          {{ t('twofactor_email', 'Reset all Two-Factor email app-wide admin settings to their defaults') }}
-        </NcButton>
-      </div>
+			<div class="reset-section">
+				<NcButton :disabled="resetting"
+						  type="tertiary-no-background"
+						  @click="onReset">
+					<template #icon>
+						<NcIconSvgWrapper :path="mdiUndo" :size="20" />
+					</template>
+					{{ t('twofactor_email', 'Reset all Two-Factor email app-wide admin settings to their defaults') }}
+				</NcButton>
+			</div>
 
-    </NcSettingsSection>
-  </div>
+		</NcSettingsSection>
+	</div>
 </template>
 
 <script setup>
@@ -61,28 +63,27 @@ import { mdiUndo } from '@mdi/js'
 import { t } from '@nextcloud/l10n'
 import { useAdminSettingsStore } from '../Store.js'
 import { useAdminSettings } from '../composables/useAdminSettings.js'
+import Logger from '../Logger.js'
 
 const resetting = ref(false)
 
 const store = useAdminSettingsStore()
-store.loadInitialState('codeLength', 'codeValidMinutes', 'sendRateLimitAttempts', 'sendRateLimitPeriodSeconds', 'eMailTemplate')
+store.loadInitialState('codeLength', 'codeValidMinutes', 'eMailTemplate')
 
 const numericFields = [
-  { key: 'codeLength',                 label: t('twofactor_email', 'Code Length (Characters)') },
-  { key: 'codeValidMinutes',           label: t('twofactor_email', 'Code Validity (Minutes)') },
-  { key: 'sendRateLimitAttempts',      label: t('twofactor_email', 'Send Rate Limit (Attempts)') },
-  { key: 'sendRateLimitPeriodSeconds', label: t('twofactor_email', 'Send Rate Limit Period (Seconds)') },
+	{ key: 'codeLength', label: t('twofactor_email', 'Code Length (Characters)') },
+	{ key: 'codeValidMinutes', label: t('twofactor_email', 'Code Validity (Minutes)') },
 ]
 
 const textAreaFields = [
-  { key: 'eMailTemplate' },
+	{ key: 'eMailTemplate' },
 ]
 
 const allFields = [...numericFields, ...textAreaFields]
 
 const { inputValues, loading, successRefs } = useAdminSettings(
-    store,
-    allFields.map(f => f.key)
+	store,
+	allFields.map(f => f.key),
 )
 
 /**
@@ -93,9 +94,9 @@ const { inputValues, loading, successRefs } = useAdminSettings(
  * @param {KeyboardEvent} event - The keyboard event from the input field
  */
 function blockInvalidNumericInput(event) {
-  if (event.key === '-' || event.key === 'e') {
-    event.preventDefault()
-  }
+	if (event.key === '-' || event.key === 'e') {
+		event.preventDefault()
+	}
 }
 
 async function onReset() {
@@ -108,7 +109,7 @@ async function onReset() {
 			}
 		}
 	} catch (e) {
-		console.error('reset failed:', e)
+		Logger.error('reset failed:', e)
 	} finally {
 		resetting.value = false
 	}
@@ -117,39 +118,41 @@ async function onReset() {
 
 <style scoped>
 .numeric-fields-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 16px;
-  margin-bottom: 24px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px 16px;
+	margin-bottom: 24px;
 }
 
 /* Stack to single column on narrow screens */
 @media (max-width: 640px) {
-  .numeric-fields-grid {
-    grid-template-columns: 1fr;
-  }
+	.numeric-fields-grid {
+		grid-template-columns: 1fr;
+	}
 }
 
 .email-template-field {
-  margin-top: 8px;
+	margin-top: 8px;
 }
 
 /* Force monospace / code-editor appearance on the inner textarea element */
 .email-template-field__textarea :deep(textarea) {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 13px;
-  line-height: 1.6;
-  min-height: 220px;
-  margin-top: 24px;
-  margin-bottom: 8px;
-  resize: vertical;
-  tab-size: 2;
-  white-space: pre-wrap;
-  background-color: var(--color-background-dark);
-  border-radius: var(--border-radius);
+	font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+	font-size: 13px;
+	line-height: 1.6;
+	min-height: 220px;
+	margin-top: 24px;
+	margin-bottom: 8px;
+	resize: vertical;
+	tab-size: 2;
+	white-space: pre-wrap;
+	/* noinspection CssUnresolvedCustomProperty */
+	background-color: var(--color-background-dark, darkgray);
+	/* noinspection CssUnresolvedCustomProperty */
+	border-radius: var(--border-radius, 4px);
 }
 
 .reset-section {
-  margin-top: 16px;
+	margin-top: 16px;
 }
 </style>

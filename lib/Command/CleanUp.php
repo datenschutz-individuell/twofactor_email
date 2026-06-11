@@ -18,7 +18,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class CleanUp extends Command {
 
 	public function __construct(
-		private ICodeStorage $codeStorage,
+		private readonly ICodeStorage $codeStorage,
 	) {
 		parent::__construct();
 	}

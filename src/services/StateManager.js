@@ -8,11 +8,20 @@ import { generateUrl } from '@nextcloud/router'
 import Logger from '../Logger.js'
 
 /**
- * @param {boolean} enabled Enable or disable?
- * @return {Promise}
+ * @typedef {{
+ *   enabled: boolean,
+ *   error: string|boolean
+ * }} PersistStateResult
  */
-export function persist(enabled) {
-	const url = generateUrl('/apps/twofactor_email/personal/save')
+
+/**
+ * Makes the backend save the twofactor "email" enabled/disabled state.
+ *
+ * @param {boolean} enabled Enable or disable?
+ * @return {Promise<PersistStateResult>}
+ */
+export function persistState(enabled) {
+	const url = generateUrl('/apps/twofactor_email/state/save')
 	const data = {
 		state: enabled,
 	}
@@ -20,16 +29,42 @@ export function persist(enabled) {
 	Logger.debug('sending two-factor email state change request', data)
 	return Axios.post(url, data)
 		.then(resp => {
-			if (resp.status !== 200) {
-				return { error: 'save-failed' }
-			} else {
-				return resp.data
+			// here HTTP 2xx only, HTTP 4xx error codes go to catch
+			return resp.data
+		}).catch(error => {
+			Logger.error('failed to save two-factor email state', error)
+
+			if (error.response && error.response.data && error.response.data.error) {
+				return {
+					enabled: false,
+					error: error.response.data.error,
+				}
 			}
-		}).catch(_ => {
-			return { error: 'save-failed' }
+
+			// fallback for network or other unexpected errors
+			return {
+				enabled: false,
+				error: 'save-failed',
+			}
 		})
 }
 
+
+/**
+ * @typedef {{
+ *   codeLength: number,
+ *   codeValidMinutes: number,
+ *   eMailTemplate: string,
+ *   error: boolean
+ * }} PersistAdminSettingsResult
+ */
+
+/**
+ * Makes the backend save the admin settings.
+ *
+ * @param {object} settings The admin settings to save
+ * @return {Promise<PersistAdminSettingsResult>}
+ */
 export function persistAdminSettings(settings) {
 	const url = generateUrl('/apps/twofactor_email/admin/save')
 
@@ -46,6 +81,11 @@ export function persistAdminSettings(settings) {
 		})
 }
 
+/**
+ * Resets the admin settings to their default values.
+ *
+ * @return {Promise<PersistAdminSettingsResult>}
+ */
 export function resetAdminSettings() {
 	const url = generateUrl('/apps/twofactor_email/admin/reset')
 

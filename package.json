@@ -1,7 +1,7 @@
 {
   "name": "twofactor_email",
   "description": "Two-Factor Email Provider",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "type": "module",
   "author": {
     "name": "Christoph Wurst",
@@ -65,12 +65,16 @@
     "node": "^24.0.0",
     "npm": "^11.0.0"
   },
+  "overrides": {
+    "fast-xml-parser": "^5.7.0"
+  },
   "devDependencies": {
     "@mdi/js": "^7.4.47",
     "@nextcloud/browserslist-config": "^3.0.1",
     "@nextcloud/eslint-config": "^8.4.2",
     "@nextcloud/prettier-config": "^1.2.0",
     "@nextcloud/stylelint-config": "^3.1.0",
+    "@nextcloud/typings": "^1.10.0",
     "@nextcloud/vite-config": "^2.5.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",

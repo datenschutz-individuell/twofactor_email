@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024-2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
+# SPDX-FileCopyrightText: 2024 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
 # SPDX-License-Identifier: MIT
 
 name: Test
@@ -6,7 +6,7 @@ name: Test
 permissions:
   contents: read
   pull-requests: write
-  
+
 on:
   pull_request:
     branches:
@@ -21,12 +21,12 @@ jobs:
       matrix:
         php-version: [ "8.2" ]
         nextcloud-version: [ 'stable33' ]
-        db: ['sqlite']
+        db: [ 'sqlite' ]
 
     name: Nextcloud ${{ matrix.nextcloud-version }} php${{ matrix.php-version }} unit tests
     steps:
       - name: Set up php${{ matrix.php-version }}
-        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php-version }}
           extensions: ctype,curl,dom,gd,iconv,intl,json,mbstring,openssl,posix,sqlite,xml,zip
@@ -39,7 +39,7 @@ jobs:
         run: php -f nextcloud/occ maintenance:install --database-host 127.0.0.1 --database-name nextcloud --database-user nextcloud --database-pass nextcloud --admin-user admin --admin-pass admin --database ${{ matrix.db }}
 
       - name: Checkout app
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           path: nextcloud/apps/twofactor_email
 
@@ -52,7 +52,7 @@ jobs:
         run: composer run test:unit
 
       - name: Report coverage
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         if: ${{ always() }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

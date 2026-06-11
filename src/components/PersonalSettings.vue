@@ -9,9 +9,9 @@
 		<div v-if="store.hasEmail">
 			<p>
 				<NcCheckboxRadioSwitch v-model="store.enabled"
-						type="switch"
-						:loading="loading"
-						@update:model-value="onUpdate">
+									   :loading="loading"
+									   type="switch"
+									   @update:model-value="onUpdate">
 					{{ t('twofactor_email', 'Use two-factor authentication via email') }}
 				</NcCheckboxRadioSwitch>
 			</p>
@@ -21,13 +21,14 @@
 		</div>
 		<div v-else>
 			<span class="notice">
-				{{ t('twofactor_email', 'You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first.') }}
+				{{ t('twofactor_email', 'You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first.')
+				}}
 			</span>
 		</div>
-    <span v-if="store.error === 'password-confirmation-failed'" class="error">
+		<span v-if="store.error === 'password-confirmation-failed'" class="error">
       {{ t('twofactor_email', 'Password confirmation failed. Please try again.') }}
     </span>
-    <span v-else-if="store.error === 'no-email'" class="error">
+		<span v-else-if="store.error === 'no-email'" class="error">
 			{{ t('twofactor_email', 'Apparently your previously configured email address just vanished.') }}
 		</span>
 		<span v-else-if="store.error === 'save-failed'" class="error">
@@ -40,14 +41,14 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import { t } from '@nextcloud/l10n'
 import { confirmPassword } from '@nextcloud/password-confirmation'
 import '@nextcloud/password-confirmation/style.css'
 
 import Logger from '../Logger.js'
-import { usePersonalSettingsStore } from "../Store.js"
+import { usePersonalSettingsStore } from '../Store.js'
 
 const store = usePersonalSettingsStore()
 store.loadInitialState('enabled', 'hasEmail', 'email')
@@ -59,35 +60,39 @@ async function onUpdate() {
 		Logger.debug('still loading -> ignoring event')
 		return
 	}
-  loading.value = true
+	loading.value = true
 
-  // Save the current "enabled" value to be used in the frontend in case of an error in the backend.
-  // Since the toggle already happened (only then onUpdate is called), that's the inverted value.
-  const previousState = !store.enabled
+	// Save the current "enabled" value to be used in the frontend in case of an error in the backend.
+	// Since the toggle already happened (only then onUpdate is called), that's the inverted value.
+	const previousState = !store.enabled
 
-  // Reset possible previous errors upon consecutive retries
-  store.$patch({ error: null })
+	// Reset possible previous errors upon consecutive retries
+	store.$patch({ error: null })
 
-  try {
-    await confirmPassword()
-  } catch (passwordError) {
-    // password required but not correct or not given, e.g. aborted
-    store.enabled = previousState
-    store.$patch({ error: 'password-confirmation-failed' })
-    Logger.error('Password confirmation failed', passwordError)
-    loading.value = false
-    return
-  }
+	try {
+		await confirmPassword()
+	} catch (passwordError) {
+		// password required but not correct or not given, e.g., aborted
+		store.enabled = previousState
+		store.$patch({ error: 'password-confirmation-failed' })
+		Logger.error('Password confirmation failed', passwordError)
+		loading.value = false
+		return
+	}
 
-  try {
-    await store.save()
-  } catch (saveError) {
-    // backend error while trying to persist
-    store.enabled = previousState
-    store.$patch({ error: 'save-failed' })
-    Logger.error('Could not persist settings', saveError)
-  } finally {
-    loading.value = false
-  }
+	try {
+		await store.save()
+		// Reset the UI switch if StateController sends HTTP error code
+		if (store.error) {
+			store.enabled = previousState
+		}
+	} catch (saveError) {
+		// backend error while trying to persistState
+		store.enabled = previousState
+		store.$patch({ error: 'save-failed' })
+		Logger.error('Could not persistState settings', saveError)
+	} finally {
+		loading.value = false
+	}
 }
 </script>

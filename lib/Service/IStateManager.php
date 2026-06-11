@@ -13,6 +13,8 @@ use OCP\IUser;
 
 interface IStateManager {
 	public function enable(IUser $user, bool $byAdmin = false): void;
+
 	public function disable(IUser $user, bool $byAdmin = false): void;
+
 	public function isEnabled(IUser $user): bool;
 }

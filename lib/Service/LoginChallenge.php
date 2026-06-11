@@ -13,31 +13,36 @@ use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCP\IUser;
 use OCP\Security\IHasher;
+use Psr\Log\LoggerInterface;
 
 final class LoginChallenge implements ILoginChallenge {
 	public function __construct(
-		private ICodeGenerator $codeGenerator,
-		private ICodeStorage $codeStorage,
-		private IEMailSender $emailSender,
-		private IHasher $hasher,
+		private readonly ICodeGenerator $codeGenerator,
+		private readonly ICodeStorage $codeStorage,
+		private readonly IEMailSender $emailSender,
+		private readonly IHasher $hasher,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 
 	/**
-	 * Store code securely (and resistent to time-based attacks) in case an attacker managed to elevate his privileges.
-	 *
-	 * Login retry throttling is done by Nextcloud, but re-loading the form would generate and send new codes.
-	 * This is not handled by the brute force protection. We could skip sending emails once a rate limit is reached,
-	 * see https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/security.html#rate-limiting
-	 * Instead, we don't send a new code if we can read the code from storage (which means that there's a code that
-	 * is still valid).
-	 *
-	 * One could always delete the code after verification. Allowing retries is more convenient for users (mistype).
+	 * @throws SendEMailFailed
+	 * @throws EMailNotSet
 	 */
 	public function sendChallenge(IUser $user): bool {
-		// If there is still a valid code stored, don't generate and send another.
+		/**
+		 * Store code securely and time-based attack resistent in case an attacker managed to elevate his privileges.
+		 */
 		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
-		if (! is_null($storedCodeHash)) {
+
+		/**
+		 * Login retry throttling is done by Nextcloud, but re-loading the form would generate and send new codes.
+		 * This is not handled by the brute force protection. We could skip sending emails once a rate limit is reached,
+		 * see https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/security.html#rate-limiting
+		 * Instead, we don't generate and send a new code as long as we can read a code from the user's preferences.
+		 * We can only successfully read a code if there is one stored and while that one is still valid.
+		 */
+		if (!is_null($storedCodeHash)) {
 			return false;
 		}
 
@@ -48,8 +53,18 @@ final class LoginChallenge implements ILoginChallenge {
 			// Only store the code if it could be sent.
 			$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode));
 			return true;
-		} catch (EMailNotSet|SendEMailFailed) {
-			return false;
+		} catch (EMailNotSet $e) {
+			$this->logger->warning('Could not send 2FA challenge: No email address configured for user.', [
+				'exception' => $e,
+				'app' => 'twofactor_email',
+			]);
+			throw $e;
+		} catch (SendEMailFailed $e) {
+			$this->logger->error('Failed to send 2FA challenge email due to a mailer error.', [
+				'exception' => $e,
+				'app' => 'twofactor_email',
+			]);
+			throw $e;
 		}
 	}
 
@@ -62,6 +77,11 @@ final class LoginChallenge implements ILoginChallenge {
 			$isValid = $this->hasher->verify($submittedCode, $storedCodeHash);
 		}
 
+		/*
+		 * We currently only delete the code if it was successfully used (and the user is verified / logged in).
+		 * We could always delete the code, even if the verification failed. That would be more secure but less
+		 * convenient. We want users to be able to retry in case the mistyped their code.
+		 */
 		if ($isValid) {
 			$this->codeStorage->deleteCode($user->getUID());
 		}

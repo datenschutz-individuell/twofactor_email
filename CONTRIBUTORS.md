@@ -2,8 +2,9 @@
 
 ### Sponsor
 
-* [Datenschutz Individuell](mailto:Datenschutz Individuell <kontakt@datenschutz-individuell.de>) (https://www.datenschutz-individuell.de)
-  Sponsor of the development of twofactor_email ≥3.0.0
+* [Datenschutz Individuell](mailto:Datenschutz
+  Individuell <kontakt@datenschutz-individuell.de>) (https://www.datenschutz-individuell.de)
+  Development sponsor for twofactor_email ≥3.0.0
 
 ### Current Maintainer
 
@@ -17,7 +18,8 @@
 
 ### Original Authors
 
-* [Christoph Wurst](mailto:Christoph Wurst <christoph@winzerhof-wurst.at>) ([christophwurst](christophwurst))
+* [Christoph Wurst](mailto:Christoph
+  Wurst <christoph@winzerhof-wurst.at>) ([christophwurst](https://github.com/christophwurst))
   Author of [twofactor_totp](https://github.com/nextcloud/twofactor_totp) that ≥3.0.0 was cloned from
 * [Roeland Jago Douma](mailto:Roeland Jago Douma <roeland@famdouma.nl>) ([rullzer](https://github.com/rullzer))
   Original author of twofactor_email ≤3.0.0
@@ -41,6 +43,8 @@
 * All code proposed by an AI is thoroughly manually verified and adjusted by the maintainers.
 * Major AI contributions are commented in the source code near the AI enhanced code parts.
 * Many thanks to both DuckDuckGo and OpenAI. It is fun using duck.ai with GPT-5 mini.
+
 ____
 
-*Please [tell me](mailto:Olav Seyfarth <olav@seyfarth.de>?subject=[twofactor_email] CONTRIBUTORS.md) if I forgot to include you or somebody or if I shall correct or delete contact details.*
+*Please [tell me](mailto:Olav Seyfarth <olav@seyfarth.de>?subject=[twofactor_email] CONTRIBUTORS.md) if I forgot to
+include you or somebody or if I shall correct or delete contact details.*

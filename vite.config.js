@@ -5,6 +5,7 @@
 
 import { createAppConfig } from '@nextcloud/vite-config'
 
+// noinspection JSUnusedGlobalSymbols
 export default createAppConfig({
 	personal_settings: 'src/PersonalSettings.js',
 	admin_settings: 'src/AdminSettings.js',

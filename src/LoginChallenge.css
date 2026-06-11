@@ -4,14 +4,15 @@
  */
 
 .twofactor_email-challenge-form {
-	margin: 16px auto 1px !important;
+    margin: 16px auto 1px !important;
 }
 
 .twofactor_email-challenge-form > input {
-	padding: 10px;
-	margin: 0 0 5px 0;
+    padding: 10px;
+    margin: 0 0 5px 0;
 }
 
 .twofactor_email-challenge-icon {
-	filter: var(--background-invert-if-bright);
+    /* noinspection CssUnresolvedCustomProperty */
+    filter: var(--background-invert-if-bright);
 }

@@ -1,23 +1,19 @@
 <?xml version="1.0"?>
 <psalm
-    errorLevel="3"
-    phpVersion="8.1"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="https://getpsalm.org/schema/config"
-    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
-    findUnusedCode="false"
-    ensureOverrideAttribute="false"
-    autoloader="tests/bootstrap.php"
+        errorLevel="3"
+        phpVersion="8.1"
+        findUnusedCode="false"
+        ensureOverrideAttribute="false"
+        autoloader="tests/bootstrap.php"
 >
     <projectFiles>
-        <directory name="lib" />
+        <directory name="lib"/>
     </projectFiles>
     <extraFiles>
-        <directory name="vendor" />
-		<ignoreFiles>
-			<directory name="vendor/phpunit/php-code-coverage" />
-		</ignoreFiles>
+        <directory name="vendor"/>
+        <directory name="stubs"/>
+        <ignoreFiles>
+            <directory name="vendor/phpunit/php-code-coverage"/>
+        </ignoreFiles>
     </extraFiles>
-	<issueHandlers>
-	</issueHandlers>
 </psalm>

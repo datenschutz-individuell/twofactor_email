@@ -1,9 +1,7 @@
-<!--
-  - SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
-  - SPDX-License-Identifier: AGPL-3.0-or-later
--->
 # Changelog
-Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+
+Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), project adheres
+to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## 3.1.1 (2026-06-01)
 
@@ -11,6 +9,12 @@ Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), pro
 
 - When updating the app from v2 to v3, authentication codes are no longer migrated, see
   https://github.com/datenschutz-individuell/twofactor_email/issues/69#issuecomment-4588492017
+
+## 3.1.2 (2026-06-11)
+
+### Fixed
+
+- Code cleanup; updated dependencies that also fix an optical glitch in the personal settings toggle
 
 ## 3.1.0 (2026-05-31)
 
@@ -32,7 +36,8 @@ Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), pro
 ### Added
 
 - Support for Nextcloud 34
-- New translations: de, de_DE, en_GB, et_EE, ga, lt_LT, pl, pt_BR, ru, sv, uz, zh_HK, zh_TW – a BIG "Thank you!" to all translators on transifex!
+- New translations: de, de_DE, en_GB, et_EE, ga, lt_LT, pl, pt_BR, ru, sv, uz, zh_HK, zh_TW – a BIG "Thank you!" to all
+  translators on transifex!
 
 ## 3.0.8-beta.1 (2026-04-22)
 

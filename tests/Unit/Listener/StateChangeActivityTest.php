@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
- * SPDX-License-Identifier: AGPL-3.0-only
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
 namespace OCA\TwoFactorEMail\Test\Unit\Listener;
@@ -15,6 +15,7 @@ use OCA\TwoFactorEMail\Listener\StateChangeActivity;
 use OCP\Activity\IEvent;
 use OCP\Activity\IManager;
 use OCP\IUser;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class StateChangeActivityTest extends TestCase {
@@ -23,14 +24,9 @@ class StateChangeActivityTest extends TestCase {
 
 	private IManager|MockObject $activityManager;
 
-	protected function setUp(): void {
-		parent::setUp();
-
-		$this->activityManager = $this->createMock(IManager::class);
-
-		$this->listener = new StateChangeActivity($this->activityManager);
-	}
-
+	/**
+	 * @throws Exception
+	 */
 	public function testHandleStateEvent() {
 		$uid = 'user234';
 		$user = $this->createMock(IUser::class);
@@ -61,5 +57,16 @@ class StateChangeActivityTest extends TestCase {
 			->with($activityEvent);
 
 		$this->listener->handle($event);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->activityManager = $this->createMock(IManager::class);
+
+		$this->listener = new StateChangeActivity($this->activityManager);
 	}
 }

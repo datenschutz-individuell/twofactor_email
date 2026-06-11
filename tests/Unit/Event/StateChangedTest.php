@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
- * SPDX-License-Identifier: AGPL-3.0-only
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
 namespace OCA\TwoFactorEMail\Test\Unit\Event;
@@ -12,8 +12,12 @@ namespace OCA\TwoFactorEMail\Test\Unit\Event;
 use ChristophWurst\Nextcloud\Testing\TestCase;
 use OCA\TwoFactorEMail\Event\StateChanged;
 use OCP\IUser;
+use PHPUnit\Framework\MockObject\Exception;
 
 class StateChangedTest extends TestCase {
+	/**
+	 * @throws Exception
+	 */
 	public function testEnabled() {
 		$user = $this->createMock(IUser::class);
 		$event = new StateChanged($user, true);
@@ -21,6 +25,9 @@ class StateChangedTest extends TestCase {
 		$this->assertTrue($event->isEnabled());
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testDisabled() {
 		$user = $this->createMock(IUser::class);
 		$event = new StateChanged($user, false);

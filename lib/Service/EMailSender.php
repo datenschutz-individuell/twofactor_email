@@ -20,11 +20,11 @@ use Psr\Log\LoggerInterface;
 
 final class EMailSender implements IEMailSender {
 	public function __construct(
-		private LoggerInterface $logger,
-		private IL10N $l10n,
-		private IMailer $mailer,
-		private Defaults $defaults,
-		private IAppSettings $appSettings,
+		private readonly LoggerInterface $logger,
+		private readonly IL10N $l10n,
+		private readonly IMailer $mailer,
+		private readonly Defaults $defaults,
+		private readonly IAppSettings $appSettings,
 	) {
 	}
 

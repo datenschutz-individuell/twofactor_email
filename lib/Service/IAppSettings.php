@@ -2,7 +2,7 @@
 
 /*
  * SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
- * SPDX-License-Identifier: AGPL-3.0-only
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
 namespace OCA\TwoFactorEMail\Service;
@@ -16,25 +16,11 @@ interface IAppSettings {
 	public function getCodeLength(): int;
 
 	/**
-	 * How long shall a stored 2FA code be valid.
+	 * How long a stored 2FA code shall be valid.
 	 *
 	 * @return int minutes of validity
 	 */
 	public function getCodeValidMinutes(): int;
-
-	/**
-	 * How many emails may be sent during a certain period.
-	 *
-	 * @return int number of attempts allowed
-	 */
-	public function getSendRateLimitAttempts(): int;
-
-	/**
-	 * Period in which the defined amount of emails may be sent.
-	 *
-	 * @return int seconds of sliding window
-	 */
-	public function getSendRateLimitPeriodSeconds(): int;
 
 	/**
 	 * Plain-text email template used when sending the 2FA challenge email.

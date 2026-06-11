@@ -2,7 +2,7 @@
 
 /*
  * SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
- * SPDX-License-Identifier: AGPL-3.0-only
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
 namespace OCA\TwoFactorEMail\Test\Unit\Activity;
@@ -15,6 +15,7 @@ use OCP\Activity\IEvent;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\L10N\IFactory;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class ProviderTest extends TestCase {
@@ -22,26 +23,6 @@ class ProviderTest extends TestCase {
 	private IURLGenerator&MockObject $urlGenerator;
 
 	private Provider $provider;
-
-	protected function setUp(): void {
-		parent::setUp();
-
-		$this->l10n = $this->createMock(IFactory::class);
-		$this->urlGenerator = $this->createMock(IURLGenerator::class);
-
-		$this->provider = new Provider($this->l10n, $this->urlGenerator);
-	}
-
-	public function testParseUnrelated() {
-		$lang = 'ru';
-		$event = $this->createMock(IEvent::class);
-		$event->expects($this->once())
-			->method('getApp')
-			->willReturn('comments');
-		$this->expectException(InvalidArgumentException::class);
-
-		$this->provider->parse($lang, $event);
-	}
 
 	public static function subjectData(): array {
 		return [
@@ -53,7 +34,22 @@ class ProviderTest extends TestCase {
 	}
 
 	/**
+	 * @throws Exception
+	 */
+	public function testParseUnrelated() {
+		$lang = 'ru';
+		$event = $this->createMock(IEvent::class);
+		$event->expects($this->once())
+			->method('getApp')
+			->willReturn('comments');
+		$this->expectException(InvalidArgumentException::class);
+
+		$this->provider->parse($lang, $event);
+	}
+
+	/**
 	 * @dataProvider subjectData
+	 * @throws Exception
 	 */
 	public function testParse(Notification $subject) {
 		$lang = 'ru';
@@ -85,5 +81,17 @@ class ProviderTest extends TestCase {
 			->method('setSubject');
 
 		$this->provider->parse($lang, $event);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->l10n = $this->createMock(IFactory::class);
+		$this->urlGenerator = $this->createMock(IURLGenerator::class);
+
+		$this->provider = new Provider($this->l10n, $this->urlGenerator);
 	}
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
- * SPDX-License-Identifier: AGPL-3.0-only
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
 namespace OCA\TwoFactorEMail\Listener;
@@ -22,30 +22,28 @@ use OCP\EventDispatcher\IEventListener;
 final class StateChangeActivity implements IEventListener {
 
 	public function __construct(
-		private ActivityManager $activityManager,
+		private readonly ActivityManager $activityManager,
 	) {
 	}
 
 	public function handle(Event $event): void {
-		if ($event instanceof StateChanged) {
-			if ($event->byAdmin()) {
-				$notification = $event->isEnabled()
-					? Notification::ENABLED_BY_ADMIN
-					: Notification::DISABLED_BY_ADMIN;
-			} else {
-				$notification = $event->isEnabled()
-					? Notification::ENABLED_BY_USER
-					: Notification::DISABLED_BY_USER;
-			}
-			$user = $event->getUser();
-
-			$activity = $this->activityManager->generateEvent();
-			$activity->setApp(Application::APP_ID)
-				->setType('security')
-				->setAuthor($user->getUID())
-				->setAffectedUser($user->getUID())
-				->setSubject($notification->value);
-			$this->activityManager->publish($activity);
+		if ($event->byAdmin()) {
+			$notification = $event->isEnabled()
+				? Notification::ENABLED_BY_ADMIN
+				: Notification::DISABLED_BY_ADMIN;
+		} else {
+			$notification = $event->isEnabled()
+				? Notification::ENABLED_BY_USER
+				: Notification::DISABLED_BY_USER;
 		}
+		$user = $event->getUser();
+
+		$activity = $this->activityManager->generateEvent();
+		$activity->setApp(Application::APP_ID)
+			->setType('security')
+			->setAuthor($user->getUID())
+			->setAffectedUser($user->getUID())
+			->setSubject($notification->value);
+		$this->activityManager->publish($activity);
 	}
 }

@@ -2,7 +2,7 @@
 
 /*
  * SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
- * SPDX-License-Identifier: AGPL-3.0-only
+ * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
 namespace OCA\TwoFactorEMail\Test\Unit\Listener;
@@ -14,6 +14,7 @@ use OCA\TwoFactorEMail\Provider\TwoFactorEMail;
 use OCP\Authentication\TwoFactorAuth\IRegistry;
 use OCP\EventDispatcher\Event;
 use OCP\IUser;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class StateChangeRegistryUpdaterTest extends TestCase {
@@ -22,15 +23,6 @@ class StateChangeRegistryUpdaterTest extends TestCase {
 
 	private IRegistry|MockObject $registry;
 	private TwoFactorEMail|MockObject $provider;
-
-	protected function setUp(): void {
-		parent::setUp();
-
-		$this->registry = $this->createMock(IRegistry::class);
-		$this->provider = $this->createMock(TwoFactorEMail::class);
-
-		$this->listener = new StateChangeRegistryUpdater($this->registry, $this->provider);
-	}
 
 	public function testIgnoresGenericEvent() {
 		$event = new Event();
@@ -42,6 +34,9 @@ class StateChangeRegistryUpdaterTest extends TestCase {
 		$this->listener->handle($event);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testProviderEnabledEvent() {
 		$user = $this->createMock(IUser::class);
 		$event = new StateChanged($user, true);
@@ -52,6 +47,9 @@ class StateChangeRegistryUpdaterTest extends TestCase {
 		$this->listener->handle($event);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testProviderDisabledEvent() {
 		$user = $this->createMock(IUser::class);
 		$event = new StateChanged($user, false);
@@ -60,5 +58,17 @@ class StateChangeRegistryUpdaterTest extends TestCase {
 			->with($this->provider, $user);
 
 		$this->listener->handle($event);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->registry = $this->createMock(IRegistry::class);
+		$this->provider = $this->createMock(TwoFactorEMail::class);
+
+		$this->listener = new StateChangeRegistryUpdater($this->registry, $this->provider);
 	}
 }
