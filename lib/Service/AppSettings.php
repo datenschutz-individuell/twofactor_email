@@ -43,14 +43,6 @@ final class AppSettings implements IAppSettings {
 		);
 	}
 
-	public function getEMailHeading(): string {
-		return $this->appConfig->getValueString(
-			Application::APP_ID,
-			AppSettingsDefaults::CONFIG_KEY_EMAIL_HEADING,
-			AppSettingsDefaults::EMAIL_HEADING,
-		);
-	}
-
 	public function getEMailTemplate(): string {
 		return $this->appConfig->getValueString(
 			Application::APP_ID,

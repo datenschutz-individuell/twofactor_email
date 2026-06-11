@@ -9,13 +9,14 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Service;
 
+use OCP\IL10N;
+
 final class AppSettingsDefaults {
 
 	// Config keys used to store settings in the app config
 	public const CONFIG_KEY_CODE_LENGTH = 'code_length';
 	public const CONFIG_KEY_CODE_VALID_MINUTES = 'code_valid_minutes';
 	public const CONFIG_KEY_EMAIL_SUBJECT = 'email_subject';
-	public const CONFIG_KEY_EMAIL_HEADING = 'email_heading';
 	public const CONFIG_KEY_EMAIL_TEMPLATE = 'email_template';
 	public const CONFIG_KEY_EMAIL_FOOTER = 'email_footer';
 
@@ -24,9 +25,29 @@ final class AppSettingsDefaults {
 	public const CODE_VALID_MINUTES = 10;
 
 	// For all email template parts an empty string means: use the localized
-	// default text (see EMailDefaults), or the theming footer respectively.
+	// default text (the methods below), or the theming footer respectively.
 	public const EMAIL_SUBJECT = '';
-	public const EMAIL_HEADING = '';
 	public const EMAIL_TEMPLATE = '';
 	public const EMAIL_FOOTER = '';
+
+	public function __construct(
+		private readonly IL10N $l10n,
+	) {
+	}
+
+	/*
+	 * Localized default texts for the parts of the challenge email. They are
+	 * used whenever the corresponding admin setting is empty, and they are
+	 * shown as placeholders in the admin settings form. All texts are
+	 * templates: the placeholders {code}, {user}, {cloud} and {validity} are
+	 * replaced when the email is sent.
+	 */
+
+	public function eMailSubject(): string {
+		return $this->l10n->t('Login attempt for %s', ['{user} @ {cloud}']);
+	}
+
+	public function eMailBody(): string {
+		return $this->l10n->t("Your two-factor authentication code is: {code}\n\nIf you tried to login, please enter that code on {cloud}. If you did not, somebody else did and knows your email address or username – and your password!");
+	}
 }

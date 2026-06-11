@@ -8,7 +8,7 @@
 namespace OCA\TwoFactorEMail\Test\Unit\Service;
 
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
-use OCA\TwoFactorEMail\Service\EMailDefaults;
+use OCA\TwoFactorEMail\Service\AppSettingsDefaults;
 use OCA\TwoFactorEMail\Service\EMailSender;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\Defaults;
@@ -44,7 +44,7 @@ class EMailSenderTest extends TestCase {
 		$this->defaults->method('getName')->willReturn('Example Cloud');
 		$this->appSettings->method('getCodeValidMinutes')->willReturn(10);
 
-		// EMailDefaults is final, so use the real class with a pass-through IL10N
+		// AppSettingsDefaults is final, so use the real class with a pass-through IL10N
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnCallback(
 			static fn (string $text, $parameters = []) => vsprintf($text, (array)$parameters),
@@ -55,7 +55,7 @@ class EMailSenderTest extends TestCase {
 			$this->mailer,
 			$this->defaults,
 			$this->appSettings,
-			new EMailDefaults($l10n),
+			new AppSettingsDefaults($l10n),
 		);
 	}
 
@@ -84,7 +84,6 @@ class EMailSenderTest extends TestCase {
 
 	public function testUsesLocalizedDefaultsWhenSettingsAreEmpty(): void {
 		$this->appSettings->method('getEMailSubject')->willReturn('');
-		$this->appSettings->method('getEMailHeading')->willReturn('');
 		$this->appSettings->method('getEMailTemplate')->willReturn('');
 		$this->appSettings->method('getEMailFooter')->willReturn('');
 
@@ -92,9 +91,8 @@ class EMailSenderTest extends TestCase {
 		$this->template->expects($this->once())
 			->method('setSubject')
 			->with('Login attempt for Jane Doe @ Example Cloud');
-		$this->template->expects($this->once())
-			->method('addHeading')
-			->with('Your two-factor authentication code is: 123456');
+		$this->template->expects($this->never())
+			->method('addHeading');
 		$this->template->expects($this->once())
 			->method('addBodyText')
 			->with("Your two-factor authentication code is: 123456\n\n"
@@ -111,7 +109,6 @@ class EMailSenderTest extends TestCase {
 
 	public function testUsesCustomTemplatesAndReplacesAllPlaceholders(): void {
 		$this->appSettings->method('getEMailSubject')->willReturn('Code {code} for {user}');
-		$this->appSettings->method('getEMailHeading')->willReturn('Hello {user}');
 		$this->appSettings->method('getEMailTemplate')->willReturn('Use {code} on {cloud} within {validity} minutes.');
 		$this->appSettings->method('getEMailFooter')->willReturn('Mail by {cloud}');
 
@@ -119,9 +116,6 @@ class EMailSenderTest extends TestCase {
 		$this->template->expects($this->once())
 			->method('setSubject')
 			->with('Code 123456 for Jane Doe');
-		$this->template->expects($this->once())
-			->method('addHeading')
-			->with('Hello Jane Doe');
 		$this->template->expects($this->once())
 			->method('addBodyText')
 			->with('Use 123456 on Example Cloud within 10 minutes.');

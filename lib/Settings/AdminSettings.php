@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Settings;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
-use OCA\TwoFactorEMail\Service\EMailDefaults;
+use OCA\TwoFactorEMail\Service\AppSettingsDefaults;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
@@ -22,7 +22,7 @@ use OCP\Settings\IDelegatedSettings;
 final class AdminSettings implements IDelegatedSettings {
 	public function __construct(
 		private readonly IAppSettings $appSettings,
-		private readonly EMailDefaults $eMailDefaults,
+		private readonly AppSettingsDefaults $appSettingsDefaults,
 		private readonly IInitialState $initialState,
 		private readonly IL10N $l10n,
 		private readonly Defaults $themingDefaults,
@@ -34,14 +34,12 @@ final class AdminSettings implements IDelegatedSettings {
 		$this->initialState->provideInitialState('codeLength', $this->appSettings->getCodeLength());
 		$this->initialState->provideInitialState('codeValidMinutes', $this->appSettings->getCodeValidMinutes());
 		$this->initialState->provideInitialState('eMailSubject', $this->appSettings->getEMailSubject());
-		$this->initialState->provideInitialState('eMailHeading', $this->appSettings->getEMailHeading());
 		$this->initialState->provideInitialState('eMailTemplate', $this->appSettings->getEMailTemplate());
 		$this->initialState->provideInitialState('eMailFooter', $this->appSettings->getEMailFooter());
 		// Localized default texts, shown as placeholders in the empty form fields
 		$this->initialState->provideInitialState('eMailDefaults', [
-			'eMailSubject' => $this->eMailDefaults->subject(),
-			'eMailHeading' => $this->eMailDefaults->heading(),
-			'eMailTemplate' => $this->eMailDefaults->body(),
+			'eMailSubject' => $this->appSettingsDefaults->eMailSubject(),
+			'eMailTemplate' => $this->appSettingsDefaults->eMailBody(),
 			'eMailFooter' => $this->defaultFooterText(),
 		]);
 

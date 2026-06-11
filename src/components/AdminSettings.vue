@@ -46,7 +46,7 @@
 				<p class="settings-group__description">
 					{{ t('twofactor_email', 'All parts of the email sent to users can be customized. Empty fields use the localized default text, shown as a hint inside the field.') }}
 					{{ t('twofactor_email', 'Available placeholders in all fields: {code} (the one-time code), {user} (display name of the user), {cloud} (name of this instance), {validity} (code validity in minutes).') }}
-					{{ t('twofactor_email', 'The {code} placeholder must remain in the heading or in the body.') }}
+					{{ t('twofactor_email', 'A customized body must contain the {code} placeholder.') }}
 					{{ t('twofactor_email', 'Note: a {code} in the subject may show up in notification previews on lock screens.') }}
 				</p>
 
@@ -116,7 +116,7 @@ import Logger from '../Logger.js'
 const resetting = ref(false)
 
 const store = useAdminSettingsStore()
-store.loadInitialState('codeLength', 'codeValidMinutes', 'eMailSubject', 'eMailHeading', 'eMailTemplate', 'eMailFooter')
+store.loadInitialState('codeLength', 'codeValidMinutes', 'eMailSubject', 'eMailTemplate', 'eMailFooter')
 
 // Localized default texts, shown as placeholders in empty fields
 const defaults = loadState('twofactor_email', 'eMailDefaults', {})
@@ -128,7 +128,6 @@ const numericFields = [
 
 const textFields = [
 	{ key: 'eMailSubject', label: t('twofactor_email', 'Email Subject') },
-	{ key: 'eMailHeading', label: t('twofactor_email', 'Email Heading') },
 	{ key: 'eMailFooter', label: t('twofactor_email', 'Email Footer') },
 ]
 

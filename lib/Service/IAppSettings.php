@@ -32,15 +32,6 @@ interface IAppSettings {
 	public function getEMailSubject(): string;
 
 	/**
-	 * Heading shown inside the 2FA challenge email.
-	 * Supports the placeholders {code}, {user}, {cloud} and {validity}.
-	 * An empty string means: use the localized default heading.
-	 *
-	 * @return string email heading template
-	 */
-	public function getEMailHeading(): string;
-
-	/**
 	 * Plain-text email body template used when sending the 2FA challenge email.
 	 * Supports the placeholders {code}, {user}, {cloud} and {validity}.
 	 * An empty string means: use the localized default body text.

@@ -23,7 +23,7 @@ final class EMailSender implements IEMailSender {
 		private readonly IMailer $mailer,
 		private readonly Defaults $defaults,
 		private readonly IAppSettings $appSettings,
-		private readonly EMailDefaults $eMailDefaults,
+		private readonly AppSettingsDefaults $appSettingsDefaults,
 	) {
 	}
 
@@ -36,15 +36,13 @@ final class EMailSender implements IEMailSender {
 		$this->logger->debug("sending email message to $email.");
 
 		// For every part an empty admin setting means: use the localized default
-		$subject = $this->appSettings->getEMailSubject() ?: $this->eMailDefaults->subject();
-		$heading = $this->appSettings->getEMailHeading() ?: $this->eMailDefaults->heading();
-		$body = $this->appSettings->getEMailTemplate() ?: $this->eMailDefaults->body();
+		$subject = $this->appSettings->getEMailSubject() ?: $this->appSettingsDefaults->eMailSubject();
+		$body = $this->appSettings->getEMailTemplate() ?: $this->appSettingsDefaults->eMailBody();
 		$footer = $this->appSettings->getEMailFooter();
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
 		$template->setSubject($this->replacePlaceholders($subject, $user, $code));
 		$template->addHeader();
-		$template->addHeading($this->replacePlaceholders($heading, $user, $code));
 		$template->addBodyText($this->replacePlaceholders($body, $user, $code));
 		if ($footer === '') {
 			// Standard footer of this Nextcloud instance (theming slogan)

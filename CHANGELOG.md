@@ -8,10 +8,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ### Added
 
 - All parts of the challenge email are now configurable in the admin settings: subject,
-  heading, body and footer. Empty fields fall back to the localized default texts, so
+  body and footer. Empty fields fall back to the localized default texts, so
   out-of-the-box emails are now translated into the recipient's language (previously the
   default body was always English). A new placeholder `{validity}` (code validity in
   minutes) is available in all parts alongside `{code}`, `{user}` and `{cloud}`.
+
+### Changed
+
+- The challenge email no longer renders a separate heading; its text duplicated the
+  first sentence of the body.
 
 ## 3.1.1 (2026-06-01)
 
