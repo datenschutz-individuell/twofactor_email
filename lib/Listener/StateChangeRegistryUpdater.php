@@ -27,6 +27,9 @@ final class StateChangeRegistryUpdater implements IEventListener {
 	}
 
 	public function handle(Event $event): void {
+		if (!$event instanceof StateChanged) {
+			return;
+		}
 		if ($event->isEnabled()) {
 			$this->registry->enableProviderFor($this->provider, $event->getUser());
 		} else {

@@ -10,6 +10,7 @@ namespace OCA\TwoFactorEMail\Test\Unit\Controller;
 use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Controller\StateController;
 use OCA\TwoFactorEMail\Service\IStateManager;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use OCP\IUser;
@@ -61,7 +62,7 @@ class StateControllerTest extends TestCase {
 		$expected = new JSONResponse([
 			'enabled' => false,
 			'error' => 'no-email',
-		]);
+		], Http::STATUS_PRECONDITION_FAILED);
 
 		$this->assertEquals($expected, $this->controller->save(true));
 	}
