@@ -8,50 +8,81 @@
 		<NcSettingsSection :name="t('twofactor_email', 'Two-Factor email provider')"
 						   :description="t('twofactor_email', 'These system wide settings are saved automatically shortly after the last keypress.')">
 
-			<!-- Numeric fields: min="1" prevents zero and negative values at the browser level;
-				 @keydown guard blocks direct keyboard entry of '-' and 'e' (scientific notation) -->
-			<div class="numeric-fields-grid">
-				<NcTextField v-for="field in numericFields"
-							 :key="field.key"
-							 v-model="inputValues[field.key]"
-							 :error="successRefs[field.key] === false"
-							 :label="field.label"
-							 :loading="loading"
-							 :success="successRefs[field.key] === true"
-							 min="1"
-							 type="number"
-							 @keydown="blockInvalidNumericInput" />
-			</div>
+			<!-- Group: authentication code -->
+			<fieldset class="settings-group">
+				<h3 class="settings-group__heading">
+					{{ t('twofactor_email', 'Authentication code') }}
+				</h3>
+				<p class="settings-group__description">
+					{{ t('twofactor_email', 'Length and validity of the one-time codes sent via email.') }}
+				</p>
 
-			<!-- Email template parts: empty fields fall back to the localized
-				 default shown as placeholder. Available placeholders in all
-				 fields: {code}, {user}, {cloud}, {validity}. -->
-			<div class="email-text-fields">
-				<NcTextField v-for="field in textFields"
-							 :key="field.key"
-							 v-model="inputValues[field.key]"
-							 :error="successRefs[field.key] === false"
-							 :helper-text="field.helperText"
-							 :label="field.label"
-							 :loading="loading"
-							 :placeholder="defaults[field.key]"
-							 :success="successRefs[field.key] === true" />
-			</div>
+				<!-- Numeric fields: min="1" prevents zero and negative values at the browser level;
+					 @keydown guard blocks direct keyboard entry of '-' and 'e' (scientific notation) -->
+				<div v-for="field in numericFields"
+					 :key="field.key"
+					 class="labeled-field">
+					<label :for="`twofactor_email-${field.key}`" class="labeled-field__label">
+						{{ field.label }}
+					</label>
+					<NcTextField :id="`twofactor_email-${field.key}`"
+								 v-model="inputValues[field.key]"
+								 :error="successRefs[field.key] === false"
+								 :label-outside="true"
+								 :loading="loading"
+								 :success="successRefs[field.key] === true"
+								 class="labeled-field__input"
+								 min="1"
+								 type="number"
+								 @keydown="blockInvalidNumericInput" />
+				</div>
+			</fieldset>
 
-			<!-- Email body: monospace textarea with code-editor appearance -->
-			<div class="email-template-field">
-				<NcTextArea v-for="field in textAreaFields"
-							:key="field.key"
-							v-model="inputValues[field.key]"
-							:error="successRefs[field.key] === false"
-							:helper-text="t('twofactor_email', 'The email body text to be sent to the user. Leave empty to use the localized default. Available placeholders: {code}, {user}, {cloud}, {validity}. The code must appear in the heading or in the body.')"
-							:hide-label="true"
-							:label="t('twofactor_email', 'Email Body (plain text)')"
-							:loading="loading"
-							:placeholder="defaults[field.key]"
-							:success="successRefs[field.key] === true"
-							class="email-template-field__textarea" />
-			</div>
+			<!-- Group: email template -->
+			<fieldset class="settings-group">
+				<h3 class="settings-group__heading">
+					{{ t('twofactor_email', 'Email template') }}
+				</h3>
+				<p class="settings-group__description">
+					{{ t('twofactor_email', 'All parts of the email sent to users can be customized. Empty fields use the localized default text, shown as a hint inside the field.') }}
+					{{ t('twofactor_email', 'Available placeholders in all fields: {code} (the one-time code), {user} (display name of the user), {cloud} (name of this instance), {validity} (code validity in minutes).') }}
+					{{ t('twofactor_email', 'The {code} placeholder must remain in the heading or in the body.') }}
+					{{ t('twofactor_email', 'Note: a {code} in the subject may show up in notification previews on lock screens.') }}
+				</p>
+
+				<div v-for="field in textFields"
+					 :key="field.key"
+					 class="labeled-field">
+					<label :for="`twofactor_email-${field.key}`" class="labeled-field__label">
+						{{ field.label }}
+					</label>
+					<NcTextField :id="`twofactor_email-${field.key}`"
+								 v-model="inputValues[field.key]"
+								 :error="successRefs[field.key] === false"
+								 :label-outside="true"
+								 :loading="loading"
+								 :placeholder="defaults[field.key]"
+								 :success="successRefs[field.key] === true"
+								 class="labeled-field__input" />
+				</div>
+
+				<!-- Email body: label above, monospace textarea with code-editor appearance -->
+				<div v-for="field in textAreaFields"
+					 :key="field.key"
+					 class="labeled-field labeled-field--stacked">
+					<label :for="`twofactor_email-${field.key}`" class="labeled-field__label">
+						{{ field.label }}
+					</label>
+					<NcTextArea :id="`twofactor_email-${field.key}`"
+								v-model="inputValues[field.key]"
+								:error="successRefs[field.key] === false"
+								:label-outside="true"
+								:loading="loading"
+								:placeholder="defaults[field.key]"
+								:success="successRefs[field.key] === true"
+								class="labeled-field__input email-template-field__textarea" />
+				</div>
+			</fieldset>
 
 			<div class="reset-section">
 				<NcButton :disabled="resetting"
@@ -96,25 +127,13 @@ const numericFields = [
 ]
 
 const textFields = [
-	{
-		key: 'eMailSubject',
-		label: t('twofactor_email', 'Email Subject'),
-		helperText: t('twofactor_email', 'Leave empty to use the localized default. Note: a {code} in the subject may show up in notification previews on lock screens.'),
-	},
-	{
-		key: 'eMailHeading',
-		label: t('twofactor_email', 'Email Heading'),
-		helperText: t('twofactor_email', 'Leave empty to use the localized default.'),
-	},
-	{
-		key: 'eMailFooter',
-		label: t('twofactor_email', 'Email Footer'),
-		helperText: t('twofactor_email', 'Leave empty to use the standard footer of this Nextcloud instance.'),
-	},
+	{ key: 'eMailSubject', label: t('twofactor_email', 'Email Subject') },
+	{ key: 'eMailHeading', label: t('twofactor_email', 'Email Heading') },
+	{ key: 'eMailFooter', label: t('twofactor_email', 'Email Footer') },
 ]
 
 const textAreaFields = [
-	{ key: 'eMailTemplate' },
+	{ key: 'eMailTemplate', label: t('twofactor_email', 'Email Body (plain text)') },
 ]
 
 const allFields = [...numericFields, ...textFields, ...textAreaFields]
@@ -155,28 +174,48 @@ async function onReset() {
 </script>
 
 <style scoped>
-.numeric-fields-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 8px 16px;
-	margin-bottom: 24px;
+/* Visual grouping with heading and description (fieldset reset) */
+.settings-group {
+	border: 0;
+	margin: 0 0 32px;
+	padding: 0;
+	min-width: 0;
 }
 
-/* Stack to single column on narrow screens */
+.settings-group__heading {
+	font-size: 16px;
+	font-weight: bold;
+	margin-bottom: 4px;
+}
+
+.settings-group__description {
+	/* noinspection CssUnresolvedCustomProperty */
+	color: var(--color-text-maxcontrast, gray);
+	margin-bottom: 16px;
+	max-width: 64em;
+}
+
+/* One row per field: real label on the left, input indented to a common edge */
+.labeled-field {
+	display: grid;
+	grid-template-columns: 220px 1fr;
+	gap: 4px 16px;
+	align-items: center;
+	margin-bottom: 8px;
+	max-width: 64em;
+}
+
+/* Multi-line fields get their label above instead */
+.labeled-field--stacked {
+	grid-template-columns: 1fr;
+	align-items: start;
+}
+
+/* Stack all labels above their field on narrow screens */
 @media (max-width: 640px) {
-	.numeric-fields-grid {
+	.labeled-field {
 		grid-template-columns: 1fr;
 	}
-}
-
-.email-text-fields {
-	display: grid;
-	gap: 8px;
-	margin-bottom: 16px;
-}
-
-.email-template-field {
-	margin-top: 8px;
 }
 
 /* Force monospace / code-editor appearance on the inner textarea element */
@@ -185,7 +224,6 @@ async function onReset() {
 	font-size: 13px;
 	line-height: 1.6;
 	min-height: 220px;
-	margin-top: 24px;
 	margin-bottom: 8px;
 	resize: vertical;
 	tab-size: 2;

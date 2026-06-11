@@ -14,7 +14,9 @@ use OCA\TwoFactorEMail\Service\EMailDefaults;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
+use OCP\Defaults;
 use OCP\IL10N;
+use OCP\L10N\IFactory;
 use OCP\Settings\IDelegatedSettings;
 
 final class AdminSettings implements IDelegatedSettings {
@@ -23,6 +25,8 @@ final class AdminSettings implements IDelegatedSettings {
 		private readonly EMailDefaults $eMailDefaults,
 		private readonly IInitialState $initialState,
 		private readonly IL10N $l10n,
+		private readonly Defaults $themingDefaults,
+		private readonly IFactory $l10nFactory,
 	) {
 	}
 
@@ -38,10 +42,23 @@ final class AdminSettings implements IDelegatedSettings {
 			'eMailSubject' => $this->eMailDefaults->subject(),
 			'eMailHeading' => $this->eMailDefaults->heading(),
 			'eMailTemplate' => $this->eMailDefaults->body(),
-			'eMailFooter' => $this->l10n->t('Standard footer of this Nextcloud instance'),
+			'eMailFooter' => $this->defaultFooterText(),
 		]);
 
 		return new TemplateResponse(Application::APP_ID, 'AdminSettings', renderAs: TemplateResponse::RENDER_AS_BLANK);
+	}
+
+	/**
+	 * The text the server renders when no custom footer is set — same
+	 * composition as \OC\Mail\EMailTemplate::addFooter(), as a single line.
+	 */
+	private function defaultFooterText(): string {
+		$slogan = $this->themingDefaults->getSlogan();
+		return $this->themingDefaults->getName()
+			. ($slogan !== '' ? ' - ' . $slogan : '')
+			. ' – '
+			// This sentence is part of the server's footer; reuse its translation
+			. $this->l10nFactory->get('lib')->t('This is an automatically sent email, please do not reply.');
 	}
 
 	public function getSection(): string {
