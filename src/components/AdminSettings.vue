@@ -23,16 +23,32 @@
 							 @keydown="blockInvalidNumericInput" />
 			</div>
 
-			<!-- Email template: monospace textarea with code-editor appearance -->
+			<!-- Email template parts: empty fields fall back to the localized
+				 default shown as placeholder. Available placeholders in all
+				 fields: {code}, {user}, {cloud}, {validity}. -->
+			<div class="email-text-fields">
+				<NcTextField v-for="field in textFields"
+							 :key="field.key"
+							 v-model="inputValues[field.key]"
+							 :error="successRefs[field.key] === false"
+							 :helper-text="field.helperText"
+							 :label="field.label"
+							 :loading="loading"
+							 :placeholder="defaults[field.key]"
+							 :success="successRefs[field.key] === true" />
+			</div>
+
+			<!-- Email body: monospace textarea with code-editor appearance -->
 			<div class="email-template-field">
 				<NcTextArea v-for="field in textAreaFields"
 							:key="field.key"
 							v-model="inputValues[field.key]"
 							:error="successRefs[field.key] === false"
-							:helper-text="t('twofactor_email', 'The email template text to be sent to the user. It MUST contain the placeholders `{code} and `{cloud}`.')"
+							:helper-text="t('twofactor_email', 'The email body text to be sent to the user. Leave empty to use the localized default. Available placeholders: {code}, {user}, {cloud}, {validity}. The code must appear in the heading or in the body.')"
 							:hide-label="true"
-							:label="t('twofactor_email', 'Email Template (plain text)')"
+							:label="t('twofactor_email', 'Email Body (plain text)')"
 							:loading="loading"
+							:placeholder="defaults[field.key]"
 							:success="successRefs[field.key] === true"
 							class="email-template-field__textarea" />
 			</div>
@@ -54,6 +70,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { loadState } from '@nextcloud/initial-state'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcSettingsSection from '@nextcloud/vue/components/NcSettingsSection'
@@ -68,18 +85,39 @@ import Logger from '../Logger.js'
 const resetting = ref(false)
 
 const store = useAdminSettingsStore()
-store.loadInitialState('codeLength', 'codeValidMinutes', 'eMailTemplate')
+store.loadInitialState('codeLength', 'codeValidMinutes', 'eMailSubject', 'eMailHeading', 'eMailTemplate', 'eMailFooter')
+
+// Localized default texts, shown as placeholders in empty fields
+const defaults = loadState('twofactor_email', 'eMailDefaults', {})
 
 const numericFields = [
 	{ key: 'codeLength', label: t('twofactor_email', 'Code Length (Characters)') },
 	{ key: 'codeValidMinutes', label: t('twofactor_email', 'Code Validity (Minutes)') },
 ]
 
+const textFields = [
+	{
+		key: 'eMailSubject',
+		label: t('twofactor_email', 'Email Subject'),
+		helperText: t('twofactor_email', 'Leave empty to use the localized default. Note: a {code} in the subject may show up in notification previews on lock screens.'),
+	},
+	{
+		key: 'eMailHeading',
+		label: t('twofactor_email', 'Email Heading'),
+		helperText: t('twofactor_email', 'Leave empty to use the localized default.'),
+	},
+	{
+		key: 'eMailFooter',
+		label: t('twofactor_email', 'Email Footer'),
+		helperText: t('twofactor_email', 'Leave empty to use the standard footer of this Nextcloud instance.'),
+	},
+]
+
 const textAreaFields = [
 	{ key: 'eMailTemplate' },
 ]
 
-const allFields = [...numericFields, ...textAreaFields]
+const allFields = [...numericFields, ...textFields, ...textAreaFields]
 
 const { inputValues, loading, successRefs } = useAdminSettings(
 	store,
@@ -129,6 +167,12 @@ async function onReset() {
 	.numeric-fields-grid {
 		grid-template-columns: 1fr;
 	}
+}
+
+.email-text-fields {
+	display: grid;
+	gap: 8px;
+	margin-bottom: 16px;
 }
 
 .email-template-field {

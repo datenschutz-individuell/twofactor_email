@@ -13,7 +13,6 @@ use Exception;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCP\Defaults;
-use OCP\IL10N;
 use OCP\IUser;
 use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
@@ -21,10 +20,10 @@ use Psr\Log\LoggerInterface;
 final class EMailSender implements IEMailSender {
 	public function __construct(
 		private readonly LoggerInterface $logger,
-		private readonly IL10N $l10n,
 		private readonly IMailer $mailer,
 		private readonly Defaults $defaults,
 		private readonly IAppSettings $appSettings,
+		private readonly EMailDefaults $eMailDefaults,
 	) {
 	}
 
@@ -36,22 +35,23 @@ final class EMailSender implements IEMailSender {
 
 		$this->logger->debug("sending email message to $email.");
 
-		$cloud = $this->defaults->getName();
-		$userAtCloud = $user->getDisplayName() . ' @ ' . $cloud;
-
-		// Replace placeholders in the admin-configurable template
-		$bodyText = str_replace(
-			['{code}', '{user}', '{cloud}'],
-			[$code, $user->getDisplayName(), $cloud],
-			$this->appSettings->getEMailTemplate()
-		);
+		// For every part an empty admin setting means: use the localized default
+		$subject = $this->appSettings->getEMailSubject() ?: $this->eMailDefaults->subject();
+		$heading = $this->appSettings->getEMailHeading() ?: $this->eMailDefaults->heading();
+		$body = $this->appSettings->getEMailTemplate() ?: $this->eMailDefaults->body();
+		$footer = $this->appSettings->getEMailFooter();
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
-		$template->setSubject($this->l10n->t('Login attempt for %s', [$userAtCloud]));
+		$template->setSubject($this->replacePlaceholders($subject, $user, $code));
 		$template->addHeader();
-		$template->addHeading($this->l10n->t('Your two-factor authentication code is: %s', [$code]));
-		$template->addBodyText($bodyText);
-		$template->addFooter();
+		$template->addHeading($this->replacePlaceholders($heading, $user, $code));
+		$template->addBodyText($this->replacePlaceholders($body, $user, $code));
+		if ($footer === '') {
+			// Standard footer of this Nextcloud instance (theming slogan)
+			$template->addFooter();
+		} else {
+			$template->addFooter($this->replacePlaceholders($footer, $user, $code));
+		}
 
 		$message = $this->mailer->createMessage();
 		$message->setTo([$email => $user->getDisplayName()]);
@@ -63,5 +63,13 @@ final class EMailSender implements IEMailSender {
 			$this->logger->error('failed sending email message to user ' . $user->getUID() . '.', ['exception' => $e]);
 			throw new SendEMailFailed(previous: $e);
 		}
+	}
+
+	private function replacePlaceholders(string $text, IUser $user, string $code): string {
+		return str_replace(
+			['{code}', '{user}', '{cloud}', '{validity}'],
+			[$code, $user->getDisplayName(), $this->defaults->getName(), (string)$this->appSettings->getCodeValidMinutes()],
+			$text,
+		);
 	}
 }

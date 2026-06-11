@@ -14,16 +14,19 @@ final class AppSettingsDefaults {
 	// Config keys used to store settings in the app config
 	public const CONFIG_KEY_CODE_LENGTH = 'code_length';
 	public const CONFIG_KEY_CODE_VALID_MINUTES = 'code_valid_minutes';
+	public const CONFIG_KEY_EMAIL_SUBJECT = 'email_subject';
+	public const CONFIG_KEY_EMAIL_HEADING = 'email_heading';
 	public const CONFIG_KEY_EMAIL_TEMPLATE = 'email_template';
+	public const CONFIG_KEY_EMAIL_FOOTER = 'email_footer';
 
 	// Default values — used when no value has been stored in the app config
 	public const CODE_LENGTH = 6;
 	public const CODE_VALID_MINUTES = 10;
 
-	// Placeholders available in the email template: {code}, {user}, {cloud}
-	public const EMAIL_TEMPLATE
-		= "Your two-factor authentication code is: {code}\n\n"
-		. 'If you tried to login, please enter that code on {cloud}. '
-		. 'If you did not, somebody else did and knows your email address '
-		. 'or username – and your password!';
+	// For all email template parts an empty string means: use the localized
+	// default text (see EMailDefaults), or the theming footer respectively.
+	public const EMAIL_SUBJECT = '';
+	public const EMAIL_HEADING = '';
+	public const EMAIL_TEMPLATE = '';
+	public const EMAIL_FOOTER = '';
 }

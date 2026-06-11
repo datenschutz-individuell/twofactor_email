@@ -99,14 +99,21 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 	 */
 	function validate() {
 		const errors = []
-		const requiredPlaceholders = ['{code}', '{cloud}']
-		// noinspection JSUnresolvedVariable
-		const missingPlaceholders = requiredPlaceholders.filter(
-			p => !(inputValues.eMailTemplate ?? '').includes(p),
-		)
-		if (missingPlaceholders.length > 0) {
-			errors.push('eMailTemplate')
-			Logger.warn(`Email template missing required placeholders: ${missingPlaceholders.join(', ')}`)
+		// The code must reach the user: empty fields fall back to defaults which
+		// contain {code}, so only customized fields can lose it. Reject only if
+		// heading and body are both customized and neither contains {code}.
+		const heading = inputValues.eMailHeading ?? ''
+		const body = inputValues.eMailTemplate ?? ''
+		const headingHasCode = heading === '' || heading.includes('{code}')
+		const bodyHasCode = body === '' || body.includes('{code}')
+		if (!headingHasCode && !bodyHasCode) {
+			errors.push('eMailHeading', 'eMailTemplate')
+			Logger.warn('Neither email heading nor email body contains the {code} placeholder')
+		}
+		// The subject must stay a single line (email header)
+		if (/[\r\n]/.test(inputValues.eMailSubject ?? '')) {
+			errors.push('eMailSubject')
+			Logger.warn('Email subject must not contain line breaks')
 		}
 		return errors
 	}

@@ -3,6 +3,16 @@
 Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
+## Unreleased
+
+### Added
+
+- All parts of the challenge email are now configurable in the admin settings: subject,
+  heading, body and footer. Empty fields fall back to the localized default texts, so
+  out-of-the-box emails are now translated into the recipient's language (previously the
+  default body was always English). A new placeholder `{validity}` (code validity in
+  minutes) is available in all parts alongside `{code}`, `{user}` and `{cloud}`.
+
 ## 3.1.1 (2026-06-01)
 
 ### Fixed

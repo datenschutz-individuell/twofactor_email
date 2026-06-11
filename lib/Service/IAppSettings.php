@@ -23,10 +23,39 @@ interface IAppSettings {
 	public function getCodeValidMinutes(): int;
 
 	/**
-	 * Plain-text email template used when sending the 2FA challenge email.
-	 * Supports the placeholders {code}, {user}, {cloud}.
+	 * Subject of the 2FA challenge email.
+	 * Supports the placeholders {code}, {user}, {cloud} and {validity}.
+	 * An empty string means: use the localized default subject.
 	 *
-	 * @return string email template
+	 * @return string email subject template
+	 */
+	public function getEMailSubject(): string;
+
+	/**
+	 * Heading shown inside the 2FA challenge email.
+	 * Supports the placeholders {code}, {user}, {cloud} and {validity}.
+	 * An empty string means: use the localized default heading.
+	 *
+	 * @return string email heading template
+	 */
+	public function getEMailHeading(): string;
+
+	/**
+	 * Plain-text email body template used when sending the 2FA challenge email.
+	 * Supports the placeholders {code}, {user}, {cloud} and {validity}.
+	 * An empty string means: use the localized default body text.
+	 *
+	 * @return string email body template
 	 */
 	public function getEMailTemplate(): string;
+
+	/**
+	 * Footer text of the 2FA challenge email.
+	 * Supports the placeholders {code}, {user}, {cloud} and {validity}.
+	 * An empty string means: use the standard footer of this Nextcloud
+	 * instance (theming slogan).
+	 *
+	 * @return string email footer template
+	 */
+	public function getEMailFooter(): string;
 }
