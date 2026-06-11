@@ -1,4 +1,6 @@
 {
+  "name": "datenschutz-individuell/twofactor_email",
+  "description": "Two-Factor Email Provider",
   "license": [
     "AGPL-3.0-or-later"
   ],
