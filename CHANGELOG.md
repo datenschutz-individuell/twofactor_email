@@ -10,6 +10,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - When updating the app from v2 to v3, authentication codes are no longer migrated, see
   https://github.com/datenschutz-individuell/twofactor_email/issues/69#issuecomment-4588492017
 
+## 3.1.2 (2026-06-11)
+
+### Fixed
+
+- Code cleanup; updated dependencies that also fix an optical glitch in the personal settings toggle
+
 ## 3.1.0 (2026-05-31)
 
 ### Added
