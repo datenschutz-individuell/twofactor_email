@@ -51,7 +51,7 @@ final class AppSettingsDefaults {
 		// The {logo} and {code} structure is kept outside of the translatable
 		// strings so translations cannot break it
 		return "{logo}\n\n"
-			. $this->l10n->t('Someone is trying to log in to {cloud} with your account {user}. Since two-factor authentication is enabled for your account, a confirmation is required. Email was chosen as the second factor. This is your code:')
+			. $this->l10n->t('Someone is trying to log in to {cloud} with your account {user}. Since two-factor authentication is enabled for your account, a confirmation is required. Email was chosen as the second factor, so you are receiving this code:')
 			. "\n\n{code}\n\n"
 			. $this->l10n->t('This code is valid for {validity} minutes. Enter it only if you tried to log in yourself. Otherwise, treat this message as an attack attempt and inform your administrator.');
 	}

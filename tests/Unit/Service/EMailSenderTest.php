@@ -139,10 +139,10 @@ class EMailSenderTest extends TestCase {
 			[
 				'Someone is trying to log in to <strong style="font-family:monospace">Example Cloud</strong> with your account <strong style="font-family:monospace">Jane Doe</strong>. '
 				. 'Since two-factor authentication is enabled for your account, a confirmation is required. '
-				. 'Email was chosen as the second factor. This is your code:',
+				. 'Email was chosen as the second factor, so you are receiving this code:',
 				'Someone is trying to log in to Example Cloud with your account Jane Doe. '
 				. 'Since two-factor authentication is enabled for your account, a confirmation is required. '
-				. 'Email was chosen as the second factor. This is your code:',
+				. 'Email was chosen as the second factor, so you are receiving this code:',
 			],
 			[
 				'<strong style="font-family:monospace">123456</strong>',
