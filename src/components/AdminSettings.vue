@@ -43,6 +43,9 @@
 				<h3 class="settings-group__heading">
 					{{ t('twofactor_email', 'Email template') }}
 				</h3>
+				<p class="settings-group__description">
+					{{ t('twofactor_email', 'This template defines the email that delivers the one-time code to users. It is partially dynamic: placeholders are filled individually each time an email is sent.') }}
+				</p>
 				<ul class="settings-group__hints">
 					<li>{{ t('twofactor_email', 'Placeholders: {code} (one-time code), {user} (display name), {cloud} (instance name), {validity} (validity in minutes). A customized body must contain {code}; in the body all placeholders are highlighted.') }}</li>
 					<li>{{ t('twofactor_email', 'Defaults: empty fields use the localized default text, shown as a hint inside the field.') }}</li>
@@ -201,7 +204,7 @@ async function onReset() {
 	/* noinspection CssUnresolvedCustomProperty */
 	color: var(--color-text-maxcontrast, gray);
 	list-style: disc;
-	margin: 0 0 16px;
+	margin: -8px 0 16px;
 	max-width: 64em;
 	padding-inline-start: 24px;
 }
