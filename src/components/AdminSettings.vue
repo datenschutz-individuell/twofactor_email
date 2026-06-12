@@ -44,16 +44,16 @@
 					{{ t('twofactor_email', 'Email template') }}
 				</h3>
 				<p class="settings-group__description">
-					{{ t('twofactor_email', 'All parts of the email sent to users can be customized. Empty fields use the localized default text, shown as a hint inside the field.') }}
-					{{ t('twofactor_email', 'Available placeholders in all fields: {code} (the one-time code), {user} (display name of the user), {cloud} (name of this instance), {validity} (code validity in minutes).') }}
-					{{ t('twofactor_email', 'A customized body must contain the {code} placeholder.') }}
-					{{ t('twofactor_email', 'In body and footer, a blank line starts a new paragraph and a single line break becomes a line break.') }}
-					{{ t('twofactor_email', 'Links can be written as [URL="https://example.org"]Text[/URL] or just [URL]https://example.org[/URL] — clickable in the body, shown as "Text (URL)" in the footer.') }}
-					{{ t('twofactor_email', 'Images can be embedded as [IMG="https://example.org/image.png"]Description[/IMG] (https only); many email clients load remote images only after confirmation.') }}
-					{{ t('twofactor_email', 'With an empty body the email starts with the standard logo header. A customized body controls the logo itself: place it anywhere with {logo}, or leave it out entirely.') }}
-					{{ t('twofactor_email', 'The logo is rendered small: at most 250 pixels and at most 20% of the email width.') }}
-					{{ t('twofactor_email', 'Note: a {code} in the subject may show up in notification previews on lock screens.') }}
+					{{ t('twofactor_email', 'Empty fields use the localized default text, shown as a hint inside the field.') }}
 				</p>
+				<ul class="settings-group__hints">
+					<li>{{ t('twofactor_email', 'Placeholders: {code} (one-time code), {user} (display name), {cloud} (instance name), {validity} (validity in minutes). A customized body must contain {code}; in the body all placeholders are highlighted.') }}</li>
+					<li>{{ t('twofactor_email', 'Formatting: a blank line starts a new paragraph, a single line break becomes a line break.') }}</li>
+					<li>{{ t('twofactor_email', 'Links: [URL="https://example.org"]Text[/URL] or [URL]https://example.org[/URL] — in the footer shown as "Text (URL)".') }}</li>
+					<li>{{ t('twofactor_email', 'Images: [IMG="https://example.org/image.png"]Description[/IMG] (https only); many clients load remote images only after confirmation.') }}</li>
+					<li>{{ t('twofactor_email', 'Logo: an empty body shows the standard logo header; in a customized body place {logo} anywhere or omit it. The logo is rendered small (at most 250 pixels and 20% of the email width).') }}</li>
+					<li>{{ t('twofactor_email', 'Subject: a {code} here may show up in notification previews on lock screens.') }}</li>
+				</ul>
 
 				<div v-for="field in textFields"
 					 :key="field.key"
@@ -197,6 +197,19 @@ async function onReset() {
 	color: var(--color-text-maxcontrast, gray);
 	margin-bottom: 16px;
 	max-width: 64em;
+}
+
+.settings-group__hints {
+	/* noinspection CssUnresolvedCustomProperty */
+	color: var(--color-text-maxcontrast, gray);
+	list-style: disc;
+	margin: -8px 0 16px;
+	max-width: 64em;
+	padding-inline-start: 24px;
+}
+
+.settings-group__hints li {
+	margin-bottom: 4px;
 }
 
 /* One row per field: real label on the left, input indented to a common edge */
