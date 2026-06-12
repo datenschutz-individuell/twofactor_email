@@ -49,6 +49,11 @@ final class EMailSender implements IEMailSender {
 			// Default body: classic email layout with the standard logo header.
 			// A customized body controls the logo itself via the {logo} token.
 			$template->addHeader();
+		} else {
+			// Without the header the first paragraph would stick to the top
+			// edge (the server's <p> only has a bottom margin) — add an empty
+			// paragraph as spacing. It has no plain text counterpart.
+			$template->addBodyText('&nbsp;', false);
 		}
 		// In the body, the placeholders are replaced during rendering: bold and
 		// monospace in the HTML variant, bare values in the plain text variant

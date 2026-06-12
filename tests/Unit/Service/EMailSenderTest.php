@@ -158,10 +158,17 @@ class EMailSenderTest extends TestCase {
 
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
-		$this->assertSame([[
-			'Use <strong style="font-family:monospace">123456</strong> on <strong style="font-family:monospace">Example Cloud</strong> within <strong style="font-family:monospace">10</strong> minutes.',
-			'Use >>> 123456 <<< on Example Cloud within 10 minutes.',
-		]], $bodyTexts);
+		$this->assertSame([
+			[
+				// Spacing paragraph replacing the omitted logo header
+				'&nbsp;',
+				false,
+			],
+			[
+				'Use <strong style="font-family:monospace">123456</strong> on <strong style="font-family:monospace">Example Cloud</strong> within <strong style="font-family:monospace">10</strong> minutes.',
+				'Use >>> 123456 <<< on Example Cloud within 10 minutes.',
+			],
+		], $bodyTexts);
 	}
 
 	public function testRendersParagraphsLineBreaksAndLinks(): void {
@@ -186,6 +193,11 @@ class EMailSenderTest extends TestCase {
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
 		$this->assertSame([
+			[
+				// Spacing paragraph replacing the omitted logo header
+				'&nbsp;',
+				false,
+			],
 			[
 				// Placeholders are bold and monospace in the HTML variant only
 				'Hello <strong style="font-family:monospace">Jane Doe</strong>,<br>your code: <strong style="font-family:monospace">123456</strong>',
@@ -237,6 +249,11 @@ class EMailSenderTest extends TestCase {
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
 		$this->assertSame([
+			[
+				// Spacing paragraph replacing the omitted logo header
+				'&nbsp;',
+				false,
+			],
 			[
 				// Logo-only paragraph: no plain text counterpart at all
 				'<img src="https://cloud.example/themes/logo.png" alt="Example Cloud" style="max-width:250px;max-width:min(250px, 20%);max-height:250px">',
