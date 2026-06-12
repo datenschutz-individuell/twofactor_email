@@ -16,6 +16,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
   email: a blank line starts a new paragraph, a single line break becomes a line break,
   and `[Text](https://example.org)` becomes a clickable link (http, https and mailto).
   Everything else is HTML-escaped.
+- Images can be embedded in the body as `![Description](https://example.org/image.png)`
+  (https only). Note that many email clients load remote images only after confirmation.
+- A customized body controls the instance logo itself: an empty body keeps the standard
+  logo header, a customized one shows the logo only where the new `{logo}` placeholder
+  is written — or not at all when it is omitted.
 
 ### Changed
 

@@ -13,6 +13,7 @@ use OCA\TwoFactorEMail\Service\EMailSender;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\Defaults;
 use OCP\IL10N;
+use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\Mail\IEMailTemplate;
 use OCP\Mail\IMailer;
@@ -25,6 +26,7 @@ use Psr\Log\LoggerInterface;
 class EMailSenderTest extends TestCase {
 	private IMailer&MockObject $mailer;
 	private Defaults&MockObject $defaults;
+	private IURLGenerator&MockObject $urlGenerator;
 	private IAppSettings&MockObject $appSettings;
 	private IEMailTemplate&MockObject $template;
 
@@ -38,6 +40,7 @@ class EMailSenderTest extends TestCase {
 
 		$this->mailer = $this->createMock(IMailer::class);
 		$this->defaults = $this->createMock(Defaults::class);
+		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->appSettings = $this->createMock(IAppSettings::class);
 		$this->template = $this->createMock(IEMailTemplate::class);
 
@@ -54,6 +57,7 @@ class EMailSenderTest extends TestCase {
 			$this->createMock(LoggerInterface::class),
 			$this->mailer,
 			$this->defaults,
+			$this->urlGenerator,
 			$this->appSettings,
 			new AppSettingsDefaults($l10n),
 		);
@@ -105,6 +109,8 @@ class EMailSenderTest extends TestCase {
 			->with('Login attempt for Jane Doe @ Example Cloud');
 		$this->template->expects($this->never())
 			->method('addHeading');
+		$this->template->expects($this->once())
+			->method('addHeader');
 		$bodyTexts = [];
 		$this->collectBodyTexts($bodyTexts);
 		// Empty footer setting means: standard theming footer (no argument)
@@ -140,6 +146,9 @@ class EMailSenderTest extends TestCase {
 		$this->template->expects($this->once())
 			->method('setSubject')
 			->with('Code 123456 for Jane Doe');
+		// A customized body controls the logo itself — no automatic header
+		$this->template->expects($this->never())
+			->method('addHeader');
 		$bodyTexts = [];
 		$this->collectBodyTexts($bodyTexts);
 		$this->template->expects($this->once())
@@ -192,6 +201,46 @@ class EMailSenderTest extends TestCase {
 				// Raw HTML is escaped in the HTML variant
 				'&lt;b&gt;Hi&lt;/b&gt; &amp; Co',
 				'<b>Hi</b> & Co',
+			],
+		], $bodyTexts);
+	}
+
+	public function testLogoTokenAndEmbeddedImages(): void {
+		$this->appSettings->method('getEMailSubject')->willReturn('');
+		$this->appSettings->method('getEMailTemplate')->willReturn(
+			"{logo}\n\n"
+			. "![Chart of the week](https://example.org/chart.png)\n\n"
+			. '![insecure](http://example.org/x.png)'
+		);
+		$this->appSettings->method('getEMailFooter')->willReturn('');
+		$this->defaults->method('getLogo')->with(false)->willReturn('/themes/logo.png');
+		$this->urlGenerator->method('getAbsoluteURL')
+			->with('/themes/logo.png')
+			->willReturn('https://cloud.example/themes/logo.png');
+
+		$this->expectMailWithTemplate();
+		// A customized body controls the logo itself — no automatic header
+		$this->template->expects($this->never())
+			->method('addHeader');
+		$bodyTexts = [];
+		$this->collectBodyTexts($bodyTexts);
+
+		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
+
+		$this->assertSame([
+			[
+				// Logo-only paragraph: no plain text counterpart at all
+				'<img src="https://cloud.example/themes/logo.png" alt="Example Cloud" style="max-width:100%">',
+				false,
+			],
+			[
+				'<img src="https://example.org/chart.png" alt="Chart of the week" style="max-width:100%">',
+				'Chart of the week (https://example.org/chart.png)',
+			],
+			[
+				// Images must use https — anything else stays literal
+				'![insecure](http://example.org/x.png)',
+				'![insecure](http://example.org/x.png)',
 			],
 		], $bodyTexts);
 	}
