@@ -191,9 +191,8 @@ class EMailSenderTest extends TestCase {
 		$this->appSettings->method('getEMailSubject')->willReturn('');
 		$this->appSettings->method('getEMailTemplate')->willReturn(
 			"Hello {user},\nyour code: {code}\n\n"
-			. "Visit [URL=\"https://example.org/help?a=1&b=2\"]the help page[/URL] for details.\n\n"
-			. "See [url]https://example.org[/url]\n\n"
-			. "[URL=\"javascript:alert(1)\"]bad[/URL]\n\n"
+			. "Visit https://example.org/help?a=1&b=2 for details.\n\n"
+			. "More info (https://example.org/path).\n\n"
 			. '<b>Hi</b> & Co'
 		);
 
@@ -215,18 +214,14 @@ class EMailSenderTest extends TestCase {
 				"Hello Jane Doe,\nyour code: >>> 123456 <<<",
 			],
 			[
-				'Visit <a href="https://example.org/help?a=1&amp;b=2">the help page</a> for details.',
-				'Visit the help page (https://example.org/help?a=1&b=2) for details.',
+				// URLs are auto-linked with themselves as the visible text
+				'Visit <a href="https://example.org/help?a=1&amp;b=2">https://example.org/help?a=1&amp;b=2</a> for details.',
+				'Visit https://example.org/help?a=1&b=2 for details.',
 			],
 			[
-				// Short form and lowercase tags work; the URL is the link text
-				'See <a href="https://example.org">https://example.org</a>',
-				'See https://example.org',
-			],
-			[
-				// Disallowed link scheme: the markup stays literal in both variants
-				'[URL=&quot;javascript:alert(1)&quot;]bad[/URL]',
-				'[URL="javascript:alert(1)"]bad[/URL]',
+				// Trailing sentence punctuation is not part of the URL
+				'More info (<a href="https://example.org/path">https://example.org/path</a>).',
+				'More info (https://example.org/path).',
 			],
 			[
 				// Raw HTML is escaped in the HTML variant
@@ -236,14 +231,9 @@ class EMailSenderTest extends TestCase {
 		], $bodyTexts);
 	}
 
-	public function testLogoTokenAndEmbeddedImages(): void {
+	public function testLogoToken(): void {
 		$this->appSettings->method('getEMailSubject')->willReturn('');
-		$this->appSettings->method('getEMailTemplate')->willReturn(
-			"{logo}\n\n"
-			. "[IMG=\"https://example.org/chart.png\"]Chart of the week[/IMG]\n\n"
-			. "[IMG]https://example.org/plain.png[/IMG]\n\n"
-			. '[IMG="http://example.org/x.png"]insecure[/IMG]'
-		);
+		$this->appSettings->method('getEMailTemplate')->willReturn("{logo}\n\nYour code: {code}");
 		$this->defaults->method('getLogo')->with(false)->willReturn('/themes/logo.png');
 		$this->urlGenerator->method('getAbsoluteURL')
 			->with('/themes/logo.png')
@@ -260,7 +250,6 @@ class EMailSenderTest extends TestCase {
 
 		$this->assertSame([
 			[
-				// Spacing paragraph replacing the omitted logo header
 				'&nbsp;',
 				false,
 			],
@@ -270,18 +259,8 @@ class EMailSenderTest extends TestCase {
 				false,
 			],
 			[
-				'<img src="https://example.org/chart.png" alt="Chart of the week" style="max-width:100%">',
-				'Chart of the week (https://example.org/chart.png)',
-			],
-			[
-				// Short form: no description, the URL is the plain text fallback
-				'<img src="https://example.org/plain.png" alt="" style="max-width:100%">',
-				'https://example.org/plain.png',
-			],
-			[
-				// Images must use https — anything else stays literal
-				'[IMG=&quot;http://example.org/x.png&quot;]insecure[/IMG]',
-				'[IMG="http://example.org/x.png"]insecure[/IMG]',
+				'Your code: <strong style="font-family:monospace">123456</strong>',
+				'Your code: >>> 123456 <<<',
 			],
 		], $bodyTexts);
 	}

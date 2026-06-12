@@ -93,31 +93,22 @@ final class EMailSender implements IEMailSender {
 	}
 
 	/*
-	 * The template texts support a minimal markup so that line structure
-	 * survives in the HTML variant of the email:
+	 * The template texts support no markup, but their line structure and URLs
+	 * survive in the HTML variant of the email:
 	 *   - a blank line starts a new paragraph (own addBodyText call)
 	 *   - a single line break becomes <br>
-	 *   - [URL="https://example.org"]Text[/URL] (quotes optional) or
-	 *     [URL]https://example.org[/URL] becomes a clickable link (http, https
-	 *     and mailto only); in the plain text variant it is rendered as
-	 *     "Text (URL)"
-	 *   - [IMG="https://example.org/image.png"]Description[/IMG] or
-	 *     [IMG]https://example.org/image.png[/IMG] embeds a remote image
-	 *     (https only, HTML variant only); in the plain text variant it is
-	 *     rendered as "Description (URL)"
+	 *   - http(s) URLs are detected and rendered as links — the URL itself
+	 *     stays the visible text; trailing sentence punctuation is not
+	 *     considered part of the URL
 	 *   - {logo} inserts the instance logo; it only appears in the HTML variant
 	 *   - all placeholders ({code}, {user}, {cloud}, {validity}) render bold
 	 *     and monospace in the HTML variant; in the plain text variant they are
-	 *     inserted bare, {code} with ">>> <<<" markers; inside tags and in the
+	 *     inserted bare, {code} with ">>> <<<" markers; inside URLs and in the
 	 *     subject all are inserted bare
-	 * Tags are case-insensitive. Invalid markup (unsupported scheme, missing
-	 * URL or text) stays literally. Everything else is HTML-escaped — raw HTML
-	 * is not possible.
+	 * Everything else is HTML-escaped — raw HTML is not possible.
 	 */
 
-	private const TAG_PATTERN = '~\[(URL|IMG)(?:="?([^"\]]*)"?)?\](.*?)\[/\1\]~is';
-	private const ALLOWED_LINK_SCHEMES = '~^(https?://|mailto:)~i';
-	private const ALLOWED_IMAGE_SCHEMES = '~^https://~i';
+	private const URL_PATTERN = '~https?://[^\s<>"]+~i';
 
 	/**
 	 * @return string[] non-empty paragraphs, split on blank lines
@@ -128,80 +119,41 @@ final class EMailSender implements IEMailSender {
 	}
 
 	/**
+	 * Auto-links the URLs of the given text; the literal text segments and the
+	 * URLs are escaped individually.
+	 *
 	 * @param array<string, string> $values placeholder => replacement value
 	 */
 	private function toHtml(string $paragraph, array $values): string {
-		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $this->renderTags($paragraph, true, $values));
+		$result = '';
+		$offset = 0;
+		while (preg_match(self::URL_PATTERN, $paragraph, $match, PREG_OFFSET_CAPTURE, $offset) === 1) {
+			$position = $match[0][1];
+			// Trailing punctuation usually ends the sentence, not the URL
+			$url = rtrim($match[0][0], '.,;:!?)');
+			$result .= $this->literal(substr($paragraph, $offset, $position - $offset), $values);
+			// Inside URLs the placeholders are inserted bare — markup must not
+			// end up in attributes
+			$href = htmlspecialchars(strtr($url, $values));
+			$result .= '<a href="' . $href . '">' . $href . '</a>';
+			$offset = $position + strlen($url);
+		}
+		$result .= $this->literal(substr($paragraph, $offset), $values);
+		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $result);
 	}
 
 	/**
 	 * @param array<string, string> $values placeholder => replacement value
 	 */
 	private function toPlain(string $paragraph, array $values): string {
-		return $this->renderTags($paragraph, false, $values);
-	}
-
-	/**
-	 * Renders the [URL] and [IMG] tags of the given text into the HTML or the
-	 * plain text variant. The markup is parsed on the raw text; the literal
-	 * text segments and all tag parts are escaped individually for HTML.
-	 *
-	 * @param array<string, string> $values placeholder => replacement value
-	 */
-	private function renderTags(string $text, bool $asHtml, array $values): string {
-		$result = '';
-		$offset = 0;
-		while (preg_match(self::TAG_PATTERN, $text, $match, PREG_OFFSET_CAPTURE, $offset) === 1) {
-			$position = $match[0][1];
-			$result .= $this->literal(substr($text, $offset, $position - $offset), $asHtml, $values);
-			$result .= $this->renderTag(strtoupper($match[1][0]), $match[2][0], $match[3][0], $asHtml, $values)
-				?? $this->literal($match[0][0], $asHtml, $values);
-			$offset = $position + strlen($match[0][0]);
-		}
-		return $result . $this->literal(substr($text, $offset), $asHtml, $values);
-	}
-
-	/**
-	 * @param array<string, string> $values placeholder => replacement value
-	 * @return string|null the rendered tag, or null if the markup is invalid
-	 *                     and shall stay literally
-	 */
-	private function renderTag(string $tag, string $attribute, string $content, bool $asHtml, array $values): ?string {
-		// Inside tags the placeholders are always inserted bare — also in the
-		// HTML variant, since markup must not end up in URLs or attributes
-		$attribute = strtr($attribute, $values);
-		$content = strtr($content, $values);
-		if ($tag === 'URL') {
-			$url = $attribute !== '' ? $attribute : trim($content);
-			$text = $attribute !== '' ? $content : $url;
-			if ($url === '' || $text === '' || preg_match(self::ALLOWED_LINK_SCHEMES, $url) !== 1) {
-				return null;
-			}
-			if ($asHtml) {
-				return '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($text) . '</a>';
-			}
-			return $text === $url ? $url : $text . ' (' . $url . ')';
-		}
-		// IMG
-		$src = $attribute !== '' ? $attribute : trim($content);
-		$alt = $attribute !== '' ? $content : '';
-		if ($src === '' || preg_match(self::ALLOWED_IMAGE_SCHEMES, $src) !== 1) {
-			return null;
-		}
-		if ($asHtml) {
-			return '<img src="' . htmlspecialchars($src) . '" alt="' . htmlspecialchars($alt) . '" style="max-width:100%">';
-		}
-		return $alt === '' ? $src : $alt . ' (' . $src . ')';
+		// No styling in plain text — bare values, the code with markers
+		return strtr($paragraph, ['{code}' => '>>> ' . $values['{code}'] . ' <<<'] + $values);
 	}
 
 	/**
 	 * @param array<string, string> $values placeholder => replacement value
 	 */
-	private function literal(string $text, bool $asHtml, array $values): string {
-		if (!$asHtml) {
-			// No styling in plain text — bare values, the code with markers
-			return strtr($text, ['{code}' => '>>> ' . $values['{code}'] . ' <<<'] + $values);
-		}
+	private function literal(string $text, array $values): string {
 		$html = htmlspecialchars($text);
 		if (str_contains($html, '{logo}')) {
 			// Keep the logo small: at most 250px and 20% of the email width.

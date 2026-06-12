@@ -74,4 +74,18 @@ function blockInvalidNumericInput(event) {
 	display: block;
 	margin-bottom: 4px;
 }
+
+/* Helper texts may be multi-line references — keep their line breaks.
+   The muted color works around NcTextArea not dimming its helper text
+   the way NcInputField does. */
+.labeled-field :deep(.input-field__helper-text-message),
+.labeled-field :deep(.textarea__helper-text-message) {
+	white-space: pre-line;
+	align-items: start;
+}
+
+.labeled-field :deep(.textarea__helper-text-message) {
+	/* noinspection CssUnresolvedCustomProperty */
+	color: var(--color-text-maxcontrast, gray);
+}
 </style>
