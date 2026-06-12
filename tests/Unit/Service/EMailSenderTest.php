@@ -127,7 +127,7 @@ class EMailSenderTest extends TestCase {
 				'Your two-factor authentication code is: >>> 123456 <<<',
 			],
 			[
-				'If you tried to login, please enter that code on Example Cloud. '
+				'If you tried to login, please enter that code on <strong style="font-family:monospace">Example Cloud</strong>. '
 				. 'If you did not, somebody else did and knows your email address '
 				. 'or username – and your password!',
 				'If you tried to login, please enter that code on Example Cloud. '
@@ -159,7 +159,7 @@ class EMailSenderTest extends TestCase {
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
 		$this->assertSame([[
-			'Use <strong style="font-family:monospace">123456</strong> on Example Cloud within 10 minutes.',
+			'Use <strong style="font-family:monospace">123456</strong> on <strong style="font-family:monospace">Example Cloud</strong> within <strong style="font-family:monospace">10</strong> minutes.',
 			'Use >>> 123456 <<< on Example Cloud within 10 minutes.',
 		]], $bodyTexts);
 	}
@@ -187,8 +187,8 @@ class EMailSenderTest extends TestCase {
 
 		$this->assertSame([
 			[
-				// {code} is bold and monospace in the HTML variant only
-				'Hello Jane Doe,<br>your code: <strong style="font-family:monospace">123456</strong>',
+				// Placeholders are bold and monospace in the HTML variant only
+				'Hello <strong style="font-family:monospace">Jane Doe</strong>,<br>your code: <strong style="font-family:monospace">123456</strong>',
 				"Hello Jane Doe,\nyour code: >>> 123456 <<<",
 			],
 			[

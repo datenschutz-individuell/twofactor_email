@@ -50,21 +50,23 @@ final class EMailSender implements IEMailSender {
 			// A customized body controls the logo itself via the {logo} token.
 			$template->addHeader();
 		}
-		// In the body, {code} is replaced during rendering: bold and monospace
-		// in the HTML variant, the bare code in the plain text variant.
-		foreach ($this->paragraphs($this->replaceTextPlaceholders($body, $user)) as $paragraph) {
-			$plain = $this->toPlain(str_replace('{logo}', '', $paragraph), $code);
+		// In the body, the placeholders are replaced during rendering: bold and
+		// monospace in the HTML variant, bare values in the plain text variant
+		// ({code} additionally with ">>> <<<" markers there).
+		$values = $this->placeholderValues($user, $code);
+		foreach ($this->paragraphs($body) as $paragraph) {
+			$plain = $this->toPlain(str_replace('{logo}', '', $paragraph), $values);
 			// An empty plain text (e.g. a logo-only paragraph) must be passed as
 			// false — with '' the server would fall back to escaping the HTML.
-			$template->addBodyText($this->toHtml($paragraph, $code), trim($plain) === '' ? false : $plain);
+			$template->addBodyText($this->toHtml($paragraph, $values), trim($plain) === '' ? false : $plain);
 		}
 		if ($footer === '') {
 			// Standard footer of this Nextcloud instance (theming slogan)
 			$template->addFooter();
 		} else {
-			// In the footer {code} is inserted bare (replaced before rendering,
-			// so the plain text markers do not apply)
-			$template->addFooter($this->toFooterHtml($this->replacePlaceholders($footer, $user, $code), $code));
+			// In the footer all placeholders are inserted bare (replaced before
+			// rendering, so neither styling nor markers apply)
+			$template->addFooter($this->toFooterHtml($this->replacePlaceholders($footer, $user, $code), $values));
 		}
 
 		$message = $this->mailer->createMessage();
@@ -79,16 +81,22 @@ final class EMailSender implements IEMailSender {
 		}
 	}
 
-	private function replacePlaceholders(string $text, IUser $user, string $code): string {
-		return str_replace('{code}', $code, $this->replaceTextPlaceholders($text, $user));
+	/**
+	 * @return array<string, string> placeholder => replacement value
+	 */
+	private function placeholderValues(IUser $user, string $code): array {
+		return [
+			'{code}' => $code,
+			'{user}' => $user->getDisplayName(),
+			'{cloud}' => $this->defaults->getName(),
+			'{validity}' => (string)$this->appSettings->getCodeValidMinutes(),
+		];
 	}
 
-	private function replaceTextPlaceholders(string $text, IUser $user): string {
-		return str_replace(
-			['{user}', '{cloud}', '{validity}'],
-			[$user->getDisplayName(), $this->defaults->getName(), (string)$this->appSettings->getCodeValidMinutes()],
-			$text,
-		);
+	private function replacePlaceholders(string $text, IUser $user, string $code): string {
+		// strtr() replaces in a single pass — placeholder-like fragments in the
+		// inserted values (e.g. a display name containing "{code}") stay as-is
+		return strtr($text, $this->placeholderValues($user, $code));
 	}
 
 	/*
@@ -106,9 +114,10 @@ final class EMailSender implements IEMailSender {
 	 *     "Description (URL)"
 	 *   - {logo} (body only) inserts the instance logo; it only appears in the
 	 *     HTML variant
-	 *   - {code} renders bold and monospace in the HTML variant of the body
-	 *     and as ">>> code <<<" in its plain text variant; inside tags, in the
-	 *     subject and in the footer it is inserted bare
+	 *   - all placeholders ({code}, {user}, {cloud}, {validity}) render bold
+	 *     and monospace in the HTML variant of the body; in its plain text
+	 *     variant they are inserted bare, {code} with ">>> <<<" markers; inside
+	 *     tags, in the subject and in the footer all are inserted bare
 	 * Tags are case-insensitive. Invalid markup (unsupported scheme, missing
 	 * URL or text) stays literally. Everything else is HTML-escaped — raw HTML
 	 * is not possible.
@@ -126,41 +135,50 @@ final class EMailSender implements IEMailSender {
 		return array_values(array_filter(array_map(trim(...), $split), static fn (string $p): bool => $p !== ''));
 	}
 
-	private function toHtml(string $paragraph, string $code): string {
-		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $this->renderTags($paragraph, true, $code));
+	/**
+	 * @param array<string, string> $values placeholder => replacement value
+	 */
+	private function toHtml(string $paragraph, array $values): string {
+		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $this->renderTags($paragraph, true, $values));
 	}
 
-	private function toPlain(string $paragraph, string $code): string {
-		return $this->renderTags($paragraph, false, $code);
+	/**
+	 * @param array<string, string> $values placeholder => replacement value
+	 */
+	private function toPlain(string $paragraph, array $values): string {
+		return $this->renderTags($paragraph, false, $values);
 	}
 
 	/**
 	 * Renders the [URL] and [IMG] tags of the given text into the HTML or the
 	 * plain text variant. The markup is parsed on the raw text; the literal
 	 * text segments and all tag parts are escaped individually for HTML.
+	 *
+	 * @param array<string, string> $values placeholder => replacement value
 	 */
-	private function renderTags(string $text, bool $asHtml, string $code): string {
+	private function renderTags(string $text, bool $asHtml, array $values): string {
 		$result = '';
 		$offset = 0;
 		while (preg_match(self::TAG_PATTERN, $text, $match, PREG_OFFSET_CAPTURE, $offset) === 1) {
 			$position = $match[0][1];
-			$result .= $this->literal(substr($text, $offset, $position - $offset), $asHtml, $code);
-			$result .= $this->renderTag(strtoupper($match[1][0]), $match[2][0], $match[3][0], $asHtml, $code)
-				?? $this->literal($match[0][0], $asHtml, $code);
+			$result .= $this->literal(substr($text, $offset, $position - $offset), $asHtml, $values);
+			$result .= $this->renderTag(strtoupper($match[1][0]), $match[2][0], $match[3][0], $asHtml, $values)
+				?? $this->literal($match[0][0], $asHtml, $values);
 			$offset = $position + strlen($match[0][0]);
 		}
-		return $result . $this->literal(substr($text, $offset), $asHtml, $code);
+		return $result . $this->literal(substr($text, $offset), $asHtml, $values);
 	}
 
 	/**
+	 * @param array<string, string> $values placeholder => replacement value
 	 * @return string|null the rendered tag, or null if the markup is invalid
 	 *                     and shall stay literally
 	 */
-	private function renderTag(string $tag, string $attribute, string $content, bool $asHtml, string $code): ?string {
-		// Inside tags the code is always inserted bare — also in the HTML
-		// variant, since markup must not end up in URLs or attributes
-		$attribute = str_replace('{code}', $code, $attribute);
-		$content = str_replace('{code}', $code, $content);
+	private function renderTag(string $tag, string $attribute, string $content, bool $asHtml, array $values): ?string {
+		// Inside tags the placeholders are always inserted bare — also in the
+		// HTML variant, since markup must not end up in URLs or attributes
+		$attribute = strtr($attribute, $values);
+		$content = strtr($content, $values);
 		if ($tag === 'URL') {
 			$url = $attribute !== '' ? $attribute : trim($content);
 			$text = $attribute !== '' ? $content : $url;
@@ -184,10 +202,13 @@ final class EMailSender implements IEMailSender {
 		return $alt === '' ? $src : $alt . ' (' . $src . ')';
 	}
 
-	private function literal(string $text, bool $asHtml, string $code): string {
+	/**
+	 * @param array<string, string> $values placeholder => replacement value
+	 */
+	private function literal(string $text, bool $asHtml, array $values): string {
 		if (!$asHtml) {
-			// No styling in plain text — make the code stand out with markers
-			return str_replace('{code}', '>>> ' . $code . ' <<<', $text);
+			// No styling in plain text — bare values, the code with markers
+			return strtr($text, ['{code}' => '>>> ' . $values['{code}'] . ' <<<'] + $values);
 		}
 		$html = htmlspecialchars($text);
 		if (str_contains($html, '{logo}')) {
@@ -203,19 +224,23 @@ final class EMailSender implements IEMailSender {
 				$html,
 			);
 		}
-		// The code stands out: bold and monospace in the HTML variant
-		return str_replace(
-			'{code}',
-			'<strong style="font-family:monospace">' . htmlspecialchars($code) . '</strong>',
-			$html,
-		);
+		// The placeholder values stand out: bold and monospace in the HTML variant
+		$styled = [];
+		foreach ($values as $placeholder => $value) {
+			$styled[$placeholder] = '<strong style="font-family:monospace">' . htmlspecialchars($value) . '</strong>';
+		}
+		return strtr($html, $styled);
 	}
 
-	private function toFooterHtml(string $footer, string $code): string {
+	/**
+	 * @param array<string, string> $values placeholder => replacement value
+	 */
+	private function toFooterHtml(string $footer, array $values): string {
 		// The footer has no paragraph concept and the server derives its plain
 		// text variant from the HTML by replacing <br>, so links and images are
-		// rendered in their "Text (URL)" form and the code stays bare here.
-		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], htmlspecialchars($this->toPlain($footer, $code)));
+		// rendered in their "Text (URL)" form and all placeholders stay bare
+		// (they are already replaced before rendering).
+		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], htmlspecialchars($this->toPlain($footer, $values)));
 	}
 
 	private function logoUrl(): string {
