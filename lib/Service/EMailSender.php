@@ -39,22 +39,17 @@ final class EMailSender implements IEMailSender {
 
 		// For every part an empty admin setting means: use the localized default
 		$subject = $this->appSettings->getEMailSubject() ?: $this->appSettingsDefaults->eMailSubject();
-		$customBody = $this->appSettings->getEMailTemplate();
-		$body = $customBody ?: $this->appSettingsDefaults->eMailBody();
+		$body = $this->appSettings->getEMailTemplate() ?: $this->appSettingsDefaults->eMailBody();
 		$footer = $this->appSettings->getEMailFooter();
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
 		$template->setSubject($this->replacePlaceholders($subject, $user, $code));
-		if ($customBody === '') {
-			// Default body: classic email layout with the standard logo header.
-			// A customized body controls the logo itself via the {logo} token.
-			$template->addHeader();
-		} else {
-			// Without the header the first paragraph would stick to the top
-			// edge (the server's <p> only has a bottom margin) — add an empty
-			// paragraph as spacing. It has no plain text counterpart.
-			$template->addBodyText('&nbsp;', false);
-		}
+		// The logo is solely controlled by the {logo} token in the body (the
+		// default body starts with it) — no automatic logo header. Without
+		// that header the first paragraph would stick to the top edge (the
+		// server's <p> only has a bottom margin), so add an empty paragraph
+		// as spacing. It has no plain text counterpart.
+		$template->addBodyText('&nbsp;', false);
 		// In the body, the placeholders are replaced during rendering: bold and
 		// monospace in the HTML variant, bare values in the plain text variant
 		// ({code} additionally with ">>> <<<" markers there).

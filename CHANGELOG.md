@@ -18,9 +18,12 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
   becomes a clickable link (http, https and mailto). Everything else is HTML-escaped.
 - Images can be embedded in the body as `[IMG="https://example.org/image.png"]Description[/IMG]`
   (https only). Note that many email clients load remote images only after confirmation.
-- A customized body controls the instance logo itself: an empty body keeps the standard
-  logo header, a customized one shows the logo only where the new `{logo}` placeholder
-  is written — or not at all when it is omitted.
+- The instance logo is controlled by the body: the new `{logo}` placeholder renders it
+  (small) wherever it is written — or not at all when it is omitted. The classic logo
+  header block is no longer used; the new default body starts with `{logo}`.
+- New default body text: it explains who is logging in where, that email was chosen as
+  the second factor, how long the code is valid — and to treat an unexpected code as an
+  attack attempt.
 
 ### Changed
 

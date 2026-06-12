@@ -109,7 +109,7 @@
 					<li>{{ t('twofactor_email', 'Formatting: a blank line starts a new paragraph, a single line break becomes a line break.') }}</li>
 					<li>{{ t('twofactor_email', 'Links: [URL="https://example.org"]Text[/URL] or [URL]https://example.org[/URL].') }}</li>
 					<li>{{ t('twofactor_email', 'Images: [IMG="https://example.org/image.png"]Description[/IMG] (https only); many clients load remote images only after confirmation.') }}</li>
-					<li>{{ t('twofactor_email', 'Logo: an empty body shows the standard logo header; in a customized body place {logo} anywhere or omit it. The logo is rendered small (at most 250 pixels and 20% of the email width).') }}</li>
+					<li>{{ t('twofactor_email', 'Logo: place {logo} anywhere or omit it. The logo is rendered small (at most 250 pixels and 20% of the email width).') }}</li>
 				</ul>
 			</fieldset>
 

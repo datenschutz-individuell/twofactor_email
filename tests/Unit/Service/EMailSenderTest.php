@@ -102,15 +102,20 @@ class EMailSenderTest extends TestCase {
 		$this->appSettings->method('getEMailSubject')->willReturn('');
 		$this->appSettings->method('getEMailTemplate')->willReturn('');
 		$this->appSettings->method('getEMailFooter')->willReturn('');
+		$this->defaults->method('getLogo')->with(false)->willReturn('/themes/logo.png');
+		$this->urlGenerator->method('getAbsoluteURL')
+			->with('/themes/logo.png')
+			->willReturn('https://cloud.example/themes/logo.png');
 
 		$this->expectMailWithTemplate();
 		$this->template->expects($this->once())
 			->method('setSubject')
 			->with('Login attempt for Jane Doe @ Example Cloud');
+		// The logo comes solely from the {logo} token in the default body
+		$this->template->expects($this->never())
+			->method('addHeader');
 		$this->template->expects($this->never())
 			->method('addHeading');
-		$this->template->expects($this->once())
-			->method('addHeader');
 		$bodyTexts = [];
 		$this->collectBodyTexts($bodyTexts);
 		// Empty footer setting means: standard theming footer (no argument)
@@ -120,19 +125,34 @@ class EMailSenderTest extends TestCase {
 
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
-		// The blank line in the default body becomes a paragraph break
 		$this->assertSame([
 			[
-				'Your two-factor authentication code is: <strong style="font-family:monospace">123456</strong>',
-				'Your two-factor authentication code is: >>> 123456 <<<',
+				// Spacing paragraph (no logo header anymore)
+				'&nbsp;',
+				false,
 			],
 			[
-				'If you tried to login, please enter that code on <strong style="font-family:monospace">Example Cloud</strong>. '
-				. 'If you did not, somebody else did and knows your email address '
-				. 'or username – and your password!',
-				'If you tried to login, please enter that code on Example Cloud. '
-				. 'If you did not, somebody else did and knows your email address '
-				. 'or username – and your password!',
+				// The default body starts with the {logo} token
+				'<img src="https://cloud.example/themes/logo.png" alt="Example Cloud" style="max-width:250px;max-width:min(250px, 20%);max-height:250px">',
+				false,
+			],
+			[
+				'Someone is trying to log in to <strong style="font-family:monospace">Example Cloud</strong> with your account <strong style="font-family:monospace">Jane Doe</strong>. '
+				. 'Since two-factor authentication is enabled for your account, a confirmation is required. '
+				. 'Email was chosen as the second factor. This is your code:',
+				'Someone is trying to log in to Example Cloud with your account Jane Doe. '
+				. 'Since two-factor authentication is enabled for your account, a confirmation is required. '
+				. 'Email was chosen as the second factor. This is your code:',
+			],
+			[
+				'<strong style="font-family:monospace">123456</strong>',
+				'>>> 123456 <<<',
+			],
+			[
+				'This code is valid for <strong style="font-family:monospace">10</strong> minutes. Enter it only if you tried to log in yourself. '
+				. 'Otherwise, treat this message as an attack attempt and inform your administrator.',
+				'This code is valid for 10 minutes. Enter it only if you tried to log in yourself. '
+				. 'Otherwise, treat this message as an attack attempt and inform your administrator.',
 			],
 		], $bodyTexts);
 	}

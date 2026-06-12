@@ -48,6 +48,11 @@ final class AppSettingsDefaults {
 	}
 
 	public function eMailBody(): string {
-		return $this->l10n->t("Your two-factor authentication code is: {code}\n\nIf you tried to login, please enter that code on {cloud}. If you did not, somebody else did and knows your email address or username – and your password!");
+		// The {logo} and {code} structure is kept outside of the translatable
+		// strings so translations cannot break it
+		return "{logo}\n\n"
+			. $this->l10n->t('Someone is trying to log in to {cloud} with your account {user}. Since two-factor authentication is enabled for your account, a confirmation is required. Email was chosen as the second factor. This is your code:')
+			. "\n\n{code}\n\n"
+			. $this->l10n->t('This code is valid for {validity} minutes. Enter it only if you tried to log in yourself. Otherwise, treat this message as an attack attempt and inform your administrator.');
 	}
 }
