@@ -188,9 +188,15 @@ final class EMailSender implements IEMailSender {
 		}
 		$html = htmlspecialchars($text);
 		if (str_contains($html, '{logo}')) {
+			// Keep the logo small: at most 250px and 20% of the email width.
+			// The doubled max-width is progressive enhancement — clients that
+			// do not understand min() fall back to the plain 250px limit. A
+			// percentage height cap is not enforceable in emails (no sized
+			// parent), so the height is limited to 250px only.
 			$html = str_replace(
 				'{logo}',
-				'<img src="' . htmlspecialchars($this->logoUrl()) . '" alt="' . htmlspecialchars($this->defaults->getName()) . '" style="max-width:100%">',
+				'<img src="' . htmlspecialchars($this->logoUrl()) . '" alt="' . htmlspecialchars($this->defaults->getName())
+					. '" style="max-width:250px;max-width:min(250px, 20%);max-height:250px">',
 				$html,
 			);
 		}

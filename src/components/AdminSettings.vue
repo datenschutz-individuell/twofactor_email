@@ -51,6 +51,7 @@
 					{{ t('twofactor_email', 'Links can be written as [URL="https://example.org"]Text[/URL] or just [URL]https://example.org[/URL] — clickable in the body, shown as "Text (URL)" in the footer.') }}
 					{{ t('twofactor_email', 'Images can be embedded as [IMG="https://example.org/image.png"]Description[/IMG] (https only); many email clients load remote images only after confirmation.') }}
 					{{ t('twofactor_email', 'With an empty body the email starts with the standard logo header. A customized body controls the logo itself: place it anywhere with {logo}, or leave it out entirely.') }}
+					{{ t('twofactor_email', 'The logo is rendered small: at most 250 pixels and at most 20% of the email width.') }}
 					{{ t('twofactor_email', 'Note: a {code} in the subject may show up in notification previews on lock screens.') }}
 				</p>
 

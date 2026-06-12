@@ -238,7 +238,7 @@ class EMailSenderTest extends TestCase {
 		$this->assertSame([
 			[
 				// Logo-only paragraph: no plain text counterpart at all
-				'<img src="https://cloud.example/themes/logo.png" alt="Example Cloud" style="max-width:100%">',
+				'<img src="https://cloud.example/themes/logo.png" alt="Example Cloud" style="max-width:250px;max-width:min(250px, 20%);max-height:250px">',
 				false,
 			],
 			[
