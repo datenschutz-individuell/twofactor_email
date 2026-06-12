@@ -48,8 +48,8 @@
 					{{ t('twofactor_email', 'Available placeholders in all fields: {code} (the one-time code), {user} (display name of the user), {cloud} (name of this instance), {validity} (code validity in minutes).') }}
 					{{ t('twofactor_email', 'A customized body must contain the {code} placeholder.') }}
 					{{ t('twofactor_email', 'In body and footer, a blank line starts a new paragraph and a single line break becomes a line break.') }}
-					{{ t('twofactor_email', 'Links can be written as [Text](https://example.org) — clickable in the body, shown as "Text (URL)" in the footer.') }}
-					{{ t('twofactor_email', 'Images can be embedded as ![Description](https://example.org/image.png) (https only); many email clients load remote images only after confirmation.') }}
+					{{ t('twofactor_email', 'Links can be written as [URL="https://example.org"]Text[/URL] or just [URL]https://example.org[/URL] — clickable in the body, shown as "Text (URL)" in the footer.') }}
+					{{ t('twofactor_email', 'Images can be embedded as [IMG="https://example.org/image.png"]Description[/IMG] (https only); many email clients load remote images only after confirmation.') }}
 					{{ t('twofactor_email', 'With an empty body the email starts with the standard logo header. A customized body controls the logo itself: place it anywhere with {logo}, or leave it out entirely.') }}
 					{{ t('twofactor_email', 'Note: a {code} in the subject may show up in notification previews on lock screens.') }}
 				</p>

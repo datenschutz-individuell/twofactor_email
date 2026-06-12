@@ -88,19 +88,22 @@ final class EMailSender implements IEMailSender {
 	 * survives in the HTML variant of the email:
 	 *   - a blank line starts a new paragraph (own addBodyText call)
 	 *   - a single line break becomes <br>
-	 *   - [Text](https://example.org) becomes a clickable link (http, https
+	 *   - [URL="https://example.org"]Text[/URL] (quotes optional) or
+	 *     [URL]https://example.org[/URL] becomes a clickable link (http, https
 	 *     and mailto only); in the plain text variant and in the footer it is
 	 *     rendered as "Text (URL)"
-	 *   - ![Description](https://example.org/image.png) embeds a remote image
+	 *   - [IMG="https://example.org/image.png"]Description[/IMG] or
+	 *     [IMG]https://example.org/image.png[/IMG] embeds a remote image
 	 *     (https only, body HTML variant only); elsewhere it is rendered as
 	 *     "Description (URL)"
 	 *   - {logo} (body only) inserts the instance logo; it only appears in the
 	 *     HTML variant
-	 * Everything else is HTML-escaped — raw HTML is not possible.
+	 * Tags are case-insensitive. Invalid markup (unsupported scheme, missing
+	 * URL or text) stays literally. Everything else is HTML-escaped — raw HTML
+	 * is not possible.
 	 */
 
-	private const IMAGE_PATTERN = '/!\[([^\]]*)\]\(([^)\s]+)\)/';
-	private const LINK_PATTERN = '/(?<!!)\[([^\]]+)\]\(([^)\s]+)\)/';
+	private const TAG_PATTERN = '~\[(URL|IMG)(?:="?([^"\]]*)"?)?\](.*?)\[/\1\]~is';
 	private const ALLOWED_LINK_SCHEMES = '~^(https?://|mailto:)~i';
 	private const ALLOWED_IMAGE_SCHEMES = '~^https://~i';
 
@@ -113,40 +116,72 @@ final class EMailSender implements IEMailSender {
 	}
 
 	private function toHtml(string $paragraph): string {
-		$html = htmlspecialchars($paragraph);
-		$html = preg_replace_callback(self::IMAGE_PATTERN, static function (array $match): string {
-			if (preg_match(self::ALLOWED_IMAGE_SCHEMES, $match[2]) !== 1) {
-				return $match[0]; // unsupported scheme: keep the markup literally
-			}
-			return '<img src="' . $match[2] . '" alt="' . $match[1] . '" style="max-width:100%">';
-		}, $html) ?? $html;
-		$html = preg_replace_callback(self::LINK_PATTERN, static function (array $match): string {
-			if (preg_match(self::ALLOWED_LINK_SCHEMES, $match[2]) !== 1) {
-				return $match[0]; // unsupported scheme: keep the markup literally
-			}
-			return '<a href="' . $match[2] . '">' . $match[1] . '</a>';
-		}, $html) ?? $html;
-		$html = str_replace(
-			'{logo}',
-			'<img src="' . htmlspecialchars($this->logoUrl()) . '" alt="' . htmlspecialchars($this->defaults->getName()) . '" style="max-width:100%">',
-			$html,
-		);
-		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $html);
+		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $this->renderTags($paragraph, true));
 	}
 
 	private function toPlain(string $paragraph): string {
-		$plain = preg_replace_callback(self::IMAGE_PATTERN, static function (array $match): string {
-			if (preg_match(self::ALLOWED_IMAGE_SCHEMES, $match[2]) !== 1) {
-				return $match[0]; // unsupported scheme: keep the markup literally
+		return $this->renderTags($paragraph, false);
+	}
+
+	/**
+	 * Renders the [URL] and [IMG] tags of the given text into the HTML or the
+	 * plain text variant. The markup is parsed on the raw text; the literal
+	 * text segments and all tag parts are escaped individually for HTML.
+	 */
+	private function renderTags(string $text, bool $asHtml): string {
+		$result = '';
+		$offset = 0;
+		while (preg_match(self::TAG_PATTERN, $text, $match, PREG_OFFSET_CAPTURE, $offset) === 1) {
+			$position = $match[0][1];
+			$result .= $this->literal(substr($text, $offset, $position - $offset), $asHtml);
+			$result .= $this->renderTag(strtoupper($match[1][0]), $match[2][0], $match[3][0], $asHtml)
+				?? $this->literal($match[0][0], $asHtml);
+			$offset = $position + strlen($match[0][0]);
+		}
+		return $result . $this->literal(substr($text, $offset), $asHtml);
+	}
+
+	/**
+	 * @return string|null the rendered tag, or null if the markup is invalid
+	 *                     and shall stay literally
+	 */
+	private function renderTag(string $tag, string $attribute, string $content, bool $asHtml): ?string {
+		if ($tag === 'URL') {
+			$url = $attribute !== '' ? $attribute : trim($content);
+			$text = $attribute !== '' ? $content : $url;
+			if ($url === '' || $text === '' || preg_match(self::ALLOWED_LINK_SCHEMES, $url) !== 1) {
+				return null;
 			}
-			return $match[1] === '' ? $match[2] : $match[1] . ' (' . $match[2] . ')';
-		}, $paragraph) ?? $paragraph;
-		return preg_replace_callback(self::LINK_PATTERN, static function (array $match): string {
-			if (preg_match(self::ALLOWED_LINK_SCHEMES, $match[2]) !== 1) {
-				return $match[0]; // unsupported scheme: keep the markup literally
+			if ($asHtml) {
+				return '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($text) . '</a>';
 			}
-			return $match[1] === $match[2] ? $match[2] : $match[1] . ' (' . $match[2] . ')';
-		}, $plain) ?? $plain;
+			return $text === $url ? $url : $text . ' (' . $url . ')';
+		}
+		// IMG
+		$src = $attribute !== '' ? $attribute : trim($content);
+		$alt = $attribute !== '' ? $content : '';
+		if ($src === '' || preg_match(self::ALLOWED_IMAGE_SCHEMES, $src) !== 1) {
+			return null;
+		}
+		if ($asHtml) {
+			return '<img src="' . htmlspecialchars($src) . '" alt="' . htmlspecialchars($alt) . '" style="max-width:100%">';
+		}
+		return $alt === '' ? $src : $alt . ' (' . $src . ')';
+	}
+
+	private function literal(string $text, bool $asHtml): string {
+		if (!$asHtml) {
+			return $text;
+		}
+		$html = htmlspecialchars($text);
+		if (str_contains($html, '{logo}')) {
+			$html = str_replace(
+				'{logo}',
+				'<img src="' . htmlspecialchars($this->logoUrl()) . '" alt="' . htmlspecialchars($this->defaults->getName()) . '" style="max-width:100%">',
+				$html,
+			);
+		}
+		return $html;
 	}
 
 	private function toFooterHtml(string $footer): string {

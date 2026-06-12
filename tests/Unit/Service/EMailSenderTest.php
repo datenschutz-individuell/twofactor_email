@@ -167,11 +167,12 @@ class EMailSenderTest extends TestCase {
 		$this->appSettings->method('getEMailSubject')->willReturn('');
 		$this->appSettings->method('getEMailTemplate')->willReturn(
 			"Hello {user},\nyour code: {code}\n\n"
-			. "Visit [the help page](https://example.org/help?a=1&b=2) for details.\n\n"
-			. "[bad](javascript:alert(1))\n\n"
+			. "Visit [URL=\"https://example.org/help?a=1&b=2\"]the help page[/URL] for details.\n\n"
+			. "See [url]https://example.org[/url]\n\n"
+			. "[URL=\"javascript:alert(1)\"]bad[/URL]\n\n"
 			. '<b>Hi</b> & Co'
 		);
-		$this->appSettings->method('getEMailFooter')->willReturn("Line1\n[Site](https://example.org)");
+		$this->appSettings->method('getEMailFooter')->willReturn("Line1\n[URL=https://example.org]Site[/URL]");
 
 		$this->expectMailWithTemplate();
 		$bodyTexts = [];
@@ -193,9 +194,14 @@ class EMailSenderTest extends TestCase {
 				'Visit the help page (https://example.org/help?a=1&b=2) for details.',
 			],
 			[
+				// Short form and lowercase tags work; the URL is the link text
+				'See <a href="https://example.org">https://example.org</a>',
+				'See https://example.org',
+			],
+			[
 				// Disallowed link scheme: the markup stays literal in both variants
-				'[bad](javascript:alert(1))',
-				'[bad](javascript:alert(1))',
+				'[URL=&quot;javascript:alert(1)&quot;]bad[/URL]',
+				'[URL="javascript:alert(1)"]bad[/URL]',
 			],
 			[
 				// Raw HTML is escaped in the HTML variant
@@ -209,8 +215,9 @@ class EMailSenderTest extends TestCase {
 		$this->appSettings->method('getEMailSubject')->willReturn('');
 		$this->appSettings->method('getEMailTemplate')->willReturn(
 			"{logo}\n\n"
-			. "![Chart of the week](https://example.org/chart.png)\n\n"
-			. '![insecure](http://example.org/x.png)'
+			. "[IMG=\"https://example.org/chart.png\"]Chart of the week[/IMG]\n\n"
+			. "[IMG]https://example.org/plain.png[/IMG]\n\n"
+			. '[IMG="http://example.org/x.png"]insecure[/IMG]'
 		);
 		$this->appSettings->method('getEMailFooter')->willReturn('');
 		$this->defaults->method('getLogo')->with(false)->willReturn('/themes/logo.png');
@@ -238,9 +245,14 @@ class EMailSenderTest extends TestCase {
 				'Chart of the week (https://example.org/chart.png)',
 			],
 			[
+				// Short form: no description, the URL is the plain text fallback
+				'<img src="https://example.org/plain.png" alt="" style="max-width:100%">',
+				'https://example.org/plain.png',
+			],
+			[
 				// Images must use https — anything else stays literal
-				'![insecure](http://example.org/x.png)',
-				'![insecure](http://example.org/x.png)',
+				'[IMG=&quot;http://example.org/x.png&quot;]insecure[/IMG]',
+				'[IMG="http://example.org/x.png"]insecure[/IMG]',
 			],
 		], $bodyTexts);
 	}
