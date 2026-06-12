@@ -103,7 +103,7 @@ const bodyHelperText = [
 	t('twofactor_email', 'Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body.'),
 	t('twofactor_email', 'Defaults: empty fields use the localized default text, shown as a hint inside the field.'),
 	t('twofactor_email', 'Formatting: a blank line starts a new paragraph, a single line break becomes a line break.'),
-	t('twofactor_email', 'Links and Images: URLs are detected and rendered as linked URL text.'),
+	t('twofactor_email', 'Links: URLs are detected and rendered as linked URL text.'),
 ].join('\n')
 
 async function onReset() {

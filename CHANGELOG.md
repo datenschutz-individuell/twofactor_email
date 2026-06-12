@@ -7,11 +7,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ### Added
 
-- Allow admin to modify more app settings via web interface
-
+- Admin settings: allow setting a custom challenge email subject
+  
 ### Changed
 
-- The challenge email default text has changed
+- Admin settings: links in the challenge email body are now rendered as such
 
 ### Fixed
 
