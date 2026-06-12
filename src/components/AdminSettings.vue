@@ -100,6 +100,9 @@
 								 class="labeled-field__input" />
 				</div>
 
+				<h4 class="settings-group__subheading">
+					{{ t('twofactor_email', 'Placeholders and formatting') }}
+				</h4>
 				<ul class="settings-group__hints">
 					<li>{{ t('twofactor_email', 'Placeholders: {code} (one-time code), {user} (display name), {cloud} (instance name), {validity} (validity in minutes). A customized body must contain {code}; in the body all placeholders are highlighted.') }}</li>
 					<li>{{ t('twofactor_email', 'Defaults: empty fields use the localized default text, shown as a hint inside the field.') }}</li>
@@ -232,11 +235,17 @@ async function onReset() {
 	max-width: 64em;
 }
 
+.settings-group__subheading {
+	font-size: 15px;
+	font-weight: bold;
+	margin: 16px 0 4px;
+}
+
 .settings-group__hints {
 	/* noinspection CssUnresolvedCustomProperty */
 	color: var(--color-text-maxcontrast, gray);
 	list-style: disc;
-	margin: 16px 0 0;
+	margin: 0;
 	max-width: 64em;
 	padding-inline-start: 24px;
 }
@@ -263,7 +272,7 @@ async function onReset() {
 /* One row per field: real label on the left, input indented to a common edge */
 .labeled-field {
 	display: grid;
-	grid-template-columns: 220px 1fr;
+	grid-template-columns: 130px 1fr;
 	gap: 4px 16px;
 	align-items: center;
 	margin-bottom: 8px;
