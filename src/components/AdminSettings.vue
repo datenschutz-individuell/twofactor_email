@@ -47,6 +47,8 @@
 					{{ t('twofactor_email', 'All parts of the email sent to users can be customized. Empty fields use the localized default text, shown as a hint inside the field.') }}
 					{{ t('twofactor_email', 'Available placeholders in all fields: {code} (the one-time code), {user} (display name of the user), {cloud} (name of this instance), {validity} (code validity in minutes).') }}
 					{{ t('twofactor_email', 'A customized body must contain the {code} placeholder.') }}
+					{{ t('twofactor_email', 'In body and footer, a blank line starts a new paragraph and a single line break becomes a line break.') }}
+					{{ t('twofactor_email', 'Links can be written as [Text](https://example.org) — clickable in the body, shown as "Text (URL)" in the footer.') }}
 					{{ t('twofactor_email', 'Note: a {code} in the subject may show up in notification previews on lock screens.') }}
 				</p>
 

@@ -12,6 +12,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
   out-of-the-box emails are now translated into the recipient's language (previously the
   default body was always English). A new placeholder `{validity}` (code validity in
   minutes) is available in all parts alongside `{code}`, `{user}` and `{cloud}`.
+- Body and footer support a minimal markup that survives in the HTML variant of the
+  email: a blank line starts a new paragraph, a single line break becomes a line break,
+  and `[Text](https://example.org)` becomes a clickable link (http, https and mailto).
+  Everything else is HTML-escaped.
 
 ### Changed
 

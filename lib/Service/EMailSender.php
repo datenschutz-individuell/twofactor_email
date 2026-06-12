@@ -43,12 +43,14 @@ final class EMailSender implements IEMailSender {
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
 		$template->setSubject($this->replacePlaceholders($subject, $user, $code));
 		$template->addHeader();
-		$template->addBodyText($this->replacePlaceholders($body, $user, $code));
+		foreach ($this->paragraphs($this->replacePlaceholders($body, $user, $code)) as $paragraph) {
+			$template->addBodyText($this->toHtml($paragraph), $this->toPlain($paragraph));
+		}
 		if ($footer === '') {
 			// Standard footer of this Nextcloud instance (theming slogan)
 			$template->addFooter();
 		} else {
-			$template->addFooter($this->replacePlaceholders($footer, $user, $code));
+			$template->addFooter($this->toFooterHtml($this->replacePlaceholders($footer, $user, $code)));
 		}
 
 		$message = $this->mailer->createMessage();
@@ -69,5 +71,54 @@ final class EMailSender implements IEMailSender {
 			[$code, $user->getDisplayName(), $this->defaults->getName(), (string)$this->appSettings->getCodeValidMinutes()],
 			$text,
 		);
+	}
+
+	/*
+	 * The template texts support a minimal markup so that line structure
+	 * survives in the HTML variant of the email:
+	 *   - a blank line starts a new paragraph (own addBodyText call)
+	 *   - a single line break becomes <br>
+	 *   - [Text](https://example.org) becomes a clickable link (http, https
+	 *     and mailto only); in the plain text variant and in the footer it is
+	 *     rendered as "Text (URL)"
+	 * Everything else is HTML-escaped — raw HTML is not possible.
+	 */
+
+	private const LINK_PATTERN = '/\[([^\]]+)\]\(([^)\s]+)\)/';
+	private const ALLOWED_LINK_SCHEMES = '~^(https?://|mailto:)~i';
+
+	/**
+	 * @return string[] non-empty paragraphs, split on blank lines
+	 */
+	private function paragraphs(string $text): array {
+		$split = preg_split('/\R\s*\R/u', $text) ?: [];
+		return array_values(array_filter(array_map(trim(...), $split), static fn (string $p): bool => $p !== ''));
+	}
+
+	private function toHtml(string $paragraph): string {
+		$html = htmlspecialchars($paragraph);
+		$html = preg_replace_callback(self::LINK_PATTERN, static function (array $match): string {
+			if (preg_match(self::ALLOWED_LINK_SCHEMES, $match[2]) !== 1) {
+				return $match[0]; // unsupported scheme: keep the markup literally
+			}
+			return '<a href="' . $match[2] . '">' . $match[1] . '</a>';
+		}, $html) ?? $html;
+		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $html);
+	}
+
+	private function toPlain(string $paragraph): string {
+		return preg_replace_callback(self::LINK_PATTERN, static function (array $match): string {
+			if (preg_match(self::ALLOWED_LINK_SCHEMES, $match[2]) !== 1) {
+				return $match[0]; // unsupported scheme: keep the markup literally
+			}
+			return $match[1] === $match[2] ? $match[2] : $match[1] . ' (' . $match[2] . ')';
+		}, $paragraph) ?? $paragraph;
+	}
+
+	private function toFooterHtml(string $footer): string {
+		// The footer has no paragraph concept and the server derives its plain
+		// text variant from the HTML by replacing <br>, so links are rendered
+		// in their "Text (URL)" form here.
+		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], htmlspecialchars($this->toPlain($footer)));
 	}
 }
