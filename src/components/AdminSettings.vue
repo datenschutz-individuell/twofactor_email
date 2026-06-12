@@ -43,11 +43,9 @@
 				<h3 class="settings-group__heading">
 					{{ t('twofactor_email', 'Email template') }}
 				</h3>
-				<p class="settings-group__description">
-					{{ t('twofactor_email', 'Empty fields use the localized default text, shown as a hint inside the field.') }}
-				</p>
 				<ul class="settings-group__hints">
 					<li>{{ t('twofactor_email', 'Placeholders: {code} (one-time code), {user} (display name), {cloud} (instance name), {validity} (validity in minutes). A customized body must contain {code}; in the body all placeholders are highlighted.') }}</li>
+					<li>{{ t('twofactor_email', 'Defaults: empty fields use the localized default text, shown as a hint inside the field.') }}</li>
 					<li>{{ t('twofactor_email', 'Formatting: a blank line starts a new paragraph, a single line break becomes a line break.') }}</li>
 					<li>{{ t('twofactor_email', 'Links: [URL="https://example.org"]Text[/URL] or [URL]https://example.org[/URL] — in the footer shown as "Text (URL)".') }}</li>
 					<li>{{ t('twofactor_email', 'Images: [IMG="https://example.org/image.png"]Description[/IMG] (https only); many clients load remote images only after confirmation.') }}</li>
@@ -203,7 +201,7 @@ async function onReset() {
 	/* noinspection CssUnresolvedCustomProperty */
 	color: var(--color-text-maxcontrast, gray);
 	list-style: disc;
-	margin: -8px 0 16px;
+	margin: 0 0 16px;
 	max-width: 64em;
 	padding-inline-start: 24px;
 }
