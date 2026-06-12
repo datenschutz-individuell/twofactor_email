@@ -8,6 +8,7 @@
 namespace OCA\TwoFactorEMail\Test\Unit\Service;
 
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
+use OCA\TwoFactorEMail\Mail\TemplateRenderer;
 use OCA\TwoFactorEMail\Service\AppSettingsDefaults;
 use OCA\TwoFactorEMail\Service\EMailSender;
 use OCA\TwoFactorEMail\Service\IAppSettings;
@@ -53,13 +54,14 @@ class EMailSenderTest extends TestCase {
 			static fn (string $text, $parameters = []) => vsprintf($text, (array)$parameters),
 		);
 
+		// TemplateRenderer and AppSettingsDefaults are final — use the real
+		// classes, so these tests cover the full rendering pipeline
 		$this->sender = new EMailSender(
 			$this->createMock(LoggerInterface::class),
 			$this->mailer,
-			$this->defaults,
-			$this->urlGenerator,
 			$this->appSettings,
 			new AppSettingsDefaults($l10n),
+			new TemplateRenderer($this->defaults, $this->urlGenerator, $this->appSettings),
 		);
 	}
 
