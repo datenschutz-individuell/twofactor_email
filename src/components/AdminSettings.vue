@@ -43,22 +43,13 @@
 							  :result="successRefs.eMailSubject" />
 				<LabeledField id="twofactor_email-eMailTemplate"
 							  v-model="inputValues.eMailTemplate"
+							  :helper-text="bodyHelperText"
 							  :label="t('twofactor_email', 'Body')"
 							  :loading="loading"
 							  :placeholder="defaults.eMailTemplate"
 							  :result="successRefs.eMailTemplate"
 							  class="body-field"
 							  type="textarea" />
-
-				<h4>{{ t('twofactor_email', 'Placeholders and formatting') }}</h4>
-				<ul>
-					<li>{{ t('twofactor_email', 'Placeholders: {code} (one-time code), {user} (display name), {cloud} (instance name), {validity} (validity in minutes). A customized body must contain {code}; in the body all placeholders are highlighted.') }}</li>
-					<li>{{ t('twofactor_email', 'Defaults: empty fields use the localized default text, shown as a hint inside the field.') }}</li>
-					<li>{{ t('twofactor_email', 'Formatting: a blank line starts a new paragraph, a single line break becomes a line break.') }}</li>
-					<li>{{ t('twofactor_email', 'Links: [URL="https://example.org"]Text[/URL] or [URL]https://example.org[/URL].') }}</li>
-					<li>{{ t('twofactor_email', 'Images: [IMG="https://example.org/image.png"]Description[/IMG] (https only); many clients load remote images only after confirmation.') }}</li>
-					<li>{{ t('twofactor_email', 'Logo: place {logo} anywhere or omit it. The logo is rendered small (at most 250 pixels and 20% of the email width).') }}</li>
-				</ul>
 			</fieldset>
 
 			<NcButton :disabled="resetting"
@@ -99,6 +90,17 @@ const defaults = loadState('twofactor_email', 'eMailDefaults', {})
 
 const { inputValues, loading, successRefs } = useAdminSettings(store, fieldKeys)
 
+// Placeholder and formatting reference, shown below the body field
+// (rendered line by line via white-space: pre-line)
+const bodyHelperText = [
+	t('twofactor_email', 'Placeholders: {code} (one-time code), {user} (display name), {cloud} (instance name), {validity} (validity in minutes). A customized body must contain {code}; in the body all placeholders are highlighted.'),
+	t('twofactor_email', 'Defaults: empty fields use the localized default text, shown as a hint inside the field.'),
+	t('twofactor_email', 'Formatting: a blank line starts a new paragraph, a single line break becomes a line break.'),
+	t('twofactor_email', 'Links: [URL="https://example.org"]Text[/URL] or [URL]https://example.org[/URL].'),
+	t('twofactor_email', 'Images: [IMG="https://example.org/image.png"]Description[/IMG] (https only); many clients load remote images only after confirmation.'),
+	t('twofactor_email', 'Logo: place {logo} anywhere or omit it. The logo is rendered small (at most 250 pixels and 20% of the email width).'),
+].join('\n')
+
 async function onReset() {
 	resetting.value = true
 	try {
@@ -126,8 +128,7 @@ async function onReset() {
 	max-width: 64em;
 }
 
-.settings-group p,
-.settings-group ul {
+.settings-group p {
 	/* noinspection CssUnresolvedCustomProperty */
 	color: var(--color-text-maxcontrast, gray);
 }
@@ -150,5 +151,11 @@ async function onReset() {
 	font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 	min-height: 220px;
 	resize: vertical;
+}
+
+/* The body helper text is a multi-line reference — keep its line breaks */
+.body-field :deep(.textarea__helper-text-message) {
+	white-space: pre-line;
+	align-items: start;
 }
 </style>

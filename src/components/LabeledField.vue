@@ -11,6 +11,7 @@
 					:id="id"
 					v-model="model"
 					:error="result === false"
+					:helper-text="helperText"
 					:label-outside="true"
 					:loading="loading"
 					:placeholder="placeholder"
