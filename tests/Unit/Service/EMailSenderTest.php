@@ -123,7 +123,7 @@ class EMailSenderTest extends TestCase {
 		// The blank line in the default body becomes a paragraph break
 		$this->assertSame([
 			[
-				'Your two-factor authentication code is: 123456',
+				'Your two-factor authentication code is: <strong style="font-family:monospace">123456</strong>',
 				'Your two-factor authentication code is: 123456',
 			],
 			[
@@ -158,7 +158,7 @@ class EMailSenderTest extends TestCase {
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
 		$this->assertSame([[
-			'Use 123456 on Example Cloud within 10 minutes.',
+			'Use <strong style="font-family:monospace">123456</strong> on Example Cloud within 10 minutes.',
 			'Use 123456 on Example Cloud within 10 minutes.',
 		]], $bodyTexts);
 	}
@@ -186,7 +186,8 @@ class EMailSenderTest extends TestCase {
 
 		$this->assertSame([
 			[
-				'Hello Jane Doe,<br>your code: 123456',
+				// {code} is bold and monospace in the HTML variant only
+				'Hello Jane Doe,<br>your code: <strong style="font-family:monospace">123456</strong>',
 				"Hello Jane Doe,\nyour code: 123456",
 			],
 			[

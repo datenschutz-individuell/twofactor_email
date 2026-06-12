@@ -50,17 +50,19 @@ final class EMailSender implements IEMailSender {
 			// A customized body controls the logo itself via the {logo} token.
 			$template->addHeader();
 		}
-		foreach ($this->paragraphs($this->replacePlaceholders($body, $user, $code)) as $paragraph) {
-			$plain = $this->toPlain(str_replace('{logo}', '', $paragraph));
+		// In the body, {code} is replaced during rendering: bold and monospace
+		// in the HTML variant, the bare code in the plain text variant.
+		foreach ($this->paragraphs($this->replaceTextPlaceholders($body, $user)) as $paragraph) {
+			$plain = $this->toPlain(str_replace('{logo}', '', $paragraph), $code);
 			// An empty plain text (e.g. a logo-only paragraph) must be passed as
 			// false — with '' the server would fall back to escaping the HTML.
-			$template->addBodyText($this->toHtml($paragraph), trim($plain) === '' ? false : $plain);
+			$template->addBodyText($this->toHtml($paragraph, $code), trim($plain) === '' ? false : $plain);
 		}
 		if ($footer === '') {
 			// Standard footer of this Nextcloud instance (theming slogan)
 			$template->addFooter();
 		} else {
-			$template->addFooter($this->toFooterHtml($this->replacePlaceholders($footer, $user, $code)));
+			$template->addFooter($this->toFooterHtml($this->replaceTextPlaceholders($footer, $user), $code));
 		}
 
 		$message = $this->mailer->createMessage();
@@ -76,9 +78,13 @@ final class EMailSender implements IEMailSender {
 	}
 
 	private function replacePlaceholders(string $text, IUser $user, string $code): string {
+		return str_replace('{code}', $code, $this->replaceTextPlaceholders($text, $user));
+	}
+
+	private function replaceTextPlaceholders(string $text, IUser $user): string {
 		return str_replace(
-			['{code}', '{user}', '{cloud}', '{validity}'],
-			[$code, $user->getDisplayName(), $this->defaults->getName(), (string)$this->appSettings->getCodeValidMinutes()],
+			['{user}', '{cloud}', '{validity}'],
+			[$user->getDisplayName(), $this->defaults->getName(), (string)$this->appSettings->getCodeValidMinutes()],
 			$text,
 		);
 	}
@@ -98,6 +104,9 @@ final class EMailSender implements IEMailSender {
 	 *     "Description (URL)"
 	 *   - {logo} (body only) inserts the instance logo; it only appears in the
 	 *     HTML variant
+	 *   - {code} (body only) renders bold and monospace in the HTML variant;
+	 *     inside tags, in the plain text variant, in subject and footer it is
+	 *     inserted bare
 	 * Tags are case-insensitive. Invalid markup (unsupported scheme, missing
 	 * URL or text) stays literally. Everything else is HTML-escaped — raw HTML
 	 * is not possible.
@@ -115,12 +124,12 @@ final class EMailSender implements IEMailSender {
 		return array_values(array_filter(array_map(trim(...), $split), static fn (string $p): bool => $p !== ''));
 	}
 
-	private function toHtml(string $paragraph): string {
-		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $this->renderTags($paragraph, true));
+	private function toHtml(string $paragraph, string $code): string {
+		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $this->renderTags($paragraph, true, $code));
 	}
 
-	private function toPlain(string $paragraph): string {
-		return $this->renderTags($paragraph, false);
+	private function toPlain(string $paragraph, string $code): string {
+		return $this->renderTags($paragraph, false, $code);
 	}
 
 	/**
@@ -128,24 +137,28 @@ final class EMailSender implements IEMailSender {
 	 * plain text variant. The markup is parsed on the raw text; the literal
 	 * text segments and all tag parts are escaped individually for HTML.
 	 */
-	private function renderTags(string $text, bool $asHtml): string {
+	private function renderTags(string $text, bool $asHtml, string $code): string {
 		$result = '';
 		$offset = 0;
 		while (preg_match(self::TAG_PATTERN, $text, $match, PREG_OFFSET_CAPTURE, $offset) === 1) {
 			$position = $match[0][1];
-			$result .= $this->literal(substr($text, $offset, $position - $offset), $asHtml);
-			$result .= $this->renderTag(strtoupper($match[1][0]), $match[2][0], $match[3][0], $asHtml)
-				?? $this->literal($match[0][0], $asHtml);
+			$result .= $this->literal(substr($text, $offset, $position - $offset), $asHtml, $code);
+			$result .= $this->renderTag(strtoupper($match[1][0]), $match[2][0], $match[3][0], $asHtml, $code)
+				?? $this->literal($match[0][0], $asHtml, $code);
 			$offset = $position + strlen($match[0][0]);
 		}
-		return $result . $this->literal(substr($text, $offset), $asHtml);
+		return $result . $this->literal(substr($text, $offset), $asHtml, $code);
 	}
 
 	/**
 	 * @return string|null the rendered tag, or null if the markup is invalid
 	 *                     and shall stay literally
 	 */
-	private function renderTag(string $tag, string $attribute, string $content, bool $asHtml): ?string {
+	private function renderTag(string $tag, string $attribute, string $content, bool $asHtml, string $code): ?string {
+		// Inside tags the code is always inserted bare — also in the HTML
+		// variant, since markup must not end up in URLs or attributes
+		$attribute = str_replace('{code}', $code, $attribute);
+		$content = str_replace('{code}', $code, $content);
 		if ($tag === 'URL') {
 			$url = $attribute !== '' ? $attribute : trim($content);
 			$text = $attribute !== '' ? $content : $url;
@@ -169,9 +182,9 @@ final class EMailSender implements IEMailSender {
 		return $alt === '' ? $src : $alt . ' (' . $src . ')';
 	}
 
-	private function literal(string $text, bool $asHtml): string {
+	private function literal(string $text, bool $asHtml, string $code): string {
 		if (!$asHtml) {
-			return $text;
+			return str_replace('{code}', $code, $text);
 		}
 		$html = htmlspecialchars($text);
 		if (str_contains($html, '{logo}')) {
@@ -181,14 +194,19 @@ final class EMailSender implements IEMailSender {
 				$html,
 			);
 		}
-		return $html;
+		// The code stands out: bold and monospace in the HTML variant
+		return str_replace(
+			'{code}',
+			'<strong style="font-family:monospace">' . htmlspecialchars($code) . '</strong>',
+			$html,
+		);
 	}
 
-	private function toFooterHtml(string $footer): string {
+	private function toFooterHtml(string $footer, string $code): string {
 		// The footer has no paragraph concept and the server derives its plain
 		// text variant from the HTML by replacing <br>, so links and images are
-		// rendered in their "Text (URL)" form here.
-		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], htmlspecialchars($this->toPlain($footer)));
+		// rendered in their "Text (URL)" form and the code stays bare here.
+		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], htmlspecialchars($this->toPlain($footer, $code)));
 	}
 
 	private function logoUrl(): string {
