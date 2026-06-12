@@ -17,24 +17,27 @@
 					{{ t('twofactor_email', 'Length and validity of the one-time codes sent via email.') }}
 				</p>
 
-				<!-- Numeric fields: min="1" prevents zero and negative values at the browser level;
-					 @keydown guard blocks direct keyboard entry of '-' and 'e' (scientific notation) -->
-				<div v-for="field in numericFields"
-					 :key="field.key"
-					 class="labeled-field">
-					<label :for="`twofactor_email-${field.key}`" class="labeled-field__label">
-						{{ field.label }}
-					</label>
-					<NcTextField :id="`twofactor_email-${field.key}`"
-								 v-model="inputValues[field.key]"
-								 :error="successRefs[field.key] === false"
-								 :label-outside="true"
-								 :loading="loading"
-								 :success="successRefs[field.key] === true"
-								 class="labeled-field__input"
-								 min="1"
-								 type="number"
-								 @keydown="blockInvalidNumericInput" />
+				<!-- Numeric fields side by side, labels above. min="1" prevents zero and
+					 negative values at the browser level; @keydown guard blocks direct
+					 keyboard entry of '-' and 'e' (scientific notation) -->
+				<div class="numeric-fields-grid">
+					<div v-for="field in numericFields"
+						 :key="field.key"
+						 class="labeled-field labeled-field--stacked">
+						<label :for="`twofactor_email-${field.key}`" class="labeled-field__label">
+							{{ field.label }}
+						</label>
+						<NcTextField :id="`twofactor_email-${field.key}`"
+									 v-model="inputValues[field.key]"
+									 :error="successRefs[field.key] === false"
+									 :label-outside="true"
+									 :loading="loading"
+									 :success="successRefs[field.key] === true"
+									 class="labeled-field__input"
+									 min="1"
+									 type="number"
+									 @keydown="blockInvalidNumericInput" />
+					</div>
 				</div>
 			</fieldset>
 
@@ -240,6 +243,21 @@ async function onReset() {
 
 .settings-group__hints li {
 	margin-bottom: 4px;
+}
+
+/* The two short numeric fields share one row, labels above their field */
+.numeric-fields-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0 16px;
+	max-width: 64em;
+}
+
+/* Stack to single column on narrow screens */
+@media (max-width: 640px) {
+	.numeric-fields-grid {
+		grid-template-columns: 1fr;
+	}
 }
 
 /* One row per field: real label on the left, input indented to a common edge */
