@@ -153,9 +153,13 @@ async function onReset() {
 	resize: vertical;
 }
 
-/* The body helper text is a multi-line reference — keep its line breaks */
+/* The body helper text is a multi-line reference — keep its line breaks.
+   The muted color works around NcTextArea not dimming its helper text the
+   way NcInputField does. */
 .body-field :deep(.textarea__helper-text-message) {
 	white-space: pre-line;
 	align-items: start;
+	/* noinspection CssUnresolvedCustomProperty */
+	color: var(--color-text-maxcontrast, gray);
 }
 </style>
