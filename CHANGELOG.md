@@ -3,32 +3,19 @@
 Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
-## Unreleased
+## 3.2.0 (2026-06-12)
 
 ### Added
 
-- All parts of the challenge email are now configurable in the admin settings: subject,
-  body and footer. Empty fields fall back to the localized default texts, so
-  out-of-the-box emails are now translated into the recipient's language (previously the
-  default body was always English). A new placeholder `{validity}` (code validity in
-  minutes) is available in all parts alongside `{code}`, `{user}` and `{cloud}`.
-- Body and footer support a minimal markup that survives in the HTML variant of the
-  email: a blank line starts a new paragraph, a single line break becomes a line break,
-  and `[URL="https://example.org"]Text[/URL]` (or `[URL]https://example.org[/URL]`)
-  becomes a clickable link (http, https and mailto). Everything else is HTML-escaped.
-- Images can be embedded in the body as `[IMG="https://example.org/image.png"]Description[/IMG]`
-  (https only). Note that many email clients load remote images only after confirmation.
-- The instance logo is controlled by the body: the new `{logo}` placeholder renders it
-  (small) wherever it is written — or not at all when it is omitted. The classic logo
-  header block is no longer used; the new default body starts with `{logo}`.
-- New default body text: it explains who is logging in where, that email was chosen as
-  the second factor, how long the code is valid — and to treat an unexpected code as an
-  attack attempt.
+- Allow admin to modify more app settings via web interface
 
 ### Changed
 
-- The challenge email no longer renders a separate heading; its text duplicated the
-  first sentence of the body.
+- The challenge email default text has changed
+
+### Fixed
+
+- Code cleanup; updated dependencies that also fix an optical glitch in the personal settings toggle
 
 ## 3.1.1 (2026-06-01)
 
@@ -36,12 +23,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 - When updating the app from v2 to v3, authentication codes are no longer migrated, see
   https://github.com/datenschutz-individuell/twofactor_email/issues/69#issuecomment-4588492017
-
-## 3.1.2 (2026-06-11)
-
-### Fixed
-
-- Code cleanup; updated dependencies that also fix an optical glitch in the personal settings toggle
 
 ## 3.1.0 (2026-05-31)
 
