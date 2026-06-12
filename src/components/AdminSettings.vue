@@ -32,7 +32,7 @@
 			<!-- Group: email template -->
 			<fieldset class="settings-group">
 				<h3>{{ t('twofactor_email', 'Email template') }}</h3>
-				<p>{{ t('twofactor_email', 'This template defines the email that delivers the one-time code to users. It is partially dynamic: placeholders are filled individually each time an email is sent.') }}</p>
+				<p>{{ t('twofactor_email', 'This template defines the email that delivers the one-time code to users. It is partially dynamic using placeholders.') }}</p>
 
 				<LabeledField id="twofactor_email-eMailSubject"
 							  v-model="inputValues.eMailSubject"
