@@ -62,7 +62,9 @@ final class EMailSender implements IEMailSender {
 			// Standard footer of this Nextcloud instance (theming slogan)
 			$template->addFooter();
 		} else {
-			$template->addFooter($this->toFooterHtml($this->replaceTextPlaceholders($footer, $user), $code));
+			// In the footer {code} is inserted bare (replaced before rendering,
+			// so the plain text markers do not apply)
+			$template->addFooter($this->toFooterHtml($this->replacePlaceholders($footer, $user, $code), $code));
 		}
 
 		$message = $this->mailer->createMessage();
@@ -104,9 +106,9 @@ final class EMailSender implements IEMailSender {
 	 *     "Description (URL)"
 	 *   - {logo} (body only) inserts the instance logo; it only appears in the
 	 *     HTML variant
-	 *   - {code} (body only) renders bold and monospace in the HTML variant;
-	 *     inside tags, in the plain text variant, in subject and footer it is
-	 *     inserted bare
+	 *   - {code} renders bold and monospace in the HTML variant of the body
+	 *     and as ">>> code <<<" in its plain text variant; inside tags, in the
+	 *     subject and in the footer it is inserted bare
 	 * Tags are case-insensitive. Invalid markup (unsupported scheme, missing
 	 * URL or text) stays literally. Everything else is HTML-escaped — raw HTML
 	 * is not possible.
@@ -184,7 +186,8 @@ final class EMailSender implements IEMailSender {
 
 	private function literal(string $text, bool $asHtml, string $code): string {
 		if (!$asHtml) {
-			return str_replace('{code}', $code, $text);
+			// No styling in plain text — make the code stand out with markers
+			return str_replace('{code}', '>>> ' . $code . ' <<<', $text);
 		}
 		$html = htmlspecialchars($text);
 		if (str_contains($html, '{logo}')) {

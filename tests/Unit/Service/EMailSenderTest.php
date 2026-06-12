@@ -124,7 +124,7 @@ class EMailSenderTest extends TestCase {
 		$this->assertSame([
 			[
 				'Your two-factor authentication code is: <strong style="font-family:monospace">123456</strong>',
-				'Your two-factor authentication code is: 123456',
+				'Your two-factor authentication code is: >>> 123456 <<<',
 			],
 			[
 				'If you tried to login, please enter that code on Example Cloud. '
@@ -140,7 +140,7 @@ class EMailSenderTest extends TestCase {
 	public function testUsesCustomTemplatesAndReplacesAllPlaceholders(): void {
 		$this->appSettings->method('getEMailSubject')->willReturn('Code {code} for {user}');
 		$this->appSettings->method('getEMailTemplate')->willReturn('Use {code} on {cloud} within {validity} minutes.');
-		$this->appSettings->method('getEMailFooter')->willReturn('Mail by {cloud}');
+		$this->appSettings->method('getEMailFooter')->willReturn('Mail by {cloud}, code {code}');
 
 		$this->expectMailWithTemplate();
 		$this->template->expects($this->once())
@@ -151,15 +151,16 @@ class EMailSenderTest extends TestCase {
 			->method('addHeader');
 		$bodyTexts = [];
 		$this->collectBodyTexts($bodyTexts);
+		// In the footer the code is inserted bare — no markers, no styling
 		$this->template->expects($this->once())
 			->method('addFooter')
-			->with('Mail by Example Cloud');
+			->with('Mail by Example Cloud, code 123456');
 
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
 		$this->assertSame([[
 			'Use <strong style="font-family:monospace">123456</strong> on Example Cloud within 10 minutes.',
-			'Use 123456 on Example Cloud within 10 minutes.',
+			'Use >>> 123456 <<< on Example Cloud within 10 minutes.',
 		]], $bodyTexts);
 	}
 
@@ -188,7 +189,7 @@ class EMailSenderTest extends TestCase {
 			[
 				// {code} is bold and monospace in the HTML variant only
 				'Hello Jane Doe,<br>your code: <strong style="font-family:monospace">123456</strong>',
-				"Hello Jane Doe,\nyour code: 123456",
+				"Hello Jane Doe,\nyour code: >>> 123456 <<<",
 			],
 			[
 				'Visit <a href="https://example.org/help?a=1&amp;b=2">the help page</a> for details.',
