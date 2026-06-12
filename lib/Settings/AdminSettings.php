@@ -14,9 +14,7 @@ use OCA\TwoFactorEMail\Service\AppSettingsDefaults;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
-use OCP\Defaults;
 use OCP\IL10N;
-use OCP\L10N\IFactory;
 use OCP\Settings\IDelegatedSettings;
 
 final class AdminSettings implements IDelegatedSettings {
@@ -25,8 +23,6 @@ final class AdminSettings implements IDelegatedSettings {
 		private readonly AppSettingsDefaults $appSettingsDefaults,
 		private readonly IInitialState $initialState,
 		private readonly IL10N $l10n,
-		private readonly Defaults $themingDefaults,
-		private readonly IFactory $l10nFactory,
 	) {
 	}
 
@@ -40,23 +36,10 @@ final class AdminSettings implements IDelegatedSettings {
 		$this->initialState->provideInitialState('eMailDefaults', [
 			'eMailSubject' => $this->appSettingsDefaults->eMailSubject(),
 			'eMailTemplate' => $this->appSettingsDefaults->eMailBody(),
-			'eMailFooter' => $this->defaultFooterText(),
+			'eMailFooter' => $this->appSettingsDefaults->eMailFooter(),
 		]);
 
 		return new TemplateResponse(Application::APP_ID, 'AdminSettings', renderAs: TemplateResponse::RENDER_AS_BLANK);
-	}
-
-	/**
-	 * The text the server renders when no custom footer is set — same
-	 * composition as \OC\Mail\EMailTemplate::addFooter(), as a single line.
-	 */
-	private function defaultFooterText(): string {
-		$slogan = $this->themingDefaults->getSlogan();
-		return $this->themingDefaults->getName()
-			. ($slogan !== '' ? ' - ' . $slogan : '')
-			. ' – '
-			// This sentence is part of the server's footer; reuse its translation
-			. $this->l10nFactory->get('lib')->t('This is an automatically sent email, please do not reply.');
 	}
 
 	public function getSection(): string {

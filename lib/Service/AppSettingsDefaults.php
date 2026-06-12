@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Service;
 
+use OCP\Defaults;
 use OCP\IL10N;
+use OCP\L10N\IFactory;
 
 final class AppSettingsDefaults {
 
@@ -32,6 +34,8 @@ final class AppSettingsDefaults {
 
 	public function __construct(
 		private readonly IL10N $l10n,
+		private readonly Defaults $themingDefaults,
+		private readonly IFactory $l10nFactory,
 	) {
 	}
 
@@ -49,10 +53,28 @@ final class AppSettingsDefaults {
 
 	public function eMailBody(): string {
 		// The {logo} and {code} structure is kept outside of the translatable
-		// strings so translations cannot break it
+		// strings so translations cannot break it; every chunk is a complete
+		// sentence so each can be translated on its own.
 		return "{logo}\n\n"
-			. $this->l10n->t('Someone is trying to log in to {cloud} with your account {user}. Since two-factor authentication is enabled for your account, a confirmation is required. Email was chosen as the second factor, so you are receiving this code:')
+			. $this->l10n->t('Your two-factor authentication code for {cloud} is:')
 			. "\n\n{code}\n\n"
-			. $this->l10n->t('This code is valid for {validity} minutes. Enter it only if you tried to log in yourself. Otherwise, treat this message as an attack attempt and inform your administrator.');
+			. $this->l10n->t('The code is valid for {validity} minutes.')
+			. ' '
+			. $this->l10n->t('If you did not try to log in, somebody else knows your username and your password — change your password and inform your administrator.');
+	}
+
+	/**
+	 * The text the server renders when no custom footer is set — same
+	 * composition as \OC\Mail\EMailTemplate::addFooter(), as a single line.
+	 * Only used as a hint in the admin settings form; the actual default
+	 * footer is rendered by the server.
+	 */
+	public function eMailFooter(): string {
+		$slogan = $this->themingDefaults->getSlogan();
+		return $this->themingDefaults->getName()
+			. ($slogan !== '' ? ' - ' . $slogan : '')
+			. ' – '
+			// This sentence is part of the server's footer; reuse its translation
+			. $this->l10nFactory->get('lib')->t('This is an automatically sent email, please do not reply.');
 	}
 }

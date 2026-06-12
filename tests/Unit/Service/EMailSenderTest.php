@@ -15,6 +15,7 @@ use OCP\Defaults;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUser;
+use OCP\L10N\IFactory;
 use OCP\Mail\IEMailTemplate;
 use OCP\Mail\IMailer;
 use OCP\Mail\IMessage;
@@ -59,7 +60,7 @@ class EMailSenderTest extends TestCase {
 			$this->defaults,
 			$this->urlGenerator,
 			$this->appSettings,
-			new AppSettingsDefaults($l10n),
+			new AppSettingsDefaults($l10n, $this->defaults, $this->createMock(IFactory::class)),
 		);
 	}
 
@@ -137,22 +138,20 @@ class EMailSenderTest extends TestCase {
 				false,
 			],
 			[
-				'Someone is trying to log in to <strong style="font-family:monospace">Example Cloud</strong> with your account <strong style="font-family:monospace">Jane Doe</strong>. '
-				. 'Since two-factor authentication is enabled for your account, a confirmation is required. '
-				. 'Email was chosen as the second factor, so you are receiving this code:',
-				'Someone is trying to log in to Example Cloud with your account Jane Doe. '
-				. 'Since two-factor authentication is enabled for your account, a confirmation is required. '
-				. 'Email was chosen as the second factor, so you are receiving this code:',
+				'Your two-factor authentication code for <strong style="font-family:monospace">Example Cloud</strong> is:',
+				'Your two-factor authentication code for Example Cloud is:',
 			],
 			[
 				'<strong style="font-family:monospace">123456</strong>',
 				'>>> 123456 <<<',
 			],
 			[
-				'This code is valid for <strong style="font-family:monospace">10</strong> minutes. Enter it only if you tried to log in yourself. '
-				. 'Otherwise, treat this message as an attack attempt and inform your administrator.',
-				'This code is valid for 10 minutes. Enter it only if you tried to log in yourself. '
-				. 'Otherwise, treat this message as an attack attempt and inform your administrator.',
+				'The code is valid for <strong style="font-family:monospace">10</strong> minutes. '
+				. 'If you did not try to log in, somebody else knows your username and your password '
+				. '— change your password and inform your administrator.',
+				'The code is valid for 10 minutes. '
+				. 'If you did not try to log in, somebody else knows your username and your password '
+				. '— change your password and inform your administrator.',
 			],
 		], $bodyTexts);
 	}
