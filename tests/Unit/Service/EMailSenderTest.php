@@ -15,7 +15,6 @@ use OCP\Defaults;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUser;
-use OCP\L10N\IFactory;
 use OCP\Mail\IEMailTemplate;
 use OCP\Mail\IMailer;
 use OCP\Mail\IMessage;
@@ -60,7 +59,7 @@ class EMailSenderTest extends TestCase {
 			$this->defaults,
 			$this->urlGenerator,
 			$this->appSettings,
-			new AppSettingsDefaults($l10n, $this->defaults, $this->createMock(IFactory::class)),
+			new AppSettingsDefaults($l10n),
 		);
 	}
 
@@ -102,7 +101,6 @@ class EMailSenderTest extends TestCase {
 	public function testUsesLocalizedDefaultsWhenSettingsAreEmpty(): void {
 		$this->appSettings->method('getEMailSubject')->willReturn('');
 		$this->appSettings->method('getEMailTemplate')->willReturn('');
-		$this->appSettings->method('getEMailFooter')->willReturn('');
 		$this->defaults->method('getLogo')->with(false)->willReturn('/themes/logo.png');
 		$this->urlGenerator->method('getAbsoluteURL')
 			->with('/themes/logo.png')
@@ -119,7 +117,7 @@ class EMailSenderTest extends TestCase {
 			->method('addHeading');
 		$bodyTexts = [];
 		$this->collectBodyTexts($bodyTexts);
-		// Empty footer setting means: standard theming footer (no argument)
+		// The standard theming footer is always used (no argument)
 		$this->template->expects($this->once())
 			->method('addFooter')
 			->with();
@@ -159,7 +157,6 @@ class EMailSenderTest extends TestCase {
 	public function testUsesCustomTemplatesAndReplacesAllPlaceholders(): void {
 		$this->appSettings->method('getEMailSubject')->willReturn('Code {code} for {user}');
 		$this->appSettings->method('getEMailTemplate')->willReturn('Use {code} on {cloud} within {validity} minutes.');
-		$this->appSettings->method('getEMailFooter')->willReturn('Mail by {cloud}, code {code}');
 
 		$this->expectMailWithTemplate();
 		$this->template->expects($this->once())
@@ -170,10 +167,10 @@ class EMailSenderTest extends TestCase {
 			->method('addHeader');
 		$bodyTexts = [];
 		$this->collectBodyTexts($bodyTexts);
-		// In the footer the code is inserted bare — no markers, no styling
+		// The standard theming footer is always used (no argument)
 		$this->template->expects($this->once())
 			->method('addFooter')
-			->with('Mail by Example Cloud, code 123456');
+			->with();
 
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
@@ -199,15 +196,10 @@ class EMailSenderTest extends TestCase {
 			. "[URL=\"javascript:alert(1)\"]bad[/URL]\n\n"
 			. '<b>Hi</b> & Co'
 		);
-		$this->appSettings->method('getEMailFooter')->willReturn("Line1\n[URL=https://example.org]Site[/URL]");
 
 		$this->expectMailWithTemplate();
 		$bodyTexts = [];
 		$this->collectBodyTexts($bodyTexts);
-		// Footer: line break becomes <br>, links are shown as "Text (URL)"
-		$this->template->expects($this->once())
-			->method('addFooter')
-			->with('Line1<br>Site (https://example.org)');
 
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
@@ -252,7 +244,6 @@ class EMailSenderTest extends TestCase {
 			. "[IMG]https://example.org/plain.png[/IMG]\n\n"
 			. '[IMG="http://example.org/x.png"]insecure[/IMG]'
 		);
-		$this->appSettings->method('getEMailFooter')->willReturn('');
 		$this->defaults->method('getLogo')->with(false)->willReturn('/themes/logo.png');
 		$this->urlGenerator->method('getAbsoluteURL')
 			->with('/themes/logo.png')

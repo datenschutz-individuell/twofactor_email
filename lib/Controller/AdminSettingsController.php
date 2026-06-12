@@ -38,7 +38,6 @@ final class AdminSettingsController extends ALoginSetupController {
 	// Maximum allowed lengths for the email template parts in characters
 	private const MAX_EMAIL_SUBJECT_LENGTH = 255;
 	private const MAX_EMAIL_TEMPLATE_LENGTH = 10000;
-	private const MAX_EMAIL_FOOTER_LENGTH = 1000;
 
 	public function __construct(
 		string $appName,
@@ -55,9 +54,8 @@ final class AdminSettingsController extends ALoginSetupController {
 		int $codeValidMinutes,
 		string $eMailTemplate,
 		string $eMailSubject = '',
-		string $eMailFooter = '',
 	): JSONResponse {
-		$errors = $this->validate($codeLength, $codeValidMinutes, $eMailTemplate, $eMailSubject, $eMailFooter);
+		$errors = $this->validate($codeLength, $codeValidMinutes, $eMailTemplate, $eMailSubject);
 		if (!empty($errors)) {
 			return new JSONResponse(['error' => implode(', ', $errors)], Http::STATUS_BAD_REQUEST);
 		}
@@ -66,7 +64,6 @@ final class AdminSettingsController extends ALoginSetupController {
 		$this->appConfig->setValueInt(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_CODE_VALID_MINUTES, $codeValidMinutes);
 		$this->appConfig->setValueString(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_SUBJECT, $eMailSubject);
 		$this->appConfig->setValueString(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_TEMPLATE, $eMailTemplate);
-		$this->appConfig->setValueString(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_FOOTER, $eMailFooter);
 
 		return $this->currentSettingsResponse();
 	}
@@ -79,7 +76,6 @@ final class AdminSettingsController extends ALoginSetupController {
 	 * @param int $codeValidMinutes
 	 * @param string $eMailTemplate
 	 * @param string $eMailSubject
-	 * @param string $eMailFooter
 	 * @return string[]
 	 */
 	private function validate(
@@ -87,7 +83,6 @@ final class AdminSettingsController extends ALoginSetupController {
 		int $codeValidMinutes,
 		string $eMailTemplate,
 		string $eMailSubject,
-		string $eMailFooter,
 	): array {
 		$errors = [];
 		if ($codeLength < self::MIN_CODE_LENGTH || $codeLength > self::MAX_CODE_LENGTH) {
@@ -106,9 +101,6 @@ final class AdminSettingsController extends ALoginSetupController {
 		if (strlen($eMailTemplate) > self::MAX_EMAIL_TEMPLATE_LENGTH) {
 			$errors[] = 'email-template-too-long';
 		}
-		if (strlen($eMailFooter) > self::MAX_EMAIL_FOOTER_LENGTH) {
-			$errors[] = 'email-footer-too-long';
-		}
 		// The code must reach the user: an empty body falls back to the default
 		// which contains {code}, so only a customized body can lose it.
 		if ($eMailTemplate !== '' && !str_contains($eMailTemplate, '{code}')) {
@@ -124,7 +116,6 @@ final class AdminSettingsController extends ALoginSetupController {
 		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_CODE_VALID_MINUTES);
 		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_SUBJECT);
 		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_TEMPLATE);
-		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_FOOTER);
 
 		return $this->currentSettingsResponse();
 	}
@@ -135,7 +126,6 @@ final class AdminSettingsController extends ALoginSetupController {
 			'codeValidMinutes' => $this->appSettings->getCodeValidMinutes(),
 			'eMailSubject' => $this->appSettings->getEMailSubject(),
 			'eMailTemplate' => $this->appSettings->getEMailTemplate(),
-			'eMailFooter' => $this->appSettings->getEMailFooter(),
 		]);
 	}
 }

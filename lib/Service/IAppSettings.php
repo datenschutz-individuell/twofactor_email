@@ -39,14 +39,4 @@ interface IAppSettings {
 	 * @return string email body template
 	 */
 	public function getEMailTemplate(): string;
-
-	/**
-	 * Footer text of the 2FA challenge email.
-	 * Supports the placeholders {code}, {user}, {cloud} and {validity}.
-	 * An empty string means: use the standard footer of this Nextcloud
-	 * instance (theming slogan).
-	 *
-	 * @return string email footer template
-	 */
-	public function getEMailFooter(): string;
 }

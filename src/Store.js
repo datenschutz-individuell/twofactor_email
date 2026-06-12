@@ -56,7 +56,6 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 		codeValidMinutes: null,
 		eMailSubject: null,
 		eMailTemplate: null,
-		eMailFooter: null,
 		error: false,
 	}),
 	actions: {
@@ -80,7 +79,6 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 				codeValidMinutes: this.codeValidMinutes,
 				eMailSubject: this.eMailSubject,
 				eMailTemplate: this.eMailTemplate,
-				eMailFooter: this.eMailFooter,
 			})
 
 			this.$patch({
@@ -88,7 +86,6 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 				codeValidMinutes: result.codeValidMinutes ?? this.codeValidMinutes,
 				eMailSubject: result.eMailSubject ?? this.eMailSubject,
 				eMailTemplate: result.eMailTemplate ?? this.eMailTemplate,
-				eMailFooter: result.eMailFooter ?? this.eMailFooter,
 				error: result.error,
 			})
 
@@ -103,7 +100,6 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 					codeValidMinutes: result.codeValidMinutes,
 					eMailSubject: result.eMailSubject,
 					eMailTemplate: result.eMailTemplate,
-					eMailFooter: result.eMailFooter,
 					error: null,
 				})
 			}

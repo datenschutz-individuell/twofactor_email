@@ -50,12 +50,4 @@ final class AppSettings implements IAppSettings {
 			AppSettingsDefaults::EMAIL_TEMPLATE,
 		);
 	}
-
-	public function getEMailFooter(): string {
-		return $this->appConfig->getValueString(
-			Application::APP_ID,
-			AppSettingsDefaults::CONFIG_KEY_EMAIL_FOOTER,
-			AppSettingsDefaults::EMAIL_FOOTER,
-		);
-	}
 }

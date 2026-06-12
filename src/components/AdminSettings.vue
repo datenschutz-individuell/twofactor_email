@@ -19,19 +19,17 @@
 								  :label="t('twofactor_email', 'Length (characters)')"
 								  :loading="loading"
 								  :result="successRefs.codeLength"
-								  stacked
 								  type="number" />
 					<LabeledField id="twofactor_email-codeValidMinutes"
 								  v-model="inputValues.codeValidMinutes"
 								  :label="t('twofactor_email', 'Validity (minutes)')"
 								  :loading="loading"
 								  :result="successRefs.codeValidMinutes"
-								  stacked
 								  type="number" />
 				</div>
 			</fieldset>
 
-			<!-- Group: email template, fields in email order -->
+			<!-- Group: email template -->
 			<fieldset class="settings-group">
 				<h3>{{ t('twofactor_email', 'Email template') }}</h3>
 				<p>{{ t('twofactor_email', 'This template defines the email that delivers the one-time code to users. It is partially dynamic: placeholders are filled individually each time an email is sent.') }}</p>
@@ -50,15 +48,7 @@
 							  :placeholder="defaults.eMailTemplate"
 							  :result="successRefs.eMailTemplate"
 							  class="body-field"
-							  stacked
 							  type="textarea" />
-				<LabeledField id="twofactor_email-eMailFooter"
-							  v-model="inputValues.eMailFooter"
-							  :helper-text="t('twofactor_email', 'Links and images are shown as &quot;Text (URL)&quot; here.')"
-							  :label="t('twofactor_email', 'Footer')"
-							  :loading="loading"
-							  :placeholder="defaults.eMailFooter"
-							  :result="successRefs.eMailFooter" />
 
 				<h4>{{ t('twofactor_email', 'Placeholders and formatting') }}</h4>
 				<ul>
@@ -99,7 +89,7 @@ import Logger from '../Logger.js'
 
 const resetting = ref(false)
 
-const fieldKeys = ['codeLength', 'codeValidMinutes', 'eMailSubject', 'eMailTemplate', 'eMailFooter']
+const fieldKeys = ['codeLength', 'codeValidMinutes', 'eMailSubject', 'eMailTemplate']
 
 const store = useAdminSettingsStore()
 store.loadInitialState(...fieldKeys)

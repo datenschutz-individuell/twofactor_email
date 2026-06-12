@@ -31,12 +31,10 @@ final class AdminSettings implements IDelegatedSettings {
 		$this->initialState->provideInitialState('codeValidMinutes', $this->appSettings->getCodeValidMinutes());
 		$this->initialState->provideInitialState('eMailSubject', $this->appSettings->getEMailSubject());
 		$this->initialState->provideInitialState('eMailTemplate', $this->appSettings->getEMailTemplate());
-		$this->initialState->provideInitialState('eMailFooter', $this->appSettings->getEMailFooter());
 		// Localized default texts, shown as placeholders in the empty form fields
 		$this->initialState->provideInitialState('eMailDefaults', [
 			'eMailSubject' => $this->appSettingsDefaults->eMailSubject(),
 			'eMailTemplate' => $this->appSettingsDefaults->eMailBody(),
-			'eMailFooter' => $this->appSettingsDefaults->eMailFooter(),
 		]);
 
 		return new TemplateResponse(Application::APP_ID, 'AdminSettings', renderAs: TemplateResponse::RENDER_AS_BLANK);

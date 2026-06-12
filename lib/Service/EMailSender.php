@@ -40,7 +40,6 @@ final class EMailSender implements IEMailSender {
 		// For every part an empty admin setting means: use the localized default
 		$subject = $this->appSettings->getEMailSubject() ?: $this->appSettingsDefaults->eMailSubject();
 		$body = $this->appSettings->getEMailTemplate() ?: $this->appSettingsDefaults->eMailBody();
-		$footer = $this->appSettings->getEMailFooter();
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
 		$template->setSubject($this->replacePlaceholders($subject, $user, $code));
@@ -60,14 +59,8 @@ final class EMailSender implements IEMailSender {
 			// false — with '' the server would fall back to escaping the HTML.
 			$template->addBodyText($this->toHtml($paragraph, $values), trim($plain) === '' ? false : $plain);
 		}
-		if ($footer === '') {
-			// Standard footer of this Nextcloud instance (theming slogan)
-			$template->addFooter();
-		} else {
-			// In the footer all placeholders are inserted bare (replaced before
-			// rendering, so neither styling nor markers apply)
-			$template->addFooter($this->toFooterHtml($this->replacePlaceholders($footer, $user, $code), $values));
-		}
+		// Standard footer of this Nextcloud instance (theming slogan)
+		$template->addFooter();
 
 		$message = $this->mailer->createMessage();
 		$message->setTo([$email => $user->getDisplayName()]);
@@ -106,18 +99,17 @@ final class EMailSender implements IEMailSender {
 	 *   - a single line break becomes <br>
 	 *   - [URL="https://example.org"]Text[/URL] (quotes optional) or
 	 *     [URL]https://example.org[/URL] becomes a clickable link (http, https
-	 *     and mailto only); in the plain text variant and in the footer it is
-	 *     rendered as "Text (URL)"
+	 *     and mailto only); in the plain text variant it is rendered as
+	 *     "Text (URL)"
 	 *   - [IMG="https://example.org/image.png"]Description[/IMG] or
 	 *     [IMG]https://example.org/image.png[/IMG] embeds a remote image
-	 *     (https only, body HTML variant only); elsewhere it is rendered as
-	 *     "Description (URL)"
-	 *   - {logo} (body only) inserts the instance logo; it only appears in the
-	 *     HTML variant
+	 *     (https only, HTML variant only); in the plain text variant it is
+	 *     rendered as "Description (URL)"
+	 *   - {logo} inserts the instance logo; it only appears in the HTML variant
 	 *   - all placeholders ({code}, {user}, {cloud}, {validity}) render bold
-	 *     and monospace in the HTML variant of the body; in its plain text
-	 *     variant they are inserted bare, {code} with ">>> <<<" markers; inside
-	 *     tags, in the subject and in the footer all are inserted bare
+	 *     and monospace in the HTML variant; in the plain text variant they are
+	 *     inserted bare, {code} with ">>> <<<" markers; inside tags and in the
+	 *     subject all are inserted bare
 	 * Tags are case-insensitive. Invalid markup (unsupported scheme, missing
 	 * URL or text) stays literally. Everything else is HTML-escaped — raw HTML
 	 * is not possible.
@@ -230,17 +222,6 @@ final class EMailSender implements IEMailSender {
 			$styled[$placeholder] = '<strong style="font-family:monospace">' . htmlspecialchars($value) . '</strong>';
 		}
 		return strtr($html, $styled);
-	}
-
-	/**
-	 * @param array<string, string> $values placeholder => replacement value
-	 */
-	private function toFooterHtml(string $footer, array $values): string {
-		// The footer has no paragraph concept and the server derives its plain
-		// text variant from the HTML by replacing <br>, so links and images are
-		// rendered in their "Text (URL)" form and all placeholders stay bare
-		// (they are already replaced before rendering).
-		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], htmlspecialchars($this->toPlain($footer, $values)));
 	}
 
 	private function logoUrl(): string {
