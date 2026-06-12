@@ -46,17 +46,7 @@
 				<p class="settings-group__description">
 					{{ t('twofactor_email', 'This template defines the email that delivers the one-time code to users. It is partially dynamic: placeholders are filled individually each time an email is sent.') }}
 				</p>
-				<ul class="settings-group__hints">
-					<li>{{ t('twofactor_email', 'Placeholders: {code} (one-time code), {user} (display name), {cloud} (instance name), {validity} (validity in minutes). A customized body must contain {code}; in the body all placeholders are highlighted.') }}</li>
-					<li>{{ t('twofactor_email', 'Defaults: empty fields use the localized default text, shown as a hint inside the field.') }}</li>
-					<li>{{ t('twofactor_email', 'Formatting: a blank line starts a new paragraph, a single line break becomes a line break.') }}</li>
-					<li>{{ t('twofactor_email', 'Links: [URL="https://example.org"]Text[/URL] or [URL]https://example.org[/URL] — in the footer shown as "Text (URL)".') }}</li>
-					<li>{{ t('twofactor_email', 'Images: [IMG="https://example.org/image.png"]Description[/IMG] (https only); many clients load remote images only after confirmation.') }}</li>
-					<li>{{ t('twofactor_email', 'Logo: an empty body shows the standard logo header; in a customized body place {logo} anywhere or omit it. The logo is rendered small (at most 250 pixels and 20% of the email width).') }}</li>
-					<li>{{ t('twofactor_email', 'Subject: a {code} here may show up in notification previews on lock screens.') }}</li>
-				</ul>
-
-				<div v-for="field in textFields"
+				<div v-for="field in subjectFields"
 					 :key="field.key"
 					 class="labeled-field">
 					<label :for="`twofactor_email-${field.key}`" class="labeled-field__label">
@@ -65,6 +55,7 @@
 					<NcTextField :id="`twofactor_email-${field.key}`"
 								 v-model="inputValues[field.key]"
 								 :error="successRefs[field.key] === false"
+								 :helper-text="field.helperText"
 								 :label-outside="true"
 								 :loading="loading"
 								 :placeholder="defaults[field.key]"
@@ -88,6 +79,32 @@
 								:success="successRefs[field.key] === true"
 								class="labeled-field__input email-template-field__textarea" />
 				</div>
+
+				<div v-for="field in footerFields"
+					 :key="field.key"
+					 class="labeled-field">
+					<label :for="`twofactor_email-${field.key}`" class="labeled-field__label">
+						{{ field.label }}
+					</label>
+					<NcTextField :id="`twofactor_email-${field.key}`"
+								 v-model="inputValues[field.key]"
+								 :error="successRefs[field.key] === false"
+								 :helper-text="field.helperText"
+								 :label-outside="true"
+								 :loading="loading"
+								 :placeholder="defaults[field.key]"
+								 :success="successRefs[field.key] === true"
+								 class="labeled-field__input" />
+				</div>
+
+				<ul class="settings-group__hints">
+					<li>{{ t('twofactor_email', 'Placeholders: {code} (one-time code), {user} (display name), {cloud} (instance name), {validity} (validity in minutes). A customized body must contain {code}; in the body all placeholders are highlighted.') }}</li>
+					<li>{{ t('twofactor_email', 'Defaults: empty fields use the localized default text, shown as a hint inside the field.') }}</li>
+					<li>{{ t('twofactor_email', 'Formatting: a blank line starts a new paragraph, a single line break becomes a line break.') }}</li>
+					<li>{{ t('twofactor_email', 'Links: [URL="https://example.org"]Text[/URL] or [URL]https://example.org[/URL].') }}</li>
+					<li>{{ t('twofactor_email', 'Images: [IMG="https://example.org/image.png"]Description[/IMG] (https only); many clients load remote images only after confirmation.') }}</li>
+					<li>{{ t('twofactor_email', 'Logo: an empty body shows the standard logo header; in a customized body place {logo} anywhere or omit it. The logo is rendered small (at most 250 pixels and 20% of the email width).') }}</li>
+				</ul>
 			</fieldset>
 
 			<div class="reset-section">
@@ -128,20 +145,32 @@ store.loadInitialState('codeLength', 'codeValidMinutes', 'eMailSubject', 'eMailT
 const defaults = loadState('twofactor_email', 'eMailDefaults', {})
 
 const numericFields = [
-	{ key: 'codeLength', label: t('twofactor_email', 'Code Length (Characters)') },
-	{ key: 'codeValidMinutes', label: t('twofactor_email', 'Code Validity (Minutes)') },
+	{ key: 'codeLength', label: t('twofactor_email', 'Length (characters)') },
+	{ key: 'codeValidMinutes', label: t('twofactor_email', 'Validity (minutes)') },
 ]
 
-const textFields = [
-	{ key: 'eMailSubject', label: t('twofactor_email', 'Subject') },
-	{ key: 'eMailFooter', label: t('twofactor_email', 'Footer') },
+// Rendered in email order: subject above the body, footer below it
+const subjectFields = [
+	{
+		key: 'eMailSubject',
+		label: t('twofactor_email', 'Subject'),
+		helperText: t('twofactor_email', 'A {code} here may show up in notification previews on lock screens.'),
+	},
+]
+
+const footerFields = [
+	{
+		key: 'eMailFooter',
+		label: t('twofactor_email', 'Footer'),
+		helperText: t('twofactor_email', 'Links and images are shown as "Text (URL)" here.'),
+	},
 ]
 
 const textAreaFields = [
 	{ key: 'eMailTemplate', label: t('twofactor_email', 'Body') },
 ]
 
-const allFields = [...numericFields, ...textFields, ...textAreaFields]
+const allFields = [...numericFields, ...subjectFields, ...textAreaFields, ...footerFields]
 
 const { inputValues, loading, successRefs } = useAdminSettings(
 	store,
@@ -204,7 +233,7 @@ async function onReset() {
 	/* noinspection CssUnresolvedCustomProperty */
 	color: var(--color-text-maxcontrast, gray);
 	list-style: disc;
-	margin: -8px 0 16px;
+	margin: 16px 0 0;
 	max-width: 64em;
 	padding-inline-start: 24px;
 }
