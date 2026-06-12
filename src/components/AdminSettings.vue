@@ -133,12 +133,12 @@ const numericFields = [
 ]
 
 const textFields = [
-	{ key: 'eMailSubject', label: t('twofactor_email', 'Email Subject') },
-	{ key: 'eMailFooter', label: t('twofactor_email', 'Email Footer') },
+	{ key: 'eMailSubject', label: t('twofactor_email', 'Subject') },
+	{ key: 'eMailFooter', label: t('twofactor_email', 'Footer') },
 ]
 
 const textAreaFields = [
-	{ key: 'eMailTemplate', label: t('twofactor_email', 'Email Body (plain text)') },
+	{ key: 'eMailTemplate', label: t('twofactor_email', 'Body') },
 ]
 
 const allFields = [...numericFields, ...textFields, ...textAreaFields]
