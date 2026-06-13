@@ -66,6 +66,7 @@
     "npm": "^11.0.0"
   },
   "overrides": {
+    "esbuild": "^0.28.1",
     "fast-xml-parser": "^5.7.0"
   },
   "devDependencies": {
