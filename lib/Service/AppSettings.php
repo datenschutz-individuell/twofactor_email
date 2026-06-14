@@ -35,6 +35,14 @@ final class AppSettings implements IAppSettings {
 		);
 	}
 
+	public function getEMailSubject(): string {
+		return $this->appConfig->getValueString(
+			Application::APP_ID,
+			AppSettingsDefaults::CONFIG_KEY_EMAIL_SUBJECT,
+			AppSettingsDefaults::EMAIL_SUBJECT,
+		);
+	}
+
 	public function getEMailTemplate(): string {
 		return $this->appConfig->getValueString(
 			Application::APP_ID,

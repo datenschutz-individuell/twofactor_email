@@ -12,8 +12,7 @@ namespace OCA\TwoFactorEMail\Service;
 use Exception;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
-use OCP\Defaults;
-use OCP\IL10N;
+use OCA\TwoFactorEMail\Mail\TemplateRenderer;
 use OCP\IUser;
 use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
@@ -21,10 +20,10 @@ use Psr\Log\LoggerInterface;
 final class EMailSender implements IEMailSender {
 	public function __construct(
 		private readonly LoggerInterface $logger,
-		private readonly IL10N $l10n,
 		private readonly IMailer $mailer,
-		private readonly Defaults $defaults,
 		private readonly IAppSettings $appSettings,
+		private readonly AppSettingsDefaults $appSettingsDefaults,
+		private readonly TemplateRenderer $templateRenderer,
 	) {
 	}
 
@@ -36,21 +35,16 @@ final class EMailSender implements IEMailSender {
 
 		$this->logger->debug("sending email message to $email.");
 
-		$cloud = $this->defaults->getName();
-		$userAtCloud = $user->getDisplayName() . ' @ ' . $cloud;
-
-		// Replace placeholders in the admin-configurable template
-		$bodyText = str_replace(
-			['{code}', '{user}', '{cloud}'],
-			[$code, $user->getDisplayName(), $cloud],
-			$this->appSettings->getEMailTemplate()
-		);
+		// For every part an empty admin setting means: use the localized default
+		$subject = $this->appSettings->getEMailSubject() ?: $this->appSettingsDefaults->eMailSubject();
+		$body = $this->appSettings->getEMailTemplate() ?: $this->appSettingsDefaults->eMailBody();
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
-		$template->setSubject($this->l10n->t('Login attempt for %s', [$userAtCloud]));
-		$template->addHeader();
-		$template->addHeading($this->l10n->t('Your two-factor authentication code is: %s', [$code]));
-		$template->addBodyText($bodyText);
+		$template->setSubject($this->templateRenderer->renderSubject($subject, $user, $code));
+		foreach ($this->templateRenderer->renderBody($body, $user, $code) as [$html, $plain]) {
+			$template->addBodyText($html, $plain);
+		}
+		// Standard footer of this Nextcloud instance (theming slogan)
 		$template->addFooter();
 
 		$message = $this->mailer->createMessage();
