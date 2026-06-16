@@ -86,7 +86,10 @@ const store = useAdminSettingsStore()
 store.loadInitialState(...fieldKeys)
 
 // Localized default texts, shown as placeholders in empty fields
-const defaults = loadState('twofactor_email', 'eMailDefaults', {})
+const defaults = {
+	eMailSubject: loadState('twofactor_email', 'eMailSubjectDefault', ''),
+	eMailTemplate: loadState('twofactor_email', 'eMailTemplateDefault', ''),
+}
 
 const { inputValues, loading, successRefs } = useAdminSettings(store, fieldKeys)
 

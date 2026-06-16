@@ -22,7 +22,6 @@ final class EMailSender implements IEMailSender {
 		private readonly LoggerInterface $logger,
 		private readonly IMailer $mailer,
 		private readonly IAppSettings $appSettings,
-		private readonly AppSettingsDefaults $appSettingsDefaults,
 		private readonly TemplateRenderer $templateRenderer,
 	) {
 	}
@@ -36,8 +35,8 @@ final class EMailSender implements IEMailSender {
 		$this->logger->debug("sending email message to $email.");
 
 		// For every part an empty admin setting means: use the localized default
-		$subject = $this->appSettings->getEMailSubject() ?: $this->appSettingsDefaults->eMailSubject();
-		$body = $this->appSettings->getEMailTemplate() ?: $this->appSettingsDefaults->eMailBody();
+		$subject = $this->appSettings->getEMailSubject() ?: $this->appSettings->getDefaultEMailSubject();
+		$body = $this->appSettings->getEMailTemplate() ?: $this->appSettings->getDefaultEMailBody();
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
 		$template->setSubject($this->templateRenderer->renderSubject($subject, $user, $code));

@@ -14,15 +14,12 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Controller;
 
-use OCA\TwoFactorEMail\AppInfo\Application;
-use OCA\TwoFactorEMail\Service\AppSettingsDefaults;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Settings\AdminSettings;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
-use OCP\IAppConfig;
 use OCP\IRequest;
 
 final class AdminSettingsController extends ALoginSetupController {
@@ -42,7 +39,6 @@ final class AdminSettingsController extends ALoginSetupController {
 	public function __construct(
 		string $appName,
 		IRequest $request,
-		private readonly IAppConfig $appConfig,
 		private readonly IAppSettings $appSettings,
 	) {
 		parent::__construct($appName, $request);
@@ -60,10 +56,10 @@ final class AdminSettingsController extends ALoginSetupController {
 			return new JSONResponse(['error' => implode(', ', $errors)], Http::STATUS_BAD_REQUEST);
 		}
 
-		$this->appConfig->setValueInt(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_CODE_LENGTH, $codeLength);
-		$this->appConfig->setValueInt(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_CODE_VALID_MINUTES, $codeValidMinutes);
-		$this->appConfig->setValueString(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_SUBJECT, $eMailSubject);
-		$this->appConfig->setValueString(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_TEMPLATE, $eMailTemplate);
+		$this->appSettings->setCodeLength($codeLength);
+		$this->appSettings->setCodeValidMinutes($codeValidMinutes);
+		$this->appSettings->setEMailSubject($eMailSubject);
+		$this->appSettings->setEMailTemplate($eMailTemplate);
 
 		return $this->currentSettingsResponse();
 	}
@@ -111,11 +107,7 @@ final class AdminSettingsController extends ALoginSetupController {
 
 	#[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function reset(): JSONResponse {
-		// Delete all keys so the defaults take effect immediately
-		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_CODE_LENGTH);
-		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_CODE_VALID_MINUTES);
-		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_SUBJECT);
-		$this->appConfig->deleteKey(Application::APP_ID, AppSettingsDefaults::CONFIG_KEY_EMAIL_TEMPLATE);
+		$this->appSettings->resetToDefaults();
 
 		return $this->currentSettingsResponse();
 	}

@@ -11,14 +11,12 @@ use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Controller\AdminSettingsController;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\AppFramework\Http;
-use OCP\IAppConfig;
 use OCP\IRequest;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class AdminSettingsControllerTest extends TestCase {
-	private IAppConfig&MockObject $appConfig;
 	private IAppSettings&MockObject $appSettings;
 
 	private AdminSettingsController $controller;
@@ -29,20 +27,20 @@ class AdminSettingsControllerTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->appConfig = $this->createMock(IAppConfig::class);
 		$this->appSettings = $this->createMock(IAppSettings::class);
 
 		$this->controller = new AdminSettingsController(
 			Application::APP_ID,
 			$this->createMock(IRequest::class),
-			$this->appConfig,
 			$this->appSettings,
 		);
 	}
 
 	public function testSavePersistsAllSettings(): void {
-		$this->appConfig->expects($this->exactly(2))->method('setValueInt');
-		$this->appConfig->expects($this->exactly(2))->method('setValueString');
+		$this->appSettings->expects($this->once())->method('setCodeLength')->with(6);
+		$this->appSettings->expects($this->once())->method('setCodeValidMinutes')->with(10);
+		$this->appSettings->expects($this->once())->method('setEMailSubject')->with('Subject');
+		$this->appSettings->expects($this->once())->method('setEMailTemplate')->with('Use {code}');
 
 		$response = $this->controller->save(6, 10, 'Use {code}', 'Subject');
 
@@ -57,7 +55,7 @@ class AdminSettingsControllerTest extends TestCase {
 	}
 
 	public function testSaveRejectsCustomBodyWithoutCode(): void {
-		$this->appConfig->expects($this->never())->method('setValueString');
+		$this->appSettings->expects($this->never())->method('setEMailTemplate');
 
 		$response = $this->controller->save(6, 10, 'body without placeholder', '');
 
@@ -66,7 +64,7 @@ class AdminSettingsControllerTest extends TestCase {
 	}
 
 	public function testSaveRejectsMultiLineSubject(): void {
-		$this->appConfig->expects($this->never())->method('setValueString');
+		$this->appSettings->expects($this->never())->method('setEMailSubject');
 
 		$response = $this->controller->save(6, 10, '', "evil\r\nBcc: spy@example.com");
 
@@ -88,8 +86,8 @@ class AdminSettingsControllerTest extends TestCase {
 		$this->assertEquals(['error' => 'email-subject-too-long'], $response->getData());
 	}
 
-	public function testResetDeletesAllKeys(): void {
-		$this->appConfig->expects($this->exactly(4))->method('deleteKey');
+	public function testResetDelegatesToAppSettings(): void {
+		$this->appSettings->expects($this->once())->method('resetToDefaults');
 
 		$response = $this->controller->reset();
 

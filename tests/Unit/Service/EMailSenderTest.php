@@ -9,11 +9,9 @@ namespace OCA\TwoFactorEMail\Test\Unit\Service;
 
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Mail\TemplateRenderer;
-use OCA\TwoFactorEMail\Service\AppSettingsDefaults;
 use OCA\TwoFactorEMail\Service\EMailSender;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\Defaults;
-use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\Mail\IEMailTemplate;
@@ -48,19 +46,13 @@ class EMailSenderTest extends TestCase {
 		$this->defaults->method('getName')->willReturn('Example Cloud');
 		$this->appSettings->method('getCodeValidMinutes')->willReturn(10);
 
-		// AppSettingsDefaults is final, so use the real class with a pass-through IL10N
-		$l10n = $this->createMock(IL10N::class);
-		$l10n->method('t')->willReturnCallback(
-			static fn (string $text, $parameters = []) => vsprintf($text, (array)$parameters),
-		);
-
-		// TemplateRenderer and AppSettingsDefaults are final — use the real
-		// classes, so these tests cover the full rendering pipeline
+		// TemplateRenderer is final — use the real class so these tests cover
+		// the full rendering pipeline. The localized default texts come from
+		// the mocked IAppSettings (their real content is tested in AppSettingsTest).
 		$this->sender = new EMailSender(
 			$this->createMock(LoggerInterface::class),
 			$this->mailer,
 			$this->appSettings,
-			new AppSettingsDefaults($l10n),
 			new TemplateRenderer($this->defaults, $this->urlGenerator, $this->appSettings),
 		);
 	}
@@ -91,7 +83,7 @@ class EMailSenderTest extends TestCase {
 	/**
 	 * Collects all addBodyText calls as [html, plain] pairs.
 	 *
-	 * @param list<array{string, string}> $calls
+	 * @param list<array{string, string|false}> $calls
 	 */
 	private function collectBodyTexts(array &$calls): void {
 		$this->template->method('addBodyText')
@@ -100,9 +92,12 @@ class EMailSenderTest extends TestCase {
 			});
 	}
 
-	public function testUsesLocalizedDefaultsWhenSettingsAreEmpty(): void {
+	public function testFallsBackToDefaultsWhenSettingsAreEmpty(): void {
+		// Empty stored values → the localized defaults from IAppSettings are used
 		$this->appSettings->method('getEMailSubject')->willReturn('');
 		$this->appSettings->method('getEMailTemplate')->willReturn('');
+		$this->appSettings->method('getDefaultEMailSubject')->willReturn('Default for {user}');
+		$this->appSettings->method('getDefaultEMailBody')->willReturn("{logo}\n\nDefault code: {code}");
 		$this->defaults->method('getLogo')->with(false)->willReturn('/themes/logo.png');
 		$this->urlGenerator->method('getAbsoluteURL')
 			->with('/themes/logo.png')
@@ -111,47 +106,25 @@ class EMailSenderTest extends TestCase {
 		$this->expectMailWithTemplate();
 		$this->template->expects($this->once())
 			->method('setSubject')
-			->with('Login attempt for Jane Doe @ Example Cloud');
-		// The logo comes solely from the {logo} token in the default body
-		$this->template->expects($this->never())
-			->method('addHeader');
-		$this->template->expects($this->never())
-			->method('addHeading');
+			->with('Default for Jane Doe');
+		// The logo comes solely from the {logo} token in the (default) body
+		$this->template->expects($this->never())->method('addHeader');
 		$bodyTexts = [];
 		$this->collectBodyTexts($bodyTexts);
 		// The standard theming footer is always used (no argument)
-		$this->template->expects($this->once())
-			->method('addFooter')
-			->with();
+		$this->template->expects($this->once())->method('addFooter')->with();
 
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
 		$this->assertSame([
+			['&nbsp;', false],
 			[
-				// Spacing paragraph (no logo header anymore)
-				'&nbsp;',
-				false,
-			],
-			[
-				// The default body starts with the {logo} token
 				'<img src="https://cloud.example/themes/logo.png" alt="Example Cloud" style="max-width:250px;max-width:min(250px, 20%);max-height:250px">',
 				false,
 			],
 			[
-				'Your two-factor authentication code for <strong style="font-family:monospace">Example Cloud</strong> is:',
-				'Your two-factor authentication code for Example Cloud is:',
-			],
-			[
-				'<strong style="font-family:monospace">123456</strong>',
-				'>>> 123456 <<<',
-			],
-			[
-				'The code is valid for <strong style="font-family:monospace">10</strong> minutes. '
-				. 'If you did not try to log in, somebody else knows your username and your password '
-				. '— change your password and inform your administrator.',
-				'The code is valid for 10 minutes. '
-				. 'If you did not try to log in, somebody else knows your username and your password '
-				. '— change your password and inform your administrator.',
+				'Default code: <strong style="font-family:monospace">123456</strong>',
+				'Default code: >>> 123456 <<<',
 			],
 		], $bodyTexts);
 	}
@@ -159,29 +132,23 @@ class EMailSenderTest extends TestCase {
 	public function testUsesCustomTemplatesAndReplacesAllPlaceholders(): void {
 		$this->appSettings->method('getEMailSubject')->willReturn('Code {code} for {user}');
 		$this->appSettings->method('getEMailTemplate')->willReturn('Use {code} on {cloud} within {validity} minutes.');
+		// Stored values are present, so the defaults must not be consulted
+		$this->appSettings->expects($this->never())->method('getDefaultEMailSubject');
+		$this->appSettings->expects($this->never())->method('getDefaultEMailBody');
 
 		$this->expectMailWithTemplate();
 		$this->template->expects($this->once())
 			->method('setSubject')
 			->with('Code 123456 for Jane Doe');
-		// A customized body controls the logo itself — no automatic header
-		$this->template->expects($this->never())
-			->method('addHeader');
+		$this->template->expects($this->never())->method('addHeader');
 		$bodyTexts = [];
 		$this->collectBodyTexts($bodyTexts);
-		// The standard theming footer is always used (no argument)
-		$this->template->expects($this->once())
-			->method('addFooter')
-			->with();
+		$this->template->expects($this->once())->method('addFooter')->with();
 
 		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 
 		$this->assertSame([
-			[
-				// Spacing paragraph replacing the omitted logo header
-				'&nbsp;',
-				false,
-			],
+			['&nbsp;', false],
 			[
 				'Use <strong style="font-family:monospace">123456</strong> on <strong style="font-family:monospace">Example Cloud</strong> within <strong style="font-family:monospace">10</strong> minutes.',
 				'Use >>> 123456 <<< on Example Cloud within 10 minutes.',
