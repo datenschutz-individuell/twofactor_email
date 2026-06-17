@@ -49,7 +49,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		int $codeLength,
 		int $codeValidMinutes,
 		string $eMailTemplate,
-		string $eMailSubject = '',
+		string $eMailSubject,
 	): JSONResponse {
 		$errors = $this->validate($codeLength, $codeValidMinutes, $eMailTemplate, $eMailSubject);
 		if (!empty($errors)) {
