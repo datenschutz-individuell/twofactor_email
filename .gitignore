@@ -16,6 +16,8 @@ css/
 /nbproject/
 # Ignore JetBrains project
 /.idea/
+# Ignore Claude preferences
+/.claude/
 
 tests/clover.xml
 tests/.phpunit.result.cache
