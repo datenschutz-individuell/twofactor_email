@@ -38,7 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			const minutes = Math.ceil(seconds / 60)
 			return n('twofactor_email', 'You can request a new code in %n minute.', 'You can request a new code in %n minutes.', minutes)
 		}
-		return t('twofactor_email', 'You can request a new code in <1 minute.')
+		// sanitize: false keeps the literal "<"; sanitize would turn it into "&lt;".
+		// Safe only because the result is assigned via textContent below, which never
+		// parses HTML. Do not reuse this string with innerHTML.
+		return t('twofactor_email', 'You can request a new code in <1 minute.', {}, { sanitize: false })
 	}
 
 	const offerResend = () => {
