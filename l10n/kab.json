@@ -1,5 +1,6 @@
 { "translations": {
     "Email" : "Imayl",
-    "Proceed" : "Kemmel"
+    "Proceed" : "Kemmel",
+    "Submit" : "Azen"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

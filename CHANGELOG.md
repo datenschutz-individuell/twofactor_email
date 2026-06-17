@@ -13,9 +13,22 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 - Admin settings: links in the challenge email body are now rendered as such
 
+## 3.1.2 (2026-06-17)
+
+### Security
+
+- Update dependencies to fix esbuild and form-data advisories
+
+### Changed
+
+- updated dependencies fix an optical glitch in the personal settings toggle
+
+## 3.1.1 (2026-06-01)
+
 ### Fixed
 
-- Code cleanup; updated dependencies that also fix an optical glitch in the personal settings toggle
+- When updating the app from v2 to v3, authentication codes are no longer migrated, see
+  https://github.com/datenschutz-individuell/twofactor_email/issues/69#issuecomment-4588492017
 
 ## 3.1.1 (2026-06-01)
 
