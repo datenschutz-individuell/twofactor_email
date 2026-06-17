@@ -20,14 +20,18 @@ use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCA\TwoFactorEMail\Service\ILoginChallenge;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\BruteForceProtection;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoTwoFactorRequired;
+use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
 use OCP\IRequest;
 use OCP\IUserSession;
 
 final class ChallengeController extends ALoginSetupController {
+
+	private const BRUTE_FORCE_ACTION = 'twofactorEmailResend';
 
 	public function __construct(
 		string $appName,
@@ -39,22 +43,21 @@ final class ChallengeController extends ALoginSetupController {
 		parent::__construct($appName, $request);
 	}
 
-	/**
-	 * Send a fresh challenge code on the user's explicit request.
-	 *
-	 * Reachable during the half-authenticated 2FA-pending state: NoTwoFactorRequired
-	 * lets the request pass TwoFactorMiddleware. Flooding is prevented by the resend
-	 * cooldown in the service (no email is sent before it elapses), so no extra
-	 * request rate limit is needed here.
+	/*
+	 * The service cooldown is the configurable source of truth. The rate limit
+	 * is an atomic backstop against concurrent bursts: period 60 equals the
+	 * smallest possible cooldown (MIN_RESEND_MINUTES), so it never rejects a
+	 * legitimately allowed resend.
 	 */
 	#[NoAdminRequired]
 	#[NoTwoFactorRequired]
+	#[UserRateLimit(limit: 1, period: 60)]
+	#[BruteForceProtection(action: self::BRUTE_FORCE_ACTION)]
 	public function resend(): JSONResponse {
 		$user = $this->userSession->getUser();
 		if ($user === null) {
 			return new JSONResponse(['error' => 'no-user'], Http::STATUS_UNAUTHORIZED);
 		}
-		// Only the email provider's own challenge may be resent here
 		if (!$this->stateManager->isEnabled($user)) {
 			return new JSONResponse(['error' => 'not-enabled'], Http::STATUS_BAD_REQUEST);
 		}
@@ -63,14 +66,18 @@ final class ChallengeController extends ALoginSetupController {
 			$this->challenge->resendChallenge($user);
 			return new JSONResponse(['status' => 'sent']);
 		} catch (ResendTooSoon $e) {
-			return new JSONResponse(
+			$response = new JSONResponse(
 				['error' => 'too-soon', 'retryAfter' => $e->retryAfterSeconds],
 				Http::STATUS_TOO_MANY_REQUESTS,
 			);
+			$response->throttle(['action' => self::BRUTE_FORCE_ACTION]);
+			return $response;
 		} catch (EMailNotSet) {
 			return new JSONResponse(['error' => 'no-email'], Http::STATUS_BAD_REQUEST);
 		} catch (SendEMailFailed) {
-			return new JSONResponse(['error' => 'send-failed'], Http::STATUS_INTERNAL_SERVER_ERROR);
+			$response = new JSONResponse(['error' => 'send-failed'], Http::STATUS_INTERNAL_SERVER_ERROR);
+			$response->throttle(['action' => self::BRUTE_FORCE_ACTION]);
+			return $response;
 		}
 	}
 }

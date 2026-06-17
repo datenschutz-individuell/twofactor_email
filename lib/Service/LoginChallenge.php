@@ -48,31 +48,13 @@ final class LoginChallenge implements ILoginChallenge {
 			return false;
 		}
 
-		$generatedCode = $this->codeGenerator->generateChallengeCode();
-		try {
-			$this->emailSender->sendChallengeEMail($user, $generatedCode);
-
-			// Only store the code if it could be sent.
-			$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode));
-			return true;
-		} catch (EMailNotSet $e) {
-			$this->logger->warning('Could not send 2FA challenge: No email address configured for user.', [
-				'exception' => $e,
-				'app' => 'twofactor_email',
-			]);
-			throw $e;
-		} catch (SendEMailFailed $e) {
-			$this->logger->error('Failed to send 2FA challenge email due to a mailer error.', [
-				'exception' => $e,
-				'app' => 'twofactor_email',
-			]);
-			throw $e;
-		}
+		$this->issueCode($user);
+		return true;
 	}
 
 	/**
-	 * Discard the current code (if any) and send a fresh one on the user's
-	 * explicit request, throttled by the configured resend cooldown.
+	 * Send a fresh code on the user's explicit request, throttled by the configured resend cooldown. The existing code
+	 * is replaced only after the new one has been sent successfully, so a failed send leaves the current code valid.
 	 *
 	 * @throws ResendTooSoon if the cooldown since the last code has not elapsed
 	 * @throws EMailNotSet
@@ -85,10 +67,7 @@ final class LoginChallenge implements ILoginChallenge {
 			throw new ResendTooSoon($cooldown - $elapsed);
 		}
 
-		// Drop the existing code so sendChallenge() generates and sends a new
-		// one — only the new code stays valid.
-		$this->codeStorage->deleteCode($user->getUID());
-		$this->sendChallenge($user);
+		$this->issueCode($user);
 	}
 
 	public function secondsUntilResendAllowed(IUser $user): int {
@@ -96,7 +75,7 @@ final class LoginChallenge implements ILoginChallenge {
 		if ($elapsed === null) {
 			return 0;
 		}
-		// Cap at the code's remaining validity: once the code expires a resend is
+		// Cap at the code's remaining validity: once the code expires, a resend is
 		// allowed anyway, so the countdown must not outlast the code (relevant
 		// only if an admin sets a cooldown longer than the validity).
 		$cooldown = min($this->settings->getResendCooldownSeconds(), $this->settings->getCodeValidMinutes() * 60);
@@ -121,5 +100,33 @@ final class LoginChallenge implements ILoginChallenge {
 			$this->codeStorage->deleteCode($user->getUID());
 		}
 		return $isValid;
+	}
+
+	/**
+	 * Sends a fresh code and only then persists it, overwriting any existing
+	 * code. If sending fails, the previously stored code stays valid.
+	 *
+	 * @throws EMailNotSet
+	 * @throws SendEMailFailed
+ */
+	private function issueCode(IUser $user): void {
+		$generatedCode = $this->codeGenerator->generateChallengeCode();
+		try {
+			$this->emailSender->sendChallengeEMail($user, $generatedCode);
+			// Only store the code if it could be sent.
+			$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode));
+		} catch (EMailNotSet $e) {
+			$this->logger->warning('Could not send 2FA challenge: No email address configured for user.', [
+				'exception' => $e,
+				'app' => 'twofactor_email',
+			]);
+			throw $e;
+		} catch (SendEMailFailed $e) {
+			$this->logger->error('Failed to send 2FA challenge email due to a mailer error.', [
+				'exception' => $e,
+				'app' => 'twofactor_email',
+			]);
+			throw $e;
+		}
 	}
 }
