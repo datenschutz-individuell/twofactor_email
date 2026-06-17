@@ -100,4 +100,23 @@ class LoginChallengeTest extends TestCase {
 
 		$this->challenge->resendChallenge($user);
 	}
+
+	public function testSecondsUntilResendAllowedIsZeroWithoutValidCode(): void {
+		$this->codeStorage->method('secondsSinceLastCode')->willReturn(null);
+
+		$this->assertSame(0, $this->challenge->secondsUntilResendAllowed($this->mockUser()));
+	}
+
+	public function testSecondsUntilResendAllowedReturnsRemainingCooldown(): void {
+		$this->codeStorage->method('secondsSinceLastCode')->willReturn(10);
+
+		// cooldown 60 - 10 elapsed = 50
+		$this->assertSame(50, $this->challenge->secondsUntilResendAllowed($this->mockUser()));
+	}
+
+	public function testSecondsUntilResendAllowedIsZeroAfterCooldown(): void {
+		$this->codeStorage->method('secondsSinceLastCode')->willReturn(100);
+
+		$this->assertSame(0, $this->challenge->secondsUntilResendAllowed($this->mockUser()));
+	}
 }

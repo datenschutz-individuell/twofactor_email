@@ -91,6 +91,14 @@ final class LoginChallenge implements ILoginChallenge {
 		$this->sendChallenge($user);
 	}
 
+	public function secondsUntilResendAllowed(IUser $user): int {
+		$elapsed = $this->codeStorage->secondsSinceLastCode($user->getUID());
+		if ($elapsed === null) {
+			return 0;
+		}
+		return max(0, $this->settings->getResendMinSeconds() - $elapsed);
+	}
+
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {
 		$submittedCode = trim($submittedCode);
 		$storedCodeHash = $this->codeStorage->readCode($user->getUID());

@@ -22,7 +22,6 @@ use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoTwoFactorRequired;
-use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
 use OCP\IRequest;
@@ -44,12 +43,12 @@ final class ChallengeController extends ALoginSetupController {
 	 * Send a fresh challenge code on the user's explicit request.
 	 *
 	 * Reachable during the half-authenticated 2FA-pending state: NoTwoFactorRequired
-	 * lets the request pass TwoFactorMiddleware. The cooldown in the service is the
-	 * primary throttle; UserRateLimit is a hard backstop.
+	 * lets the request pass TwoFactorMiddleware. Flooding is prevented by the resend
+	 * cooldown in the service (no email is sent before it elapses), so no extra
+	 * request rate limit is needed here.
 	 */
 	#[NoAdminRequired]
 	#[NoTwoFactorRequired]
-	#[UserRateLimit(limit: 5, period: 600)]
 	public function resend(): JSONResponse {
 		$user = $this->userSession->getUser();
 		if ($user === null) {

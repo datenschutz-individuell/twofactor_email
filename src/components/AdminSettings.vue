@@ -147,10 +147,10 @@ async function onReset() {
 	color: var(--color-text-maxcontrast, gray);
 }
 
-/* The two short numeric fields share one row (stacked on narrow screens) */
+/* The short numeric fields share one row (stacked on narrow screens) */
 .numeric-fields-grid {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 0 16px;
 }
 

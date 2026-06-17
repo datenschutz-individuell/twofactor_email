@@ -39,6 +39,15 @@ interface ILoginChallenge {
 	public function resendChallenge(IUser $user): void;
 
 	/**
+	 * Seconds the user still has to wait before a resend is allowed (0 if a
+	 * new code can be requested right now). Lets the challenge dialog show a
+	 * live countdown instead of letting the user click and fail.
+	 *
+	 * @param IUser $user UID
+	 */
+	public function secondsUntilResendAllowed(IUser $user): int;
+
+	/**
 	 * Verify the challenge code sent to the user by email against the one stored upon sending it.
 	 *
 	 * @param IUser $user UID
