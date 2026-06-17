@@ -37,6 +37,16 @@ final class CodeStorage implements ICodeStorage {
 		return $code;
 	}
 
+	public function secondsSinceLastCode(string $userId): ?int {
+		// Only a still-valid code counts: an expired one is treated as "none"
+		// so the user may request a fresh code without waiting.
+		if ($this->readCode($userId) === null) {
+			return null;
+		}
+		$createdAt = $this->config->getValueInt($userId, Application::APP_ID, self::KEY_CREATED_AT);
+		return max(0, time() - $createdAt);
+	}
+
 	public function deleteCode(string $userId): void {
 		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CODE);
 		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CREATED_AT);

@@ -54,6 +54,7 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 	state: () => ({
 		codeLength: null,
 		codeValidMinutes: null,
+		codeResendMinSeconds: null,
 		eMailSubject: null,
 		eMailTemplate: null,
 		error: false,
@@ -77,6 +78,7 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 			const result = await persistAdminSettings({
 				codeLength: this.codeLength,
 				codeValidMinutes: this.codeValidMinutes,
+				resendMinSeconds: this.codeResendMinSeconds,
 				eMailSubject: this.eMailSubject,
 				eMailTemplate: this.eMailTemplate,
 			})
@@ -84,6 +86,7 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 			this.$patch({
 				codeLength: result.codeLength ?? this.codeLength,
 				codeValidMinutes: result.codeValidMinutes ?? this.codeValidMinutes,
+				codeResendMinSeconds: result.codeResendMinSeconds ?? this.codeResendMinSeconds,
 				eMailSubject: result.eMailSubject ?? this.eMailSubject,
 				eMailTemplate: result.eMailTemplate ?? this.eMailTemplate,
 				error: result.error,
@@ -98,6 +101,7 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 				this.$patch({
 					codeLength: result.codeLength,
 					codeValidMinutes: result.codeValidMinutes,
+					codeResendMinSeconds: result.codeResendMinSeconds,
 					eMailSubject: result.eMailSubject,
 					eMailTemplate: result.eMailTemplate,
 					error: null,

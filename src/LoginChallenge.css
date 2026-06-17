@@ -16,3 +16,7 @@
     /* noinspection CssUnresolvedCustomProperty */
     filter: var(--background-invert-if-bright);
 }
+
+.twofactor_email-resend {
+    margin-top: 8px;
+}

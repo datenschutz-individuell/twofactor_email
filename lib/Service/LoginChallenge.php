@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Service;
 
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
+use OCA\TwoFactorEMail\Exception\ResendTooSoon;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCP\IUser;
 use OCP\Security\IHasher;
@@ -21,6 +22,7 @@ final class LoginChallenge implements ILoginChallenge {
 		private readonly ICodeStorage $codeStorage,
 		private readonly IEMailSender $emailSender,
 		private readonly IHasher $hasher,
+		private readonly IAppSettings $settings,
 		private readonly LoggerInterface $logger,
 	) {
 	}
@@ -66,6 +68,27 @@ final class LoginChallenge implements ILoginChallenge {
 			]);
 			throw $e;
 		}
+	}
+
+	/**
+	 * Discard the current code (if any) and send a fresh one on the user's
+	 * explicit request, throttled by the configured resend cooldown.
+	 *
+	 * @throws ResendTooSoon if the cooldown since the last code has not elapsed
+	 * @throws EMailNotSet
+	 * @throws SendEMailFailed
+	 */
+	public function resendChallenge(IUser $user): void {
+		$elapsed = $this->codeStorage->secondsSinceLastCode($user->getUID());
+		$cooldown = $this->settings->getResendMinSeconds();
+		if ($elapsed !== null && $elapsed < $cooldown) {
+			throw new ResendTooSoon($cooldown - $elapsed);
+		}
+
+		// Drop the existing code so sendChallenge() generates and sends a new
+		// one — only the new code stays valid.
+		$this->codeStorage->deleteCode($user->getUID());
+		$this->sendChallenge($user);
 	}
 
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {

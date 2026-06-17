@@ -11,7 +11,7 @@
 			<!-- Group: authentication code -->
 			<fieldset class="settings-group">
 				<h3>{{ t('twofactor_email', 'Authentication code') }}</h3>
-				<p>{{ t('twofactor_email', 'Length and validity of the one-time codes sent via email.') }}</p>
+				<p>{{ t('twofactor_email', 'Length and validity of the one-time codes sent via email, and how soon a user may request a new code.') }}</p>
 
 				<div class="numeric-fields-grid">
 					<LabeledField id="twofactor_email-codeLength"
@@ -25,6 +25,12 @@
 								  :label="t('twofactor_email', 'Validity (minutes)')"
 								  :loading="loading"
 								  :result="successRefs.codeValidMinutes"
+								  type="number" />
+					<LabeledField id="twofactor_email-codeResendMinSeconds"
+								  v-model="inputValues.codeResendMinSeconds"
+								  :label="t('twofactor_email', 'Resend cooldown (seconds)')"
+								  :loading="loading"
+								  :result="successRefs.codeResendMinSeconds"
 								  type="number" />
 				</div>
 			</fieldset>
@@ -80,7 +86,7 @@ import Logger from '../Logger.js'
 
 const resetting = ref(false)
 
-const fieldKeys = ['codeLength', 'codeValidMinutes', 'eMailSubject', 'eMailTemplate']
+const fieldKeys = ['codeLength', 'codeValidMinutes', 'codeResendMinSeconds', 'eMailSubject', 'eMailTemplate']
 
 const store = useAdminSettingsStore()
 store.loadInitialState(...fieldKeys)

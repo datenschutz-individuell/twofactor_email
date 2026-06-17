@@ -88,8 +88,24 @@ class AppSettingsTest extends TestCase {
 		$this->settings->setCodeLength(8);
 	}
 
+	public function testGetResendMinSecondsDefaultsTo60(): void {
+		$this->appConfig->method('getValueInt')
+			->with(Application::APP_ID, 'resend_min_seconds', 60)
+			->willReturn(60);
+
+		$this->assertSame(60, $this->settings->getResendMinSeconds());
+	}
+
+	public function testSetResendMinSecondsWritesToAppConfig(): void {
+		$this->appConfig->expects($this->once())
+			->method('setValueInt')
+			->with(Application::APP_ID, 'resend_min_seconds', 30);
+
+		$this->settings->setResendMinSeconds(30);
+	}
+
 	public function testResetToDefaultsDeletesAllKeys(): void {
-		$this->appConfig->expects($this->exactly(4))->method('deleteKey');
+		$this->appConfig->expects($this->exactly(5))->method('deleteKey');
 
 		$this->settings->resetToDefaults();
 	}

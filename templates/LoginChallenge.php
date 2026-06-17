@@ -54,4 +54,8 @@ $error = $_['error'] ?? null; // caught and passed in Provider/TwoFactorEMail.ph
 			<?php p($l->t('Submit')); ?>
 		</button>
 	</form>
+	<button type="button" class="twofactor_email-resend">
+		<?php p($l->t('Send a new code')); ?>
+	</button>
+	<p class="twofactor_email-resend-status" aria-live="polite" hidden></p>
 <?php endif; ?>
