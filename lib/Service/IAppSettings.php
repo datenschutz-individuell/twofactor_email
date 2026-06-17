@@ -31,9 +31,9 @@ interface IAppSettings {
 	public function getResendMinMinutes(): int;
 
 	/**
-	 * The resend cooldown in seconds (derived from the minutes setting) — the
-	 * single place that converts the admin unit to what the cooldown logic and
-	 * the challenge page work in.
+	 * The resend cooldown in seconds. The setting is stored in minutes and
+	 * converted here, because the cooldown logic and the challenge page work
+	 * in seconds.
 	 *
 	 * @return int seconds
 	 */

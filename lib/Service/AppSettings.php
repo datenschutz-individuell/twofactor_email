@@ -50,8 +50,6 @@ final class AppSettings implements IAppSettings {
 	}
 
 	public function getResendCooldownSeconds(): int {
-		// Single conversion point: the setting is stored in minutes, the cooldown
-		// logic and the challenge page work in seconds.
 		return $this->getResendMinMinutes() * 60;
 	}
 

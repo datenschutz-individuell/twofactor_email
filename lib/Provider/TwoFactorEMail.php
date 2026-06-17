@@ -93,8 +93,6 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 		$template->assign('codeLength', $this->settings->getCodeLength());
 		$template->assign('newCodeWasSent', $newCodeWasSent);
 		$template->assign('error', $error);
-		// Resend cooldown state, so the dialog can show a live countdown and only
-		// offer the resend link once a new code may actually be requested.
 		$template->assign('resendCooldown', $this->settings->getResendCooldownSeconds());
 		$template->assign('resendAvailableIn', $this->challengeService->secondsUntilResendAllowed($user));
 

@@ -33,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	// Coarse, minute-level wording — seconds are not shown to the user.
 	const remainingText = (seconds) => {
 		if (seconds >= 60) {
 			const minutes = Math.ceil(seconds / 60)
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		return t('twofactor_email', 'You can request a new code in less than a minute')
 	}
 
-	// Offer the clickable resend link and clear any status text.
 	const offerResend = () => {
 		clearTimer()
 		status.textContent = ''
