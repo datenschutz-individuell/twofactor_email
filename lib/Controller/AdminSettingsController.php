@@ -54,7 +54,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		int $codeValidMinutes,
 		string $eMailTemplate,
 		string $eMailSubject,
-		int $resendMinSeconds = self::MIN_RESEND_MIN_SECONDS,
+		int $resendMinSeconds,
 	): JSONResponse {
 		$errors = $this->validate($codeLength, $codeValidMinutes, $eMailTemplate, $eMailSubject, $resendMinSeconds);
 		if (!empty($errors)) {
