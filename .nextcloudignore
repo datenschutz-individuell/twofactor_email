@@ -11,6 +11,7 @@
 /.tx
 /babel.config.js
 /build
+/.claude
 /composer.*
 /krankerl.toml
 /node_modules
