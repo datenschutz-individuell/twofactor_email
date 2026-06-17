@@ -23,10 +23,45 @@ interface IAppSettings {
 	public function getCodeValidMinutes(): int;
 
 	/**
-	 * Plain-text email template used when sending the 2FA challenge email.
-	 * Supports the placeholders {code}, {user}, {cloud}.
+	 * Subject of the 2FA challenge email, as stored by the admin.
+	 * An empty string means: no custom subject — use getDefaultEMailSubject().
 	 *
-	 * @return string email template
+	 * @return string email subject template
+	 */
+	public function getEMailSubject(): string;
+
+	/**
+	 * Plain-text body template of the 2FA challenge email, as stored by the admin.
+	 * An empty string means: no custom body — use getDefaultEMailBody().
+	 *
+	 * @return string email body template
 	 */
 	public function getEMailTemplate(): string;
+
+	/**
+	 * Localized default subject, used when no custom subject is stored and
+	 * shown as a hint in the admin form.
+	 * Supports the placeholders {code}, {user}, {cloud} and {validity}.
+	 */
+	public function getDefaultEMailSubject(): string;
+
+	/**
+	 * Localized default body, used when no custom body is stored and shown as
+	 * a hint in the admin form.
+	 * Supports the placeholders {logo}, {code}, {user}, {cloud} and {validity}.
+	 */
+	public function getDefaultEMailBody(): string;
+
+	public function setCodeLength(int $codeLength): void;
+
+	public function setCodeValidMinutes(int $codeValidMinutes): void;
+
+	public function setEMailSubject(string $subject): void;
+
+	public function setEMailTemplate(string $body): void;
+
+	/**
+	 * Remove all stored settings so the defaults take effect again.
+	 */
+	public function resetToDefaults(): void;
 }

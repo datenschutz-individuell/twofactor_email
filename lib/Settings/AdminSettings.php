@@ -27,7 +27,11 @@ final class AdminSettings implements IDelegatedSettings {
 	public function getForm(): TemplateResponse {
 		$this->initialState->provideInitialState('codeLength', $this->appSettings->getCodeLength());
 		$this->initialState->provideInitialState('codeValidMinutes', $this->appSettings->getCodeValidMinutes());
+		$this->initialState->provideInitialState('eMailSubject', $this->appSettings->getEMailSubject());
 		$this->initialState->provideInitialState('eMailTemplate', $this->appSettings->getEMailTemplate());
+		// Localized default texts, shown as placeholders in the empty form fields
+		$this->initialState->provideInitialState('eMailSubjectDefault', $this->appSettings->getDefaultEMailSubject());
+		$this->initialState->provideInitialState('eMailTemplateDefault', $this->appSettings->getDefaultEMailBody());
 
 		return new TemplateResponse(Application::APP_ID, 'AdminSettings', renderAs: TemplateResponse::RENDER_AS_BLANK);
 	}

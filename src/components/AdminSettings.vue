@@ -8,45 +8,58 @@
 		<NcSettingsSection :name="t('twofactor_email', 'Two-Factor email provider')"
 						   :description="t('twofactor_email', 'These system wide settings are saved automatically shortly after the last keypress.')">
 
-			<!-- Numeric fields: min="1" prevents zero and negative values at the browser level;
-				 @keydown guard blocks direct keyboard entry of '-' and 'e' (scientific notation) -->
-			<div class="numeric-fields-grid">
-				<NcTextField v-for="field in numericFields"
-							 :key="field.key"
-							 v-model="inputValues[field.key]"
-							 :error="successRefs[field.key] === false"
-							 :label="field.label"
-							 :loading="loading"
-							 :success="successRefs[field.key] === true"
-							 min="1"
-							 type="number"
-							 @keydown="blockInvalidNumericInput" />
-			</div>
+			<!-- Group: authentication code -->
+			<fieldset class="settings-group">
+				<h3>{{ t('twofactor_email', 'Authentication code') }}</h3>
+				<p>{{ t('twofactor_email', 'Length and validity of the one-time codes sent via email.') }}</p>
 
-			<!-- Email template: monospace textarea with code-editor appearance -->
-			<div class="email-template-field">
-				<NcTextArea v-for="field in textAreaFields"
-							:key="field.key"
-							v-model="inputValues[field.key]"
-							:error="successRefs[field.key] === false"
-							:helper-text="t('twofactor_email', 'The email template text to be sent to the user. It MUST contain the placeholders `{code} and `{cloud}`.')"
-							:hide-label="true"
-							:label="t('twofactor_email', 'Email Template (plain text)')"
-							:loading="loading"
-							:success="successRefs[field.key] === true"
-							class="email-template-field__textarea" />
-			</div>
+				<div class="numeric-fields-grid">
+					<LabeledField id="twofactor_email-codeLength"
+								  v-model="inputValues.codeLength"
+								  :label="t('twofactor_email', 'Length (characters)')"
+								  :loading="loading"
+								  :result="successRefs.codeLength"
+								  type="number" />
+					<LabeledField id="twofactor_email-codeValidMinutes"
+								  v-model="inputValues.codeValidMinutes"
+								  :label="t('twofactor_email', 'Validity (minutes)')"
+								  :loading="loading"
+								  :result="successRefs.codeValidMinutes"
+								  type="number" />
+				</div>
+			</fieldset>
 
-			<div class="reset-section">
-				<NcButton :disabled="resetting"
-						  type="tertiary-no-background"
-						  @click="onReset">
-					<template #icon>
-						<NcIconSvgWrapper :path="mdiUndo" :size="20" />
-					</template>
-					{{ t('twofactor_email', 'Reset all Two-Factor email app-wide admin settings to their defaults') }}
-				</NcButton>
-			</div>
+			<!-- Group: email template -->
+			<fieldset class="settings-group">
+				<h3>{{ t('twofactor_email', 'Email template') }}</h3>
+				<p>{{ t('twofactor_email', 'This template defines the email that delivers the one-time code to users. It is partially dynamic using placeholders.') }}</p>
+
+				<LabeledField id="twofactor_email-eMailSubject"
+							  v-model="inputValues.eMailSubject"
+							  :helper-text="subjectHelperText"
+							  :label="t('twofactor_email', 'Subject')"
+							  :loading="loading"
+							  :placeholder="defaults.eMailSubject"
+							  :result="successRefs.eMailSubject" />
+				<LabeledField id="twofactor_email-eMailTemplate"
+							  v-model="inputValues.eMailTemplate"
+							  :helper-text="bodyHelperText"
+							  :label="t('twofactor_email', 'Body')"
+							  :loading="loading"
+							  :placeholder="defaults.eMailTemplate"
+							  :result="successRefs.eMailTemplate"
+							  class="body-field"
+							  type="textarea" />
+			</fieldset>
+
+			<NcButton :disabled="resetting"
+					  type="tertiary-no-background"
+					  @click="onReset">
+				<template #icon>
+					<NcIconSvgWrapper :path="mdiUndo" :size="20" />
+				</template>
+				{{ t('twofactor_email', 'Reset all Two-Factor email app-wide admin settings to their defaults') }}
+			</NcButton>
 
 		</NcSettingsSection>
 	</div>
@@ -54,57 +67,54 @@
 
 <script setup>
 import { ref } from 'vue'
+import { loadState } from '@nextcloud/initial-state'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcSettingsSection from '@nextcloud/vue/components/NcSettingsSection'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
-import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import { mdiUndo } from '@mdi/js'
 import { t } from '@nextcloud/l10n'
+import LabeledField from './LabeledField.vue'
 import { useAdminSettingsStore } from '../Store.js'
 import { useAdminSettings } from '../composables/useAdminSettings.js'
 import Logger from '../Logger.js'
 
 const resetting = ref(false)
 
+const fieldKeys = ['codeLength', 'codeValidMinutes', 'eMailSubject', 'eMailTemplate']
+
 const store = useAdminSettingsStore()
-store.loadInitialState('codeLength', 'codeValidMinutes', 'eMailTemplate')
+store.loadInitialState(...fieldKeys)
 
-const numericFields = [
-	{ key: 'codeLength', label: t('twofactor_email', 'Code Length (Characters)') },
-	{ key: 'codeValidMinutes', label: t('twofactor_email', 'Code Validity (Minutes)') },
-]
-
-const textAreaFields = [
-	{ key: 'eMailTemplate' },
-]
-
-const allFields = [...numericFields, ...textAreaFields]
-
-const { inputValues, loading, successRefs } = useAdminSettings(
-	store,
-	allFields.map(f => f.key),
-)
-
-/**
- * Blocks '-' (minus) and 'e' (scientific notation) in number inputs.
- * The min="1" attribute handles values after entry; this blocks them
- * during typing so invalid characters never appear in the field.
- *
- * @param {KeyboardEvent} event - The keyboard event from the input field
- */
-function blockInvalidNumericInput(event) {
-	if (event.key === '-' || event.key === 'e') {
-		event.preventDefault()
-	}
+// Localized default texts, shown as placeholders in empty fields
+const defaults = {
+	eMailSubject: loadState('twofactor_email', 'eMailSubjectDefault', ''),
+	eMailTemplate: loadState('twofactor_email', 'eMailTemplateDefault', ''),
 }
+
+const { inputValues, loading, successRefs } = useAdminSettings(store, fieldKeys)
+
+// Hints shown below the subject field
+// (rendered line by line via white-space: pre-line)
+const subjectHelperText = [
+	t('twofactor_email', 'Placeholders: {code}, {user}, {cloud}, {validity}.'),
+	t('twofactor_email', 'A {code} here may show up in notification previews on lock screens.'),
+].join('\n')
+
+// Placeholder and formatting reference, shown below the body field
+// (rendered line by line via white-space: pre-line)
+const bodyHelperText = [
+	t('twofactor_email', 'Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body.'),
+	t('twofactor_email', 'Defaults: empty fields use the localized default text, shown as a hint inside the field.'),
+	t('twofactor_email', 'Formatting: a blank line starts a new paragraph, a single line break becomes a line break.'),
+	t('twofactor_email', 'Links: URLs are detected and rendered as linked URL text.'),
+].join('\n')
 
 async function onReset() {
 	resetting.value = true
 	try {
 		const result = await store.reset()
 		if (typeof result?.error !== 'string') {
-			for (const key of allFields.map(f => f.key)) {
+			for (const key of fieldKeys) {
 				inputValues[key] = store[key]
 			}
 		}
@@ -117,42 +127,37 @@ async function onReset() {
 </script>
 
 <style scoped>
-.numeric-fields-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 8px 16px;
-	margin-bottom: 24px;
+/* Visual grouping; headings and lists keep their browser defaults.
+   Secondary text (descriptions, hints) uses the NC muted text color. */
+.settings-group {
+	border: 0;
+	margin: 0 0 32px;
+	padding: 0;
+	max-width: 64em;
 }
 
-/* Stack to single column on narrow screens */
+.settings-group p {
+	/* noinspection CssUnresolvedCustomProperty */
+	color: var(--color-text-maxcontrast, gray);
+}
+
+/* The two short numeric fields share one row (stacked on narrow screens) */
+.numeric-fields-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0 16px;
+}
+
 @media (max-width: 640px) {
 	.numeric-fields-grid {
 		grid-template-columns: 1fr;
 	}
 }
 
-.email-template-field {
-	margin-top: 8px;
-}
-
-/* Force monospace / code-editor appearance on the inner textarea element */
-.email-template-field__textarea :deep(textarea) {
+/* Monospace editor appearance for the body template */
+.body-field :deep(textarea) {
 	font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-	font-size: 13px;
-	line-height: 1.6;
 	min-height: 220px;
-	margin-top: 24px;
-	margin-bottom: 8px;
 	resize: vertical;
-	tab-size: 2;
-	white-space: pre-wrap;
-	/* noinspection CssUnresolvedCustomProperty */
-	background-color: var(--color-background-dark, darkgray);
-	/* noinspection CssUnresolvedCustomProperty */
-	border-radius: var(--border-radius, 4px);
-}
-
-.reset-section {
-	margin-top: 16px;
 }
 </style>
