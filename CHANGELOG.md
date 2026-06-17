@@ -3,12 +3,13 @@
 Notable changes in [changelog format](https://keepachangelog.com/en/1.0.0/), project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
-## 3.2.0 (2026-06-12)
+## 3.2.0 (2026-06-17)
 
 ### Added
 
 - Admin settings: allow setting a custom challenge email subject
-  
+- Login: allow users to request a new code
+
 ### Changed
 
 - Admin settings: links in the challenge email body are now rendered as such
@@ -22,13 +23,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ### Changed
 
 - updated dependencies fix an optical glitch in the personal settings toggle
-
-## 3.1.1 (2026-06-01)
-
-### Fixed
-
-- When updating the app from v2 to v3, authentication codes are no longer migrated, see
-  https://github.com/datenschutz-individuell/twofactor_email/issues/69#issuecomment-4588492017
 
 ## 3.1.1 (2026-06-01)
 
