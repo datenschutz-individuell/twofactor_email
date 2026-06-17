@@ -34,11 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	const remainingText = (seconds) => {
-		if (seconds >= 60) {
+		if (seconds > 60) {
 			const minutes = Math.ceil(seconds / 60)
-			return n('twofactor_email', 'You can request a new code in %n minute', 'You can request a new code in %n minutes', minutes)
+			return n('twofactor_email', 'You can request a new code in %n minute.', 'You can request a new code in %n minutes.', minutes)
 		}
-		return t('twofactor_email', 'You can request a new code in less than a minute')
+		return t('twofactor_email', 'You can request a new code in <1 minute.')
 	}
 
 	const offerResend = () => {
