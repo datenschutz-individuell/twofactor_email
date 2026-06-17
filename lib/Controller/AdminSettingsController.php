@@ -32,9 +32,9 @@ final class AdminSettingsController extends ALoginSetupController {
 	private const MIN_CODE_VALID_MINUTES = 1;
 	private const MAX_CODE_VALID_MINUTES = 44640; // 1 month
 
-	// Allowed range for the resend cooldown in seconds
-	private const MIN_RESEND_MIN_SECONDS = 5;
-	private const MAX_RESEND_MIN_SECONDS = 3600; // 1 hour
+	// Allowed range for the resend cooldown in minutes
+	private const MIN_RESEND_MINUTES = 1;
+	private const MAX_RESEND_MINUTES = 60; // 1 hour
 
 	// Maximum allowed lengths for the email template parts in characters
 	private const MAX_EMAIL_SUBJECT_LENGTH = 255;
@@ -54,16 +54,16 @@ final class AdminSettingsController extends ALoginSetupController {
 		int $codeValidMinutes,
 		string $eMailTemplate,
 		string $eMailSubject,
-		int $resendMinSeconds,
+		int $resendMinutes,
 	): JSONResponse {
-		$errors = $this->validate($codeLength, $codeValidMinutes, $eMailTemplate, $eMailSubject, $resendMinSeconds);
+		$errors = $this->validate($codeLength, $codeValidMinutes, $eMailTemplate, $eMailSubject, $resendMinutes);
 		if (!empty($errors)) {
 			return new JSONResponse(['error' => implode(', ', $errors)], Http::STATUS_BAD_REQUEST);
 		}
 
 		$this->appSettings->setCodeLength($codeLength);
 		$this->appSettings->setCodeValidMinutes($codeValidMinutes);
-		$this->appSettings->setResendMinSeconds($resendMinSeconds);
+		$this->appSettings->setResendMinMinutes($resendMinutes);
 		$this->appSettings->setEMailSubject($eMailSubject);
 		$this->appSettings->setEMailTemplate($eMailTemplate);
 
@@ -78,7 +78,7 @@ final class AdminSettingsController extends ALoginSetupController {
 	 * @param int $codeValidMinutes
 	 * @param string $eMailTemplate
 	 * @param string $eMailSubject
-	 * @param int $resendMinSeconds
+	 * @param int $resendMinutes
 	 * @return string[]
 	 */
 	private function validate(
@@ -86,7 +86,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		int $codeValidMinutes,
 		string $eMailTemplate,
 		string $eMailSubject,
-		int $resendMinSeconds,
+		int $resendMinutes,
 	): array {
 		$errors = [];
 		if ($codeLength < self::MIN_CODE_LENGTH || $codeLength > self::MAX_CODE_LENGTH) {
@@ -95,8 +95,8 @@ final class AdminSettingsController extends ALoginSetupController {
 		if ($codeValidMinutes < self::MIN_CODE_VALID_MINUTES || $codeValidMinutes > self::MAX_CODE_VALID_MINUTES) {
 			$errors[] = 'code-valid-minutes-out-of-range';
 		}
-		if ($resendMinSeconds < self::MIN_RESEND_MIN_SECONDS || $resendMinSeconds > self::MAX_RESEND_MIN_SECONDS) {
-			$errors[] = 'resend-min-seconds-out-of-range';
+		if ($resendMinutes < self::MIN_RESEND_MINUTES || $resendMinutes > self::MAX_RESEND_MINUTES) {
+			$errors[] = 'resend-minutes-out-of-range';
 		}
 		if (strlen($eMailSubject) > self::MAX_EMAIL_SUBJECT_LENGTH) {
 			$errors[] = 'email-subject-too-long';
@@ -127,7 +127,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		return new JSONResponse([
 			'codeLength' => $this->appSettings->getCodeLength(),
 			'codeValidMinutes' => $this->appSettings->getCodeValidMinutes(),
-			'codeResendMinSeconds' => $this->appSettings->getResendMinSeconds(),
+			'codeResendMinutes' => $this->appSettings->getResendMinMinutes(),
 			'eMailSubject' => $this->appSettings->getEMailSubject(),
 			'eMailTemplate' => $this->appSettings->getEMailTemplate(),
 		]);

@@ -80,7 +80,7 @@ final class LoginChallenge implements ILoginChallenge {
 	 */
 	public function resendChallenge(IUser $user): void {
 		$elapsed = $this->codeStorage->secondsSinceLastCode($user->getUID());
-		$cooldown = $this->settings->getResendMinSeconds();
+		$cooldown = $this->settings->getResendCooldownSeconds();
 		if ($elapsed !== null && $elapsed < $cooldown) {
 			throw new ResendTooSoon($cooldown - $elapsed);
 		}
@@ -96,7 +96,11 @@ final class LoginChallenge implements ILoginChallenge {
 		if ($elapsed === null) {
 			return 0;
 		}
-		return max(0, $this->settings->getResendMinSeconds() - $elapsed);
+		// Cap at the code's remaining validity: once the code expires a resend is
+		// allowed anyway, so the countdown must not outlast the code (relevant
+		// only if an admin sets a cooldown longer than the validity).
+		$cooldown = min($this->settings->getResendCooldownSeconds(), $this->settings->getCodeValidMinutes() * 60);
+		return max(0, $cooldown - $elapsed);
 	}
 
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {

@@ -39,7 +39,7 @@ class AdminSettingsControllerTest extends TestCase {
 	public function testSavePersistsAllSettings(): void {
 		$this->appSettings->expects($this->once())->method('setCodeLength')->with(6);
 		$this->appSettings->expects($this->once())->method('setCodeValidMinutes')->with(10);
-		$this->appSettings->expects($this->once())->method('setResendMinSeconds')->with(30);
+		$this->appSettings->expects($this->once())->method('setResendMinMinutes')->with(30);
 		$this->appSettings->expects($this->once())->method('setEMailSubject')->with('Subject');
 		$this->appSettings->expects($this->once())->method('setEMailTemplate')->with('Use {code}');
 
@@ -91,7 +91,7 @@ class AdminSettingsControllerTest extends TestCase {
 		$response = $this->controller->save(6, 10, '', '', 99999);
 
 		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
-		$this->assertEquals(['error' => 'resend-min-seconds-out-of-range'], $response->getData());
+		$this->assertEquals(['error' => 'resend-minutes-out-of-range'], $response->getData());
 	}
 
 	public function testResetDelegatesToAppSettings(): void {

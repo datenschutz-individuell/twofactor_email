@@ -26,11 +26,11 @@
 								  :loading="loading"
 								  :result="successRefs.codeValidMinutes"
 								  type="number" />
-					<LabeledField id="twofactor_email-codeResendMinSeconds"
-								  v-model="inputValues.codeResendMinSeconds"
-								  :label="t('twofactor_email', 'Resend cooldown (seconds)')"
+					<LabeledField id="twofactor_email-codeResendMinutes"
+								  v-model="inputValues.codeResendMinutes"
+								  :label="t('twofactor_email', 'Resend cooldown (minutes)')"
 								  :loading="loading"
-								  :result="successRefs.codeResendMinSeconds"
+								  :result="successRefs.codeResendMinutes"
 								  type="number" />
 				</div>
 			</fieldset>
@@ -86,7 +86,7 @@ import Logger from '../Logger.js'
 
 const resetting = ref(false)
 
-const fieldKeys = ['codeLength', 'codeValidMinutes', 'codeResendMinSeconds', 'eMailSubject', 'eMailTemplate']
+const fieldKeys = ['codeLength', 'codeValidMinutes', 'codeResendMinutes', 'eMailSubject', 'eMailTemplate']
 
 const store = useAdminSettingsStore()
 store.loadInitialState(...fieldKeys)

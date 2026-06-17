@@ -7,13 +7,14 @@ import './LoginChallenge.css'
 
 import Axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-import { t } from '@nextcloud/l10n'
+import { t, n } from '@nextcloud/l10n'
 import Logger from './Logger.js'
 
 // Resend control on the 2FA challenge page (server-rendered template, so plain
 // DOM, not Vue). It shows a clickable "Send a new code" link only while a resend
-// is actually possible; during the cooldown it shows a live countdown instead,
-// so the user never clicks and fails.
+// is actually possible; during the cooldown it shows a countdown instead, so the
+// user never clicks and fails. The remaining time is tracked in seconds (for an
+// accurate "link is back" moment) but displayed coarsely in minutes.
 document.addEventListener('DOMContentLoaded', () => {
 	const line = document.querySelector('.twofactor_email-resend-line')
 	const link = document.querySelector('.twofactor_email-resend')
@@ -32,6 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
+	// Coarse, minute-level wording — seconds are not shown to the user.
+	const remainingText = (seconds) => {
+		if (seconds >= 60) {
+			const minutes = Math.ceil(seconds / 60)
+			return n('twofactor_email', 'You can request a new code in %n minute', 'You can request a new code in %n minutes', minutes)
+		}
+		return t('twofactor_email', 'You can request a new code in less than a minute')
+	}
+
 	// Offer the clickable resend link and clear any status text.
 	const offerResend = () => {
 		clearTimer()
@@ -39,9 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		link.hidden = false
 	}
 
-	// Hide the link and count down until a resend is allowed again. An optional
-	// first-tick message lets us confirm a just-sent code before the plain
-	// countdown takes over.
+	// Hide the link and count down (second-accurate) until a resend is allowed
+	// again. An optional first message confirms a just-sent code.
 	const startCountdown = (seconds, firstMessage) => {
 		clearTimer()
 		link.hidden = true
@@ -52,8 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				offerResend()
 				return
 			}
-			status.textContent = message
-				|| t('twofactor_email', 'You can request a new code in {seconds} s', { seconds: remaining })
+			status.textContent = message || remainingText(remaining)
 			message = null
 			remaining -= 1
 		}
@@ -72,11 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
 				input.value = ''
 				input.focus()
 			}
-			startCountdown(cooldown, t('twofactor_email', 'A new code was sent. You can request another in {seconds} s', { seconds: cooldown }))
+			startCountdown(cooldown, t('twofactor_email', 'A new code was sent. Only the new code is valid now.'))
 		} catch (error) {
 			const data = error.response && error.response.data
 			if (error.response && error.response.status === 429) {
-				// Cooldown not elapsed; retryAfter comes from our controller.
+				// Cooldown not elapsed; retryAfter (seconds) comes from our controller.
 				startCountdown((data && data.retryAfter) || cooldown)
 			} else if (data && data.error === 'no-email') {
 				status.textContent = t('twofactor_email', 'No email address is configured for your account.')

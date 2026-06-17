@@ -95,7 +95,7 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 		$template->assign('error', $error);
 		// Resend cooldown state, so the dialog can show a live countdown and only
 		// offer the resend link once a new code may actually be requested.
-		$template->assign('resendCooldown', $this->settings->getResendMinSeconds());
+		$template->assign('resendCooldown', $this->settings->getResendCooldownSeconds());
 		$template->assign('resendAvailableIn', $this->challengeService->secondsUntilResendAllowed($user));
 
 		// Return the template for the challenge view (LoginChallenge.php file in the templates folder of the app)

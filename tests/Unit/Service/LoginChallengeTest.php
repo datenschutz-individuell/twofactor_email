@@ -41,7 +41,6 @@ class LoginChallengeTest extends TestCase {
 		$this->emailSender = $this->createMock(IEMailSender::class);
 		$this->hasher = $this->createMock(IHasher::class);
 		$this->settings = $this->createMock(IAppSettings::class);
-		$this->settings->method('getResendMinSeconds')->willReturn(60);
 
 		$this->challenge = new LoginChallenge(
 			$this->codeGenerator,
@@ -63,6 +62,7 @@ class LoginChallengeTest extends TestCase {
 	}
 
 	public function testResendIsRejectedWithinCooldown(): void {
+		$this->settings->method('getResendCooldownSeconds')->willReturn(60);
 		$this->codeStorage->method('secondsSinceLastCode')->willReturn(10);
 		$this->codeStorage->expects($this->never())->method('deleteCode');
 		$this->emailSender->expects($this->never())->method('sendChallengeEMail');
@@ -108,6 +108,8 @@ class LoginChallengeTest extends TestCase {
 	}
 
 	public function testSecondsUntilResendAllowedReturnsRemainingCooldown(): void {
+		$this->settings->method('getResendCooldownSeconds')->willReturn(60);
+		$this->settings->method('getCodeValidMinutes')->willReturn(10); // 600s, well above the cooldown
 		$this->codeStorage->method('secondsSinceLastCode')->willReturn(10);
 
 		// cooldown 60 - 10 elapsed = 50
@@ -115,8 +117,21 @@ class LoginChallengeTest extends TestCase {
 	}
 
 	public function testSecondsUntilResendAllowedIsZeroAfterCooldown(): void {
+		$this->settings->method('getResendCooldownSeconds')->willReturn(60);
+		$this->settings->method('getCodeValidMinutes')->willReturn(10);
 		$this->codeStorage->method('secondsSinceLastCode')->willReturn(100);
 
 		$this->assertSame(0, $this->challenge->secondsUntilResendAllowed($this->mockUser()));
+	}
+
+	public function testSecondsUntilResendAllowedIsCappedByCodeValidity(): void {
+		// Cooldown 30 min, but the code is only valid 10 min: the countdown must
+		// not outlast the code, so it caps at the remaining validity.
+		$this->settings->method('getResendCooldownSeconds')->willReturn(1800);
+		$this->settings->method('getCodeValidMinutes')->willReturn(10); // 600s
+		$this->codeStorage->method('secondsSinceLastCode')->willReturn(60);
+
+		// min(1800, 600) - 60 = 540
+		$this->assertSame(540, $this->challenge->secondsUntilResendAllowed($this->mockUser()));
 	}
 }

@@ -23,12 +23,21 @@ interface IAppSettings {
 	public function getCodeValidMinutes(): int;
 
 	/**
-	 * Minimum number of seconds that must pass before the user may request a
+	 * Minimum number of minutes that must pass before the user may request a
 	 * new code while the current one is still valid (resend cooldown).
+	 *
+	 * @return int minutes
+	 */
+	public function getResendMinMinutes(): int;
+
+	/**
+	 * The resend cooldown in seconds (derived from the minutes setting) — the
+	 * single place that converts the admin unit to what the cooldown logic and
+	 * the challenge page work in.
 	 *
 	 * @return int seconds
 	 */
-	public function getResendMinSeconds(): int;
+	public function getResendCooldownSeconds(): int;
 
 	/**
 	 * Subject of the 2FA challenge email, as stored by the admin.
@@ -64,7 +73,7 @@ interface IAppSettings {
 
 	public function setCodeValidMinutes(int $codeValidMinutes): void;
 
-	public function setResendMinSeconds(int $resendMinSeconds): void;
+	public function setResendMinMinutes(int $resendMinutes): void;
 
 	public function setEMailSubject(string $subject): void;
 
