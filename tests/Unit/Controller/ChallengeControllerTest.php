@@ -48,11 +48,17 @@ class ChallengeControllerTest extends TestCase {
 		);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function withEnabledUser(): void {
 		$this->userSession->method('getUser')->willReturn($this->createMock(IUser::class));
 		$this->stateManager->method('isEnabled')->willReturn(true);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testResendSendsCode(): void {
 		$this->withEnabledUser();
 		$this->challenge->expects($this->once())->method('resendChallenge');
@@ -63,6 +69,9 @@ class ChallengeControllerTest extends TestCase {
 		$this->assertEquals(['status' => 'sent'], $response->getData());
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testResendReportsCooldown(): void {
 		$this->withEnabledUser();
 		$this->challenge->method('resendChallenge')->willThrowException(new ResendTooSoon(42));
@@ -73,6 +82,9 @@ class ChallengeControllerTest extends TestCase {
 		$this->assertEquals(['error' => 'too-soon', 'retryAfter' => 42], $response->getData());
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testResendRejectedWhenEmailProviderDisabled(): void {
 		$this->userSession->method('getUser')->willReturn($this->createMock(IUser::class));
 		$this->stateManager->method('isEnabled')->willReturn(false);
@@ -92,6 +104,9 @@ class ChallengeControllerTest extends TestCase {
 		$this->assertEquals(Http::STATUS_UNAUTHORIZED, $response->getStatus());
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testResendReportsMissingEmail(): void {
 		$this->withEnabledUser();
 		$this->challenge->method('resendChallenge')
@@ -103,6 +118,9 @@ class ChallengeControllerTest extends TestCase {
 		$this->assertEquals(['error' => 'no-email'], $response->getData());
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testResendReportsSendFailure(): void {
 		$this->withEnabledUser();
 		$this->challenge->method('resendChallenge')->willThrowException(new SendEMailFailed());

@@ -108,7 +108,7 @@ final class LoginChallenge implements ILoginChallenge {
 	 *
 	 * @throws EMailNotSet
 	 * @throws SendEMailFailed
- */
+	 */
 	private function issueCode(IUser $user): void {
 		$generatedCode = $this->codeGenerator->generateChallengeCode();
 		try {

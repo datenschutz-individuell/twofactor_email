@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 
 class CodeStorageTest extends TestCase {
 	private IUserConfig&MockObject $config;
-	private IAppSettings&MockObject $settings;
 
 	private CodeStorage $storage;
 
@@ -27,10 +26,10 @@ class CodeStorageTest extends TestCase {
 		parent::setUp();
 
 		$this->config = $this->createMock(IUserConfig::class);
-		$this->settings = $this->createMock(IAppSettings::class);
-		$this->settings->method('getCodeValidMinutes')->willReturn(10);
+		$settings = $this->createMock(IAppSettings::class);
+		$settings->method('getCodeValidMinutes')->willReturn(10);
 
-		$this->storage = new CodeStorage($this->settings, $this->config);
+		$this->storage = new CodeStorage($settings, $this->config);
 	}
 
 	public function testSecondsSinceLastCodeIsNullWithoutValidCode(): void {

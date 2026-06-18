@@ -8,6 +8,7 @@
 namespace OCA\TwoFactorEMail\Test\Unit\Service;
 
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
+use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCA\TwoFactorEMail\Mail\TemplateRenderer;
 use OCA\TwoFactorEMail\Service\EMailSender;
 use OCA\TwoFactorEMail\Service\IAppSettings;
@@ -67,6 +68,9 @@ class EMailSenderTest extends TestCase {
 		return $user;
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	private function expectMailWithTemplate(): void {
 		$message = $this->createMock(IMessage::class);
 		$this->mailer->method('createEMailTemplate')->willReturn($this->template);
@@ -74,6 +78,10 @@ class EMailSenderTest extends TestCase {
 		$this->mailer->expects($this->once())->method('send');
 	}
 
+	/**
+	 * @throws SendEMailFailed
+	 * @throws Exception
+	 */
 	public function testThrowsWhenNoEmailIsSet(): void {
 		$this->expectException(EMailNotSet::class);
 
@@ -92,6 +100,11 @@ class EMailSenderTest extends TestCase {
 			});
 	}
 
+	/**
+	 * @throws SendEMailFailed
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
 	public function testFallsBackToDefaultsWhenSettingsAreEmpty(): void {
 		// Empty stored values → the localized defaults from IAppSettings are used
 		$this->appSettings->method('getEMailSubject')->willReturn('');
@@ -119,7 +132,7 @@ class EMailSenderTest extends TestCase {
 		$this->assertSame([
 			['&nbsp;', false],
 			[
-				'<img src="https://cloud.example/themes/logo.png" alt="Example Cloud" style="max-width:250px;max-width:min(250px, 20%);max-height:250px">',
+				'<img src="https://cloud.example/themes/logo.png" alt="Example Cloud" style="max-width:min(250px, 20%);max-height:250px">',
 				false,
 			],
 			[
@@ -129,6 +142,11 @@ class EMailSenderTest extends TestCase {
 		], $bodyTexts);
 	}
 
+	/**
+	 * @throws SendEMailFailed
+	 * @throws Exception
+	 * @throws EMailNotSet
+	 */
 	public function testUsesCustomTemplatesAndReplacesAllPlaceholders(): void {
 		$this->appSettings->method('getEMailSubject')->willReturn('Code {code} for {user}');
 		$this->appSettings->method('getEMailTemplate')->willReturn('Use {code} on {cloud} within {validity} minutes.');

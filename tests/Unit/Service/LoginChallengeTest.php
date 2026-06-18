@@ -9,6 +9,7 @@ namespace OCA\TwoFactorEMail\Test\Unit\Service;
 
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\ResendTooSoon;
+use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Service\ICodeGenerator;
 use OCA\TwoFactorEMail\Service\ICodeStorage;
@@ -61,6 +62,11 @@ class LoginChallengeTest extends TestCase {
 		return $user;
 	}
 
+	/**
+	 * @throws SendEMailFailed
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
 	public function testResendIsRejectedWithinCooldown(): void {
 		$this->settings->method('getResendCooldownSeconds')->willReturn(60);
 		$this->codeStorage->method('secondsSinceLastCode')->willReturn(10);
@@ -75,47 +81,67 @@ class LoginChallengeTest extends TestCase {
 		}
 	}
 
-	public function testResendDiscardsOldCodeAndSendsFreshOne(): void {
+	/**
+	 * @throws ResendTooSoon
+	 * @throws SendEMailFailed
+	 * @throws Exception
+	 * @throws EMailNotSet
+	 */
+	public function testResendSendsAndStoresFreshCode(): void {
 		$this->codeStorage->method('secondsSinceLastCode')->willReturn(null);
-		// sendChallenge() finds no stored code after the delete and proceeds
-		$this->codeStorage->method('readCode')->willReturn(null);
 		$this->codeGenerator->method('generateChallengeCode')->willReturn('654321');
 		$this->hasher->method('hash')->willReturn('hashed');
 
-		$this->codeStorage->expects($this->once())->method('deleteCode')->with('alice');
+		$this->codeStorage->expects($this->never())->method('deleteCode');
 		$this->emailSender->expects($this->once())->method('sendChallengeEMail')->with($this->anything(), '654321');
 		$this->codeStorage->expects($this->once())->method('writeCode')->with('alice', 'hashed');
 
 		$this->challenge->resendChallenge($this->mockUser());
 	}
 
+	/**
+	 * @throws ResendTooSoon
+	 * @throws SendEMailFailed
+	 * @throws Exception
+	 */
 	public function testResendPropagatesEMailNotSet(): void {
 		$this->codeStorage->method('secondsSinceLastCode')->willReturn(null);
-		$this->codeStorage->method('readCode')->willReturn(null);
 		$this->codeGenerator->method('generateChallengeCode')->willReturn('654321');
 		$user = $this->mockUser();
 		$this->emailSender->method('sendChallengeEMail')->willThrowException(new EMailNotSet($user));
+
+		// A failed sending must not touch the stored code, so the previous one stays valid.
+		$this->codeStorage->expects($this->never())->method('writeCode');
+		$this->codeStorage->expects($this->never())->method('deleteCode');
 
 		$this->expectException(EMailNotSet::class);
 
 		$this->challenge->resendChallenge($user);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testSecondsUntilResendAllowedIsZeroWithoutValidCode(): void {
 		$this->codeStorage->method('secondsSinceLastCode')->willReturn(null);
 
 		$this->assertSame(0, $this->challenge->secondsUntilResendAllowed($this->mockUser()));
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testSecondsUntilResendAllowedReturnsRemainingCooldown(): void {
 		$this->settings->method('getResendCooldownSeconds')->willReturn(60);
 		$this->settings->method('getCodeValidMinutes')->willReturn(10); // 600s, well above the cooldown
 		$this->codeStorage->method('secondsSinceLastCode')->willReturn(10);
 
-		// cooldown 60 - 10 elapsed = 50
 		$this->assertSame(50, $this->challenge->secondsUntilResendAllowed($this->mockUser()));
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testSecondsUntilResendAllowedIsZeroAfterCooldown(): void {
 		$this->settings->method('getResendCooldownSeconds')->willReturn(60);
 		$this->settings->method('getCodeValidMinutes')->willReturn(10);
@@ -124,6 +150,9 @@ class LoginChallengeTest extends TestCase {
 		$this->assertSame(0, $this->challenge->secondsUntilResendAllowed($this->mockUser()));
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	public function testSecondsUntilResendAllowedIsCappedByCodeValidity(): void {
 		// Cooldown 30 min, but the code is only valid 10 min: the countdown must
 		// not outlast the code, so it caps at the remaining validity.
