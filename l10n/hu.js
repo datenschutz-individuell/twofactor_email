@@ -2,8 +2,10 @@ OC.L10N.register(
     "twofactor_email",
     {
     "Email" : "E-mail",
-    "Proceed" : "Folytatás",
     "Authentication code" : "Hitelesítőkód",
+    "Subject" : "Tárgy",
+    "Body" : "Törzs",
+    "Proceed" : "Folytatás",
     "Submit" : "Beküldés"
 },
 "nplurals=2; plural=(n != 1);");

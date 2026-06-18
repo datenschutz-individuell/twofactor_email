@@ -1,7 +1,9 @@
 { "translations": {
     "Email" : "ອີເມວ",
-    "Proceed" : "Proceed",
     "Authentication code" : "Authentication code",
+    "Subject" : "ຫົວຂໍ້",
+    "Body" : "ເນື້ອໃນ",
+    "Proceed" : "Proceed",
     "Submit" : "ຕົກລົງ"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

@@ -2,8 +2,8 @@ OC.L10N.register(
     "twofactor_email",
     {
     "Email" : "Имейл",
-    "Proceed" : "Продължете",
     "Authentication code" : "Удостоверителен код",
+    "Proceed" : "Продължете",
     "Submit" : "Изпращане"
 },
 "nplurals=2; plural=(n != 1);");

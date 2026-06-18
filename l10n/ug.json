@@ -1,7 +1,9 @@
 { "translations": {
     "Email" : "تورخەت",
-    "Proceed" : "داۋاملاشتۇرۇڭ",
     "Authentication code" : "دەلىللەش كودى",
+    "Subject" : "تېما",
+    "Body" : "بەدەن",
+    "Proceed" : "داۋاملاشتۇرۇڭ",
     "Submit" : "يوللاڭ"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -2,14 +2,12 @@
     "Email" : "E-post",
     "Authenticate by email" : "Autentisera via e-post",
     "Login attempt for %s" : "Inloggningsförsök för %s",
-    "Your two-factor authentication code is: %s" : "Din kod för tvåfaktorsautentisering är: %s",
     "Two-Factor email provider" : "Leverantör av tvåfaktorsautentisering via e-post",
     "Email two-factor provider" : "Leverantör av tvåfaktorsautentisering via e-post",
-    "Code Length (Characters)" : "Kodlängd (tecken)",
-    "Code Validity (Minutes)" : "Kodens giltighet (minuter)",
     "These system wide settings are saved automatically shortly after the last keypress." : "Dessa systemomfattande inställningar sparas automatiskt kort efter den sista tangenttryckningen.",
-    "The email template text to be sent to the user. It MUST contain the placeholders `{code} and `{cloud}`." : "E-postmalls-texten som ska skickas till användaren. Den MÅSTE innehålla platshållarna `{code} och `{cloud}`.",
-    "Email Template (plain text)" : "E-postmall (oformaterad text)",
+    "Authentication code" : "Autentiseringskod",
+    "Subject" : "Ämne",
+    "Body" : "Textyta",
     "Reset all Two-Factor email app-wide admin settings to their defaults" : "Återställ alla appomfattande administratörsinställningar för tvåfaktors-e-post till standardvärden",
     "You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first." : "Du kan inte aktivera tvåfaktorsautentisering via e-post. Du måste först ange en primär e-postadress (under dina personliga inställningar).",
     "Could not enable/disable two-factor authentication via email." : "Det gick inte att aktivera/inaktivera tvåfaktorsautentisering via e-post.",
@@ -21,7 +19,6 @@
     "Apparently your previously configured email address just vanished." : "Det verkar som om din tidigare angivna e-postadress plötsligt har försvunnit.",
     "A new authentication code was just sent. Please enter it:" : "En ny verifieringskod har just skickats. Ange den här:",
     "Enter the authentication code that was sent to you:" : "Ange den verifieringskod som du har fått:",
-    "Authentication code" : "Autentiseringskod",
     "Submit" : "Skicka"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -1,6 +1,8 @@
 { "translations": {
     "Email" : "Email",
     "Authentication code" : "Authentication code",
+    "Subject" : "Subject",
+    "Body" : "Body",
     "Submit" : "გაგზავნა"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"
 }

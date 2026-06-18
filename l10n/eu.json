@@ -1,7 +1,9 @@
 { "translations": {
     "Email" : "Posta elektronikoa",
-    "Proceed" : "Jarraitu",
     "Authentication code" : "Autentifikazio kodea",
+    "Subject" : "Gaia",
+    "Body" : "Gorputza",
+    "Proceed" : "Jarraitu",
     "Submit" : "Bidali"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

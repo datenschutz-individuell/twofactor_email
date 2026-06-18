@@ -4,9 +4,10 @@ OC.L10N.register(
     "Email" : "Email",
     "Authenticate by email" : "Authenticate by email",
     "Login attempt for %s" : "Login attempt for %s",
-    "Your two-factor authentication code is: %s" : "Your two-factor authentication code is: %s",
     "Two-Factor email provider" : "Two-Factor email provider",
     "Email two-factor provider" : "Email two-factor provider",
+    "Authentication code" : "Authentication code",
+    "Body" : "Body",
     "You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first." : "You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first.",
     "Could not enable/disable two-factor authentication via email." : "Could not enable/disable two-factor authentication via email.",
     "Unhandled error!" : "Unhandled error!",
@@ -16,7 +17,6 @@ OC.L10N.register(
     "Apparently your previously configured email address just vanished." : "Apparently your previously configured email address just vanished.",
     "A new authentication code was just sent. Please enter it:" : "A new authentication code was just sent. Please enter it:",
     "Enter the authentication code that was sent to you:" : "Enter the authentication code that was sent to you:",
-    "Authentication code" : "Authentication code",
     "Submit" : "Submit"
 },
 "nplurals=2; plural=(n != 1);");

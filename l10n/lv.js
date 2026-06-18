@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Email" : "E-pasts",
     "Authentication code" : "Autentificēšanās kods",
+    "Subject" : "Temats",
     "Submit" : "Iesniegt"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

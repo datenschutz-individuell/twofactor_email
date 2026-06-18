@@ -1,6 +1,8 @@
 { "translations": {
     "Email" : "Posta eletrònica",
     "Authentication code" : "Còdighe de autenticatzione",
+    "Subject" : "Ogetu",
+    "Body" : "Corpus",
     "Submit" : "Imbia"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

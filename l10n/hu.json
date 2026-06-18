@@ -1,7 +1,9 @@
 { "translations": {
     "Email" : "E-mail",
-    "Proceed" : "Folytatás",
     "Authentication code" : "Hitelesítőkód",
+    "Subject" : "Tárgy",
+    "Body" : "Törzs",
+    "Proceed" : "Folytatás",
     "Submit" : "Beküldés"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

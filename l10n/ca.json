@@ -1,7 +1,7 @@
 { "translations": {
     "Email" : "Adreça de correu",
-    "Proceed" : "Continua",
     "Authentication code" : "Codi d'autenticació",
+    "Proceed" : "Continua",
     "Submit" : "Envia"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

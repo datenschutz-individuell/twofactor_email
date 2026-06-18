@@ -1,7 +1,9 @@
 { "translations": {
     "Email" : "Correo-e",
-    "Proceed" : "Continuar",
     "Authentication code" : "Código de autenticación",
+    "Subject" : "Asunto",
+    "Body" : "Corpo",
+    "Proceed" : "Continuar",
     "Submit" : "Enviar"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

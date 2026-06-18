@@ -1,6 +1,7 @@
 { "translations": {
     "Email" : "Adreiça electronica",
     "Authentication code" : "Còdi d’autentificacion",
+    "Body" : "Còs",
     "Submit" : "Transmetre"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

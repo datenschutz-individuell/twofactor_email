@@ -1,7 +1,9 @@
 { "translations": {
     "Email" : "Barua pepe",
-    "Proceed" : "Endelea",
     "Authentication code" : "Msimbo wa uthibitishaji",
+    "Subject" : "Somo",
+    "Body" : "Mwili",
+    "Proceed" : "Endelea",
     "Submit" : "Wasilisha"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

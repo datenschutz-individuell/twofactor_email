@@ -1,7 +1,9 @@
 { "translations": {
     "Email" : "Email",
-    "Proceed" : "Lanjutkan",
     "Authentication code" : "Kode autentikasi",
+    "Subject" : "Subjek",
+    "Body" : "Isi",
+    "Proceed" : "Lanjutkan",
     "Submit" : "Kirim"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

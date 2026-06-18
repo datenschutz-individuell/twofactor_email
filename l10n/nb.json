@@ -1,7 +1,9 @@
 { "translations": {
     "Email" : "E-post",
-    "Proceed" : "Fortsett",
     "Authentication code" : "Autentiseringskode",
+    "Subject" : "Emne",
+    "Body" : "Kropp",
+    "Proceed" : "Fortsett",
     "Submit" : "Send inn"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
