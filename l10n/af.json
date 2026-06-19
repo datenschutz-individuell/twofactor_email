@@ -1,5 +1,6 @@
 { "translations": {
     "Authentication code" : "Verifikasiekode",
+    "Subject" : "Onderwerp",
     "Submit" : "Dien in"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Email" : "E-mail",
     "Authentication code" : "Ověřovací kód",
+    "Subject" : "Předmět",
+    "Body" : "Těle textu",
     "Proceed" : "Pokračovat",
     "Submit" : "Odeslat"
 },

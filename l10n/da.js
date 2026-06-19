@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Email" : "E-mail",
     "Authentication code" : "Godkendelses kode",
+    "Subject" : "Emne",
+    "Body" : "Hovedtekst",
     "Proceed" : "Fortsæt",
     "Submit" : "Send"
 },

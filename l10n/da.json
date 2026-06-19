@@ -1,6 +1,8 @@
 { "translations": {
     "Email" : "E-mail",
     "Authentication code" : "Godkendelses kode",
+    "Subject" : "Emne",
+    "Body" : "Hovedtekst",
     "Proceed" : "Fortsæt",
     "Submit" : "Send"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

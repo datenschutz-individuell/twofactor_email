@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Email" : "البريد الإلكتروني",
     "Authentication code" : "رمز المصادقة",
+    "Subject" : "الموضوع",
+    "Body" : "المتن",
     "Proceed" : "مواصلة",
     "Submit" : "إرسال "
 },

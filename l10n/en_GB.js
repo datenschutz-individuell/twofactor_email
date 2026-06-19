@@ -7,6 +7,7 @@ OC.L10N.register(
     "Two-Factor email provider" : "Two-Factor email provider",
     "Email two-factor provider" : "Email two-factor provider",
     "Authentication code" : "Authentication code",
+    "Subject" : "Subject",
     "Body" : "Body",
     "You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first." : "You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first.",
     "Could not enable/disable two-factor authentication via email." : "Could not enable/disable two-factor authentication via email.",

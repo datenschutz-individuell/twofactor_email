@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Email" : "Имейл",
     "Authentication code" : "Удостоверителен код",
+    "Subject" : "Тема",
+    "Body" : "Съдържание",
     "Proceed" : "Продължете",
     "Submit" : "Изпращане"
 },

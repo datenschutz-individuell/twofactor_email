@@ -1,6 +1,8 @@
 { "translations": {
     "Email" : "Direición de corréu electrónicu",
     "Authentication code" : "Códigu d'autenticación",
+    "Subject" : "Asuntu",
+    "Body" : "Cuerpu",
     "Submit" : "Unviar"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

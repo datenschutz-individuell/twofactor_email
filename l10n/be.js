@@ -2,6 +2,7 @@ OC.L10N.register(
     "twofactor_email",
     {
     "Email" : "Электронная пошта",
+    "Subject" : "Тэма",
     "Proceed" : "Працягнуць",
     "Submit" : "Адправіць"
 },

@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Email" : "Adreça de correu",
     "Authentication code" : "Codi d'autenticació",
+    "Subject" : "Assumpte",
+    "Body" : "Cos",
     "Proceed" : "Continua",
     "Submit" : "Envia"
 },

@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Email" : "Correo electrónico",
     "Authentication code" : "Código de autentificación",
+    "Subject" : "Asunto",
     "Body" : "Cuerpo",
     "Proceed" : "Proceder",
     "Submit" : "Enviar"

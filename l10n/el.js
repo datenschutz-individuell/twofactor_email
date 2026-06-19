@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Email" : "Ηλεκτρονική αλληλογραφία",
     "Authentication code" : "Κωδικός πιστοποίησης",
+    "Subject" : "Θέμα",
+    "Body" : "Σώμα",
     "Proceed" : "Συνέχεια",
     "Submit" : "Υποβολή"
 },

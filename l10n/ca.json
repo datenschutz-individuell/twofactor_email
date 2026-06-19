@@ -1,6 +1,8 @@
 { "translations": {
     "Email" : "Adreça de correu",
     "Authentication code" : "Codi d'autenticació",
+    "Subject" : "Assumpte",
+    "Body" : "Cos",
     "Proceed" : "Continua",
     "Submit" : "Envia"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Email" : "Direición de corréu electrónicu",
     "Authentication code" : "Códigu d'autenticación",
+    "Subject" : "Asuntu",
+    "Body" : "Cuerpu",
     "Submit" : "Unviar"
 },
 "nplurals=2; plural=(n != 1);");
