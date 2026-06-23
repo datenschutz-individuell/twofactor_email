@@ -18,7 +18,7 @@ OC.L10N.register(
     "Links: URLs are detected and rendered as linked URL text." : "Links: os URLs são detectados e exibidos como texto com link.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Essas configurações gerais do sistema são salvas automaticamente logo após a última tecla ser pressionada.",
     "Authentication code" : "Código de autenticação",
-    "Length and validity of the one-time codes sent via email." : "Duração e validade dos códigos únicos enviados por e-mail.",
+    "Length and validity of the one-time codes sent via email." : "Comprimento e validade dos códigos únicos enviados por e-mail.",
     "Length (characters)" : "Comprimento (caracteres)",
     "Validity (minutes)" : "Validade (minutos)",
     "Email template" : "Modelo de e-mail",
