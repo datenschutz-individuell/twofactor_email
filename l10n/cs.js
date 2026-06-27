@@ -5,6 +5,7 @@ OC.L10N.register(
     "Authentication code" : "Ověřovací kód",
     "Subject" : "Předmět",
     "Body" : "Těle textu",
+    "Unhandled error!" : "Neošetřená chyba!",
     "Proceed" : "Pokračovat",
     "Submit" : "Odeslat"
 },
