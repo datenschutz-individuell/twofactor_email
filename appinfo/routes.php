@@ -16,6 +16,12 @@ return [
 			'verb' => 'POST',
 		],
 		[
+			// ChallengeController#resend: user-requested resend of the login code
+			'name' => 'Challenge#resend',
+			'url' => '/challenge/resend',
+			'verb' => 'POST',
+		],
+		[
 			// Nextcloud expects a class AdminSettingsController in 'AdminSettingsController.php' with a 'save' method.
 			'name' => 'AdminSettings#save',
 			'url' => '/admin/save',

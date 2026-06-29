@@ -7,9 +7,9 @@
 /.idea
 /.l10nignore
 /.nextcloudignore
+/.php-cs-fixer.cache
 /.php-cs-fixer.dist.php
 /.tx
-/babel.config.js
 /build
 /.claude
 /composer.*
@@ -25,4 +25,3 @@
 /vendor/bin
 /vendor-bin
 /vite.config.js
-/webpack.config.js

@@ -9,7 +9,6 @@ vendor/
 js/
 css/
 
-/.php_cs.cache
 /.php-cs-fixer.cache
 
 # Ignore NetBeans project
