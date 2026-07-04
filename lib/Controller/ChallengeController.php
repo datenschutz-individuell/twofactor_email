@@ -45,8 +45,8 @@ final class ChallengeController extends ALoginSetupController {
 
 	/*
 	 * The service cooldown is the configurable source of truth. The rate limit
-	 * is an atomic backstop against concurrent bursts: period 60 equals the
-	 * smallest possible cooldown (MIN_RESEND_MINUTES), so it never rejects a
+	 * is an atomic backstop against concurrent bursts: period 60s matches the
+	 * minimum allowed resend cooldown (currently 1 minute), so it never rejects a
 	 * legitimately allowed resend.
 	 */
 	#[NoAdminRequired]
