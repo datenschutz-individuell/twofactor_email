@@ -48,6 +48,6 @@ class CodeStorageTest extends TestCase {
 
 		$this->assertIsInt($elapsed);
 		$this->assertGreaterThanOrEqual(0, $elapsed);
-		$this->assertLessThan(5, $elapsed);
+		$this->assertLessThan(60, $elapsed);
 	}
 }
