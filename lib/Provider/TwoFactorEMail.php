@@ -65,10 +65,10 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	}
 
 	/**
-	 * Get the template for rending the 2FA provider view.
-	 * This function is called from nextcloud when the user activated the email 2FA.
-	 * It sends a new challenge code by email and asks the user to enter it via the Template.
-	 * If a user reloads that web page, a new code is generated and re-sent. Thus throttled.
+	 * Get the template for rendering the 2FA challenge view.
+	 * Nextcloud calls this when a user with enabled email 2FA logs in.
+	 * It sends a challenge code by email, unless a still-valid code exists —
+	 * so reloading the page does not send another email.
 	 */
 	public function getTemplate(IUser $user): ITemplate {
 		try {
@@ -81,7 +81,6 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 		$error = null;
 
 		try {
-			// Trigger the challenge dispatching process
 			$newCodeWasSent = $this->challengeService->sendChallenge($user);
 		} catch (EMailNotSet) {
 			$error = 'no-email';
@@ -89,14 +88,12 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 			$error = 'send-failed';
 		}
 
-		// To use these settings in the LoginChallenge.php template, we must provide them here.
 		$template->assign('codeLength', $this->settings->getCodeLength());
 		$template->assign('newCodeWasSent', $newCodeWasSent);
 		$template->assign('error', $error);
 		$template->assign('resendCooldown', $this->settings->getResendCooldownSeconds());
 		$template->assign('resendAvailableIn', $this->challengeService->secondsUntilResendAllowed($user));
 
-		// Return the template for the challenge view (LoginChallenge.php file in the templates folder of the app)
 		return $template;
 	}
 

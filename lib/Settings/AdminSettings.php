@@ -49,12 +49,13 @@ final class AdminSettings implements IDelegatedSettings {
 		return $this->l10n->t('Email');
 	}
 
-	// both required by Nextcloud at runtime via IDelegatedSettings
+	// Both required by Nextcloud at runtime via IDelegatedSettings
 	/** @noinspection PhpUnused */
 	public function getAuthorizedGroupIds(): array {
 		return []; // real admins only
 	}
+
 	public function getAuthorizedAppConfig(): array {
-		return [];  // no app config keys delegated to non-admins
+		return []; // no app config keys delegated to non-admins
 	}
 }

@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const minutes = Math.ceil(seconds / 60)
 			return n('twofactor_email', 'You can request a new code in %n minute.', 'You can request a new code in %n minutes.', minutes)
 		}
-		// sanitize: false keeps the literal "<"; sanitize would turn it into "&lt;".
+		// Disabling sanitize keeps the literal "<". Sanitize would turn it into "&lt;".
 		// Safe only because the result is assigned via textContent below, which never
 		// parses HTML. Do not reuse this string with innerHTML.
 		return t('twofactor_email', 'You can request a new code in <1 minute.', {}, { sanitize: false })
@@ -83,9 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 			startCountdown(cooldown, t('twofactor_email', 'A new code was sent. Only the new code is valid now.'))
 		} catch (error) {
+			/** @type {{ error?: string, retryAfter?: number } | undefined} */
 			const data = error.response && error.response.data
 			if (error.response && error.response.status === 429) {
-				// Cooldown not elapsed; retryAfter (seconds) comes from our controller.
+				// The cooldown has not elapsed. retryAfter (seconds) comes from our controller.
 				startCountdown((data && data.retryAfter) || cooldown)
 			} else if (data && data.error === 'no-email') {
 				status.textContent = t('twofactor_email', 'No email address is configured for your account.')

@@ -14,6 +14,11 @@ use OCP\Authentication\TwoFactorAuth\IRegistry;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IUser;
 
+/**
+ * enable() and disable() only dispatch a StateChanged event. The registry is
+ * updated in \OCA\TwoFactorEMail\Listener\StateChangeRegistryUpdater, because
+ * updating it here would create a circular dependency with the provider.
+ */
 final class StateManager implements IStateManager {
 	public function __construct(
 		private readonly IEventDispatcher $eventDispatcher,
@@ -22,12 +27,10 @@ final class StateManager implements IStateManager {
 	}
 
 	public function enable(IUser $user, bool $byAdmin = false): void {
-		// Registry modification happens in \OCA\TwoFactorEMail\Listener\StateChangeRegistryUpdater due to circular dependency
 		$this->eventDispatcher->dispatchTyped(new StateChanged($user, true, $byAdmin));
 	}
 
 	public function disable(IUser $user, bool $byAdmin = false): void {
-		// Registry modification happens in \OCA\TwoFactorEMail\Listener\StateChangeRegistryUpdater due to circular dependency
 		$this->eventDispatcher->dispatchTyped(new StateChanged($user, false, $byAdmin));
 	}
 
