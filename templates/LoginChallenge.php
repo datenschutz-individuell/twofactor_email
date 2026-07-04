@@ -27,6 +27,8 @@ if (!empty($codeLength)) {
 
 $newCodeWasSent = $_['newCodeWasSent']; // provided in Provider/TwoFactorEMail.php
 $error = $_['error'] ?? null; // caught and passed in Provider/TwoFactorEMail.php
+$resendCooldown = (int)($_['resendCooldown'] ?? 0); // full cooldown in seconds
+$resendAvailableIn = (int)($_['resendAvailableIn'] ?? 0); // seconds left before a resend is allowed
 ?>
 <img class="two-factor-icon twofactor_email-challenge-icon"
 	 src="<?php print_unescaped(image_path('twofactor_email', 'app.svg')); ?>" alt="Icon depicting a letter and a user">
@@ -54,4 +56,8 @@ $error = $_['error'] ?? null; // caught and passed in Provider/TwoFactorEMail.ph
 			<?php p($l->t('Submit')); ?>
 		</button>
 	</form>
+	<p class="twofactor_email-resend-line" data-cooldown="<?php p($resendCooldown) ?>" data-available-in="<?php p($resendAvailableIn) ?>">
+		<a href="#" class="twofactor_email-resend" hidden><?php p($l->t('Send a new code')); ?></a>
+		<span class="twofactor_email-resend-status" aria-live="polite"></span>
+	</p>
 <?php endif; ?>

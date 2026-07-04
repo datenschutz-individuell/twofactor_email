@@ -39,17 +39,18 @@ class AdminSettingsControllerTest extends TestCase {
 	public function testSavePersistsAllSettings(): void {
 		$this->appSettings->expects($this->once())->method('setCodeLength')->with(6);
 		$this->appSettings->expects($this->once())->method('setCodeValidMinutes')->with(10);
+		$this->appSettings->expects($this->once())->method('setResendMinMinutes')->with(30);
 		$this->appSettings->expects($this->once())->method('setEMailSubject')->with('Subject');
 		$this->appSettings->expects($this->once())->method('setEMailTemplate')->with('Use {code}');
 
-		$response = $this->controller->save(6, 10, 'Use {code}', 'Subject');
+		$response = $this->controller->save(6, 10, 'Use {code}', 'Subject', 30);
 
 		$this->assertEquals(Http::STATUS_OK, $response->getStatus());
 	}
 
 	public function testSaveAcceptsEmptyTemplateParts(): void {
 		// Empty parts mean "use the localized default" and are always valid
-		$response = $this->controller->save(6, 10, '', '');
+		$response = $this->controller->save(6, 10, '', '', 30);
 
 		$this->assertEquals(Http::STATUS_OK, $response->getStatus());
 	}
@@ -57,7 +58,7 @@ class AdminSettingsControllerTest extends TestCase {
 	public function testSaveRejectsCustomBodyWithoutCode(): void {
 		$this->appSettings->expects($this->never())->method('setEMailTemplate');
 
-		$response = $this->controller->save(6, 10, 'body without placeholder', '');
+		$response = $this->controller->save(6, 10, 'body without placeholder', '', 30);
 
 		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
 		$this->assertEquals(['error' => 'email-code-placeholder-missing'], $response->getData());
@@ -66,24 +67,31 @@ class AdminSettingsControllerTest extends TestCase {
 	public function testSaveRejectsMultiLineSubject(): void {
 		$this->appSettings->expects($this->never())->method('setEMailSubject');
 
-		$response = $this->controller->save(6, 10, '', "evil\r\nBcc: spy@example.com");
+		$response = $this->controller->save(6, 10, '', "evil\r\nBcc: spy@example.com", 30);
 
 		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
 		$this->assertEquals(['error' => 'email-subject-must-be-single-line'], $response->getData());
 	}
 
 	public function testSaveRejectsOutOfRangeCodeLength(): void {
-		$response = $this->controller->save(3, 10, '', '');
+		$response = $this->controller->save(3, 10, '', '', 30);
 
 		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
 		$this->assertEquals(['error' => 'code-length-out-of-range'], $response->getData());
 	}
 
 	public function testSaveRejectsOverlongSubject(): void {
-		$response = $this->controller->save(6, 10, '', str_repeat('x', 256));
+		$response = $this->controller->save(6, 10, '', str_repeat('x', 256), 30);
 
 		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
 		$this->assertEquals(['error' => 'email-subject-too-long'], $response->getData());
+	}
+
+	public function testSaveRejectsOutOfRangeResendCooldown(): void {
+		$response = $this->controller->save(6, 10, '', '', 99999);
+
+		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
+		$this->assertEquals(['error' => 'resend-minutes-out-of-range'], $response->getData());
 	}
 
 	public function testResetDelegatesToAppSettings(): void {

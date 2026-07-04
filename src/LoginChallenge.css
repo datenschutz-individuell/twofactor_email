@@ -16,3 +16,14 @@
     /* noinspection CssUnresolvedCustomProperty */
     filter: var(--background-invert-if-bright);
 }
+
+/* Resend control: a text link (like the dialog's other secondary actions),
+   replaced by a plain countdown hint while the cooldown is running. */
+.twofactor_email-resend-line {
+    margin-top: 8px;
+    text-align: center;
+}
+
+.twofactor_email-resend {
+    cursor: pointer;
+}

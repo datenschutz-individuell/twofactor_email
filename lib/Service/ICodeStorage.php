@@ -12,6 +12,12 @@ namespace OCA\TwoFactorEMail\Service;
 interface ICodeStorage {
 	public function readCode(string $userId): ?string;
 
+	/**
+	 * Seconds elapsed since the currently valid code was stored, or null if no
+	 * valid code exists. Used to enforce the resend cooldown.
+	 */
+	public function secondsSinceLastCode(string $userId): ?int;
+
 	public function writeCode(string $userId, string $code, ?int $createdAt = null): void;
 
 	public function deleteCode(string $userId): void;

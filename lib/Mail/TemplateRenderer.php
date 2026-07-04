@@ -146,7 +146,7 @@ final class TemplateRenderer {
 			$html = str_replace(
 				'{logo}',
 				'<img src="' . htmlspecialchars($this->logoUrl()) . '" alt="' . htmlspecialchars($this->defaults->getName())
-					. '" style="max-width:250px;max-width:min(250px, 20%);max-height:250px">',
+					. '" style="max-width:min(250px, 20%);max-height:250px">',
 				$html,
 			);
 		}

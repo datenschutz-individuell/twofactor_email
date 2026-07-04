@@ -18,6 +18,7 @@ final class AppSettings implements IAppSettings {
 	// Config keys used to store the settings in the app config
 	private const KEY_CODE_LENGTH = 'code_length';
 	private const KEY_CODE_VALID_MINUTES = 'code_valid_minutes';
+	private const KEY_RESEND_MIN_MINUTES = 'resend_min_minutes';
 	private const KEY_EMAIL_SUBJECT = 'email_subject';
 	private const KEY_EMAIL_TEMPLATE = 'email_template';
 
@@ -26,6 +27,7 @@ final class AppSettings implements IAppSettings {
 	// default text (the getDefault* methods below).
 	private const DEFAULT_CODE_LENGTH = 6;
 	private const DEFAULT_CODE_VALID_MINUTES = 10;
+	private const DEFAULT_RESEND_MIN_MINUTES = 1;
 	private const DEFAULT_EMAIL_SUBJECT = '';
 	private const DEFAULT_EMAIL_TEMPLATE = '';
 
@@ -41,6 +43,14 @@ final class AppSettings implements IAppSettings {
 
 	public function getCodeValidMinutes(): int {
 		return $this->appConfig->getValueInt(Application::APP_ID, self::KEY_CODE_VALID_MINUTES, self::DEFAULT_CODE_VALID_MINUTES);
+	}
+
+	public function getResendMinMinutes(): int {
+		return $this->appConfig->getValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, self::DEFAULT_RESEND_MIN_MINUTES);
+	}
+
+	public function getResendCooldownSeconds(): int {
+		return $this->getResendMinMinutes() * 60;
 	}
 
 	public function getEMailSubject(): string {
@@ -75,6 +85,10 @@ final class AppSettings implements IAppSettings {
 		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_CODE_VALID_MINUTES, $codeValidMinutes);
 	}
 
+	public function setResendMinMinutes(int $resendMinutes): void {
+		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, $resendMinutes);
+	}
+
 	public function setEMailSubject(string $subject): void {
 		$this->appConfig->setValueString(Application::APP_ID, self::KEY_EMAIL_SUBJECT, $subject);
 	}
@@ -86,6 +100,7 @@ final class AppSettings implements IAppSettings {
 	public function resetToDefaults(): void {
 		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_CODE_LENGTH);
 		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_CODE_VALID_MINUTES);
+		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES);
 		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_EMAIL_SUBJECT);
 		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_EMAIL_TEMPLATE);
 	}
