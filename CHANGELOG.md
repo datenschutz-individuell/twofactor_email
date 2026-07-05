@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Saving an unchanged on/off state created duplicate activity entries
 - Outdated notifications are dismissed when the provider state changes again
 
+### Security
+
+- Harden the challenge email subject against header injection (defense in depth)
+
 ## 3.2.0 (2026-07-05)
 
 ### Added

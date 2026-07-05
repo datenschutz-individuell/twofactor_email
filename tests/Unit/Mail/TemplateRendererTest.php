@@ -58,6 +58,20 @@ class TemplateRendererTest extends TestCase {
 		);
 	}
 
+	/**
+	 * @throws Exception
+	 */
+	public function testSubjectStaysSingleLineDespiteLineBreaksInDisplayName(): void {
+		// A line break in a mail header must never reach the mailer (header injection)
+		$user = $this->createMock(IUser::class);
+		$user->method('getDisplayName')->willReturn("Jane\r\nBcc: spy@example.com");
+
+		$this->assertSame(
+			'Login of Jane Bcc: spy@example.com',
+			$this->renderer->renderSubject('Login of {user}', $user, '123456'),
+		);
+	}
+
 	public function testBodyStartsWithTheSpacingParagraph(): void {
 		$this->assertSame(
 			[['&nbsp;', false]],
