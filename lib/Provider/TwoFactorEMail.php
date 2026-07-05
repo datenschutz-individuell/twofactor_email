@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Provider;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
+use OCA\TwoFactorEMail\Event\StateChangeActor;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCA\TwoFactorEMail\Service\IAppSettings;
@@ -131,11 +132,11 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	}
 
 	public function disableFor(IUser $user): void {
-		$this->stateManager->disable($user, true);
+		$this->stateManager->disable($user, StateChangeActor::ADMIN);
 	}
 
 	public function enableFor(IUser $user): void {
-		$this->stateManager->enable($user, true);
+		$this->stateManager->enable($user, StateChangeActor::ADMIN);
 	}
 
 	/**

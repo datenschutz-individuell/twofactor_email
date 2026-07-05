@@ -14,6 +14,7 @@ enum Notification: string {
 	case DISABLED_BY_USER = 'twofactor_email_disabled_by_user';
 	case ENABLED_BY_ADMIN = 'twofactor_email_enabled_by_admin';
 	case DISABLED_BY_ADMIN = 'twofactor_email_disabled_by_admin';
+	case DISABLED_NO_EMAIL = 'twofactor_email_disabled_no_email';
 
 	public function getSubjectText(): string {
 		return match ($this) {
@@ -21,6 +22,7 @@ enum Notification: string {
 			Notification::DISABLED_BY_USER => 'You disabled email two-factor authentication for your account',
 			Notification::ENABLED_BY_ADMIN => 'Email two-factor authentication was enabled by an admin',
 			Notification::DISABLED_BY_ADMIN => 'Email two-factor authentication was disabled by an admin',
+			Notification::DISABLED_NO_EMAIL => 'Email two-factor authentication was disabled because your account has no email address',
 		};
 	}
 }
