@@ -37,7 +37,7 @@ final class Provider implements IProvider {
 		$l = $this->l10n->get(Application::APP_ID, $language);
 
 		$event->setIcon($this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('core', 'actions/password.svg')));
-		$event->setSubject($l->t($notification->getSubjectText()));
+		$event->setParsedSubject($notification->getTranslatedSubject($l));
 
 		return $event;
 	}

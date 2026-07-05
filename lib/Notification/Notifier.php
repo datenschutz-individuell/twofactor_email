@@ -47,7 +47,7 @@ final class Notifier implements INotifier {
 		}
 
 		$l = $this->l10nFactory->get(Application::APP_ID, $languageCode);
-		$notification->setParsedSubject($l->t($subject->getSubjectText()));
+		$notification->setParsedSubject($subject->getTranslatedSubject($l));
 		$notification->setIcon($this->urlGenerator->getAbsoluteURL(
 			$this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg'),
 		));
