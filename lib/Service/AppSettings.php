@@ -25,9 +25,10 @@ final class AppSettings implements IAppSettings {
 	// Default values — used when no value has been stored in the app config.
 	// For the email template parts an empty string means: use the localized
 	// default text (the getDefault* methods below).
-	private const DEFAULT_CODE_LENGTH = 6;
-	private const DEFAULT_CODE_VALID_MINUTES = 10;
-	private const DEFAULT_RESEND_MIN_MINUTES = 1;
+	// The int defaults are public so the occ settings command can display them.
+	public const DEFAULT_CODE_LENGTH = 6;
+	public const DEFAULT_CODE_VALID_MINUTES = 10;
+	public const DEFAULT_RESEND_MIN_MINUTES = 1;
 	private const DEFAULT_EMAIL_SUBJECT = '';
 	private const DEFAULT_EMAIL_TEMPLATE = '';
 
