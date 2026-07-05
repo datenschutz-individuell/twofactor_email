@@ -35,7 +35,7 @@ $resendAvailableIn = (int)($_['resendAvailableIn'] ?? 0); // seconds left before
 
 <?php if ($error === 'no-email'): ?>
 	<p class="warning">
-		<?php p($l->t('An error occurred: No email address is configured in your personal settings. Please contact your administrator.')); ?>
+		<?php p($l->t('No email address available, please contact your administrator.')); ?>
 	</p>
 <?php elseif ($error === 'send-failed'): ?>
 	<p class="warning">

@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				// The cooldown has not elapsed. retryAfter (seconds) comes from our controller.
 				startCountdown((data && data.retryAfter) || cooldown)
 			} else if (data && data.error === 'no-email') {
-				status.textContent = t('twofactor_email', 'No email address is configured for your account.')
+				status.textContent = t('twofactor_email', 'No email address available, please contact your administrator.')
 			} else {
 				Logger.error('failed to resend two-factor email code', error)
 				status.textContent = t('twofactor_email', 'The code could not be sent. Please try again later.')
