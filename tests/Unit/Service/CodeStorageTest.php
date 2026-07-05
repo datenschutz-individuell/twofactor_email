@@ -40,6 +40,18 @@ class CodeStorageTest extends TestCase {
 		$this->assertNull($this->storage->secondsSinceLastCode('alice'));
 	}
 
+	public function testDeleteAllCodesDeletesBothKeysAndReturnsUserCount(): void {
+		$this->config->method('getValuesByUsers')->willReturn(['alice' => 100, 'bob' => 200]);
+		$deletedKeys = [];
+		$this->config->expects($this->exactly(2))->method('deleteKey')
+			->willReturnCallback(function (string $app, string $key) use (&$deletedKeys): void {
+				$deletedKeys[] = $key;
+			});
+
+		$this->assertSame(2, $this->storage->deleteAllCodes());
+		$this->assertSame(['code', 'code_created_at'], $deletedKeys);
+	}
+
 	public function testSecondsSinceLastCodeForFreshCode(): void {
 		$this->config->method('getValueInt')->willReturn(time());
 		$this->config->method('getValueString')->willReturn('hashed-code');
