@@ -34,6 +34,6 @@ final class CleanUp extends Command {
 		$io->title('Removing expired two-factor email codes');
 		$this->codeStorage->deleteExpired();
 		$io->success('Done.');
-		return 0;
+		return Command::SUCCESS;
 	}
 }

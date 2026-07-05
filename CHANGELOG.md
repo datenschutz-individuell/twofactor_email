@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Wrong and repeated activity entries for accounts without an email address
 - Activity and notification texts could not be translated
 - Saving an unchanged on/off state created duplicate activity entries
+- Outdated notifications are dismissed when the provider state changes again
 
 ## 3.2.0 (2026-07-05)
 
