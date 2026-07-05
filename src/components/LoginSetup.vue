@@ -19,8 +19,10 @@
 		<div v-else-if="loading" class="loading" style="min-height: 50px" />
 		<div v-else>
 			<p>Successfully enabled</p>
-			<p>{{ t('twofactor_email', 'Codes will be sent to your primary email address:') }} <b>{{ store.maskedEmail
-				}}</b></p>
+			<p>
+				{{ t('twofactor_email', 'Codes will be sent to your primary email address:') }} <b>{{ store.maskedEmail
+				}}</b>
+			</p>
 			<form method="POST">
 				<button>{{ t('twofactor_email', 'Proceed') }}</button>
 			</form>
@@ -29,9 +31,9 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
 import { t } from '@nextcloud/l10n'
-
+import { onMounted, ref } from 'vue'
+import Logger from '../Logger.js'
 import { usePersonalSettingsStore } from '../Store.js'
 
 const store = usePersonalSettingsStore()
@@ -48,7 +50,7 @@ onMounted(async () => {
 			loading.value = false
 		}
 	} catch (error) {
-		console.error(error)
+		Logger.error('failed to enable two-factor email', error)
 		store.$patch({ error: 'save-failed' })
 	} finally {
 		loading.value = false
