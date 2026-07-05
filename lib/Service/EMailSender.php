@@ -32,7 +32,8 @@ final class EMailSender implements IEMailSender {
 			throw new EMailNotSet($user);
 		}
 
-		$this->logger->debug("sending email message to $email.");
+		// Deliberately logs the UID, not the email address (data minimization)
+		$this->logger->debug('sending email message to user ' . $user->getUID() . '.');
 
 		// For every part an empty admin setting means: use the localized default
 		$subject = $this->appSettings->getEMailSubject() ?: $this->appSettings->getDefaultEMailSubject();
