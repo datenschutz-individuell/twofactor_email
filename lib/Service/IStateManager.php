@@ -9,12 +9,13 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Service;
 
+use OCA\TwoFactorEMail\Event\StateChangeActor;
 use OCP\IUser;
 
 interface IStateManager {
-	public function enable(IUser $user, bool $byAdmin = false): void;
+	public function enable(IUser $user, StateChangeActor $actor = StateChangeActor::USER): void;
 
-	public function disable(IUser $user, bool $byAdmin = false): void;
+	public function disable(IUser $user, StateChangeActor $actor = StateChangeActor::USER): void;
 
 	public function isEnabled(IUser $user): bool;
 }

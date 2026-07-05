@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admin settings: show and change all app settings via occ
 - Admins can delete the stored codes of one or all users via occ
 
+### Fixed
+
+- Wrong and repeated activity entries for accounts without an email address
+
 ## 3.2.0 (2026-07-05)
 
 ### Added

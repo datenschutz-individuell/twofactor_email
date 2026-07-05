@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Service;
 
+use OCA\TwoFactorEMail\Event\StateChangeActor;
 use OCA\TwoFactorEMail\Event\StateChanged;
 use OCP\Authentication\TwoFactorAuth\IRegistry;
 use OCP\EventDispatcher\IEventDispatcher;
@@ -26,12 +27,12 @@ final class StateManager implements IStateManager {
 	) {
 	}
 
-	public function enable(IUser $user, bool $byAdmin = false): void {
-		$this->eventDispatcher->dispatchTyped(new StateChanged($user, true, $byAdmin));
+	public function enable(IUser $user, StateChangeActor $actor = StateChangeActor::USER): void {
+		$this->eventDispatcher->dispatchTyped(new StateChanged($user, true, $actor));
 	}
 
-	public function disable(IUser $user, bool $byAdmin = false): void {
-		$this->eventDispatcher->dispatchTyped(new StateChanged($user, false, $byAdmin));
+	public function disable(IUser $user, StateChangeActor $actor = StateChangeActor::USER): void {
+		$this->eventDispatcher->dispatchTyped(new StateChanged($user, false, $actor));
 	}
 
 	public function isEnabled(IUser $user): bool {
