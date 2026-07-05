@@ -23,8 +23,14 @@ use OCP\User\Events\UserChangedEvent;
  * UI paths: profile/account updates (UserUpdatedEvent) and direct email
  * changes, e.g. by an admin via the users page (UserChangedEvent).
  *
- * Not covered (Nextcloud fires no event): raw preference edits like
- * `occ user:setting <uid> settings email --delete`.
+ * This also covers `occ user:setting <uid> settings email`: at least since
+ * Nextcloud 32 the command routes email changes through
+ * IUser::setEMailAddress(), which fires UserChangedEvent. Only writes that
+ * bypass IUser (e.g. direct database edits) fire no event.
+ *
+ * `occ user:profile <uid> email --delete` clears only the account/profile
+ * property, not the system email (IUser::getEMailAddress() keeps returning
+ * the address, codes stay deliverable) — so not disabling is correct there.
  *
  * @template-implements IEventListener<UserUpdatedEvent|UserChangedEvent>
  */
