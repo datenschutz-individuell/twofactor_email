@@ -16,7 +16,6 @@
     "Links: URLs are detected and rendered as linked URL text." : "Lingid: võrguaadressid tuvastatakse ja kuvatakse linkidena.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Need süsteemiülesed seadistused salvestatakse automaatselt õige pea viimase klahvivajutuse järel.",
     "Authentication code" : "Autentimiskood",
-    "Length and validity of the one-time codes sent via email." : "Ühekordselt kasutatavate e-postiga saadetavate koodide pikkus ja kestus.",
     "Length (characters)" : "Pikkus (tähemärkides)",
     "Validity (minutes)" : "Kehtivus (minutites)",
     "Email template" : "E-kirja mall",

@@ -16,7 +16,6 @@
     "Links: URLs are detected and rendered as linked URL text." : "Links: URLs werden erkannt und als verlinkter URL-Text dargestellt.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Diese systemweiten Einstellungen werden automatisch kurz nach dem letzten Tastendruck gespeichert.",
     "Authentication code" : "Authentifizierungscode",
-    "Length and validity of the one-time codes sent via email." : "Dauer und Gültigkeit der per E-Mail versendeten Einmalcodes.",
     "Length (characters)" : "Länge (Zeichen)",
     "Validity (minutes)" : "Gültigkeit (Minuten)",
     "Email template" : "E-Mail-Vorlage",

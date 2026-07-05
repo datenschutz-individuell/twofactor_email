@@ -18,7 +18,6 @@ OC.L10N.register(
     "Links: URLs are detected and rendered as linked URL text." : "Naisc: Braitear URLanna agus rindreáiltear iad mar théacs URL nasctha.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Sábháiltear na socruithe córais seo go huathoibríoch go gairid i ndiaidh an bhrú eochrach dheireanaigh.",
     "Authentication code" : "Cód fíordheimhnithe",
-    "Length and validity of the one-time codes sent via email." : "Fad agus bailíocht na gcód aonuaire a sheoltar trí ríomhphost.",
     "Length (characters)" : "Fad (carachtair)",
     "Validity (minutes)" : "Bailíocht (nóiméid)",
     "Email template" : "Teimpléad ríomhphoist",

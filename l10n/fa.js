@@ -18,7 +18,6 @@ OC.L10N.register(
     "Links: URLs are detected and rendered as linked URL text." : "لینک‌ها: آدرس‌های اینترنتی (URL) شناسایی و به صورت متن URL لینک‌شده نمایش داده می‌شوند.",
     "These system wide settings are saved automatically shortly after the last keypress." : "این تنظیمات سراسری سیستم مدت کوتاهی پس از آخرین فشردن کلید به طور خودکار ذخیره می‌شوند.",
     "Authentication code" : "کد احراز هویت",
-    "Length and validity of the one-time codes sent via email." : "مدت زمان و اعتبار کدهای یکبار مصرف ارسال شده از طریق ایمیل.",
     "Length (characters)" : "طول (کاراکتر)",
     "Validity (minutes)" : "اعتبار (دقیقه)",
     "Email template" : "قالب ایمیل",
