@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { createPinia, defineStore } from 'pinia'
 import { loadState } from '@nextcloud/initial-state'
+import { createPinia, defineStore } from 'pinia'
 import { persistAdminSettings, persistState, resetAdminSettings } from './services/StateManager.js'
 
 export const pinia = createPinia()

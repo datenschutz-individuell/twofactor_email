@@ -26,15 +26,9 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 	// Per-field input values and success indicators.
 	// reactive() wrapping enables automatic ref unwrapping in templates
 	// and allows watch(() => inputValues[key]) to track changes correctly.
-	const inputValues = reactive(Object.fromEntries(
-		fieldKeys.map(key => [key, store[key]]),
-	))
-	const successRefs = reactive(Object.fromEntries(
-		fieldKeys.map(key => [key, null]),
-	))
-	const successTimers = Object.fromEntries(
-		fieldKeys.map(key => [key, null]),
-	)
+	const inputValues = reactive(Object.fromEntries(fieldKeys.map((key) => [key, store[key]])))
+	const successRefs = reactive(Object.fromEntries(fieldKeys.map((key) => [key, null])))
+	const successTimers = Object.fromEntries(fieldKeys.map((key) => [key, null]))
 
 	// Shared debounce timer — restarted by any field change
 	let debounceTimer = null
@@ -66,7 +60,7 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 	 * Used instead of bare scheduleAndSave() calls to avoid ignored Promise warnings.
 	 */
 	function triggerSave() {
-		scheduleAndSave().catch(e => Logger.error('Unexpected error in scheduleAndSave', e))
+		scheduleAndSave().catch((e) => Logger.error('Unexpected error in scheduleAndSave', e))
 	}
 
 	/**

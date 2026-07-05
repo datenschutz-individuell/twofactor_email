@@ -28,10 +28,10 @@ export function persistState(enabled) {
 
 	Logger.debug('sending two-factor email state change request', data)
 	return Axios.post(url, data)
-		.then(resp => {
+		.then((resp) => {
 			// here HTTP 2xx only, HTTP 4xx error codes go to catch
 			return resp.data
-		}).catch(error => {
+		}).catch((error) => {
 			Logger.error('failed to save two-factor email state', error)
 
 			if (error.response && error.response.data && error.response.data.error) {
@@ -48,7 +48,6 @@ export function persistState(enabled) {
 			}
 		})
 }
-
 
 /**
  * @typedef {{
@@ -70,13 +69,13 @@ export function persistAdminSettings(settings) {
 
 	Logger.debug('sending two-factor email admin settings', settings)
 	return Axios.post(url, settings)
-		.then(resp => {
+		.then((resp) => {
 			if (resp.status !== 200) {
 				return { error: 'save-failed' }
 			} else {
 				return resp.data
 			}
-		}).catch(_ => {
+		}).catch(() => {
 			return { error: 'save-failed' }
 		})
 }
@@ -91,13 +90,13 @@ export function resetAdminSettings() {
 
 	Logger.debug('resetting two-factor email admin settings to defaults')
 	return Axios.post(url)
-		.then(resp => {
+		.then((resp) => {
 			if (resp.status !== 200) {
 				return { error: 'reset-failed' }
 			} else {
 				return resp.data
 			}
-		}).catch(_ => {
+		}).catch(() => {
 			return { error: 'reset-failed' }
 		})
 }

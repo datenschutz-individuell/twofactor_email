@@ -8,10 +8,11 @@
 	<div id="twofactor_email-personal_settings">
 		<div v-if="store.hasEmail">
 			<p>
-				<NcCheckboxRadioSwitch v-model="store.enabled"
-									   :loading="loading"
-									   type="switch"
-									   @update:model-value="onUpdate">
+				<NcCheckboxRadioSwitch
+					v-model="store.enabled"
+					:loading="loading"
+					type="switch"
+					@update:modelValue="onUpdate">
 					{{ t('twofactor_email', 'Use two-factor authentication via email') }}
 				</NcCheckboxRadioSwitch>
 			</p>
@@ -26,8 +27,8 @@
 			</span>
 		</div>
 		<span v-if="store.error === 'password-confirmation-failed'" class="error">
-      {{ t('twofactor_email', 'Password confirmation failed. Please try again.') }}
-    </span>
+			{{ t('twofactor_email', 'Password confirmation failed. Please try again.') }}
+		</span>
 		<span v-else-if="store.error === 'no-email'" class="error">
 			{{ t('twofactor_email', 'Apparently your previously configured email address just vanished.') }}
 		</span>
@@ -41,14 +42,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import { t } from '@nextcloud/l10n'
 import { confirmPassword } from '@nextcloud/password-confirmation'
-import '@nextcloud/password-confirmation/style.css'
-
+import { ref } from 'vue'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import Logger from '../Logger.js'
 import { usePersonalSettingsStore } from '../Store.js'
+
+import '@nextcloud/password-confirmation/style.css'
 
 const store = usePersonalSettingsStore()
 store.loadInitialState('enabled', 'hasEmail', 'email')

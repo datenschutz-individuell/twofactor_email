@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import './LoginChallenge.css'
-
 import Axios from '@nextcloud/axios'
+import { n, t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
-import { t, n } from '@nextcloud/l10n'
 import Logger from './Logger.js'
+
+import './LoginChallenge.css'
 
 // Resend control on the 2FA challenge page (server-rendered template, so plain
 // DOM, not Vue). It shows a clickable "Send a new code" link only while a resend

@@ -7,27 +7,29 @@
 <template>
 	<div class="labeled-field">
 		<label :for="id" class="labeled-field__label">{{ label }}</label>
-		<NcTextArea v-if="type === 'textarea'"
-					:id="id"
-					v-model="model"
-					:error="result === false"
-					:helper-text="helperText"
-					:label-outside="true"
-					:loading="loading"
-					:placeholder="placeholder"
-					:success="result === true" />
-		<NcTextField v-else
-					 :id="id"
-					 v-model="model"
-					 :error="result === false"
-					 :helper-text="helperText"
-					 :label-outside="true"
-					 :loading="loading"
-					 :min="type === 'number' ? '1' : undefined"
-					 :placeholder="placeholder"
-					 :success="result === true"
-					 :type="type"
-					 @keydown="blockInvalidNumericInput" />
+		<NcTextArea
+			v-if="type === 'textarea'"
+			:id="id"
+			v-model="model"
+			:error="result === false"
+			:helperText="helperText"
+			:labelOutside="true"
+			:loading="loading"
+			:placeholder="placeholder"
+			:success="result === true" />
+		<NcTextField
+			v-else
+			:id="id"
+			v-model="model"
+			:error="result === false"
+			:helperText="helperText"
+			:labelOutside="true"
+			:loading="loading"
+			:min="type === 'number' ? '1' : undefined"
+			:placeholder="placeholder"
+			:success="result === true"
+			:type="type"
+			@keydown="blockInvalidNumericInput" />
 	</div>
 </template>
 
@@ -43,6 +45,7 @@ const props = defineProps({
 	/** 'text', 'number' or 'textarea' */
 	type: { type: String, default: 'text' },
 	/** Per-field save feedback: true = success, false = error, null = idle */
+	// eslint-disable-next-line vue/no-boolean-default -- intentional tri-state, null means idle
 	result: { type: Boolean, default: null },
 	loading: { type: Boolean, default: false },
 	placeholder: { type: String, default: undefined },

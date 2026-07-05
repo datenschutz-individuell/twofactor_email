@@ -4,9 +4,8 @@
  */
 
 import { createApp } from 'vue'
-
-import { pinia } from './Store.js'
 import PersonalSettings from './components/PersonalSettings.vue'
+import { pinia } from './Store.js'
 
 const View = createApp(PersonalSettings)
 	.use(pinia)
