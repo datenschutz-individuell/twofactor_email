@@ -71,6 +71,7 @@ at the bottom of "Personal Settings/Security").]]></description>
     </two-factor-providers>
     <commands>
         <command>OCA\TwoFactorEMail\Command\CleanUp</command>
+        <command>OCA\TwoFactorEMail\Command\DeleteCodes</command>
         <command>OCA\TwoFactorEMail\Command\Settings</command>
     </commands>
     <settings>

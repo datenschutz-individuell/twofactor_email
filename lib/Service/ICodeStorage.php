@@ -22,5 +22,12 @@ interface ICodeStorage {
 
 	public function deleteCode(string $userId): void;
 
+	/**
+	 * Deletes the stored codes of all users.
+	 *
+	 * @return int the number of users that had a code stored
+	 */
+	public function deleteAllCodes(): int;
+
 	public function deleteExpired(): void;
 }

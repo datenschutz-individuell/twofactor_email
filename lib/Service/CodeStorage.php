@@ -58,6 +58,13 @@ final class CodeStorage implements ICodeStorage {
 		$this->config->setValueInt($userId, Application::APP_ID, self::KEY_CREATED_AT, $createdAt);
 	}
 
+	public function deleteAllCodes(): int {
+		$count = count($this->config->getValuesByUsers(Application::APP_ID, self::KEY_CREATED_AT, ValueType::INT));
+		$this->config->deleteKey(Application::APP_ID, self::KEY_CODE);
+		$this->config->deleteKey(Application::APP_ID, self::KEY_CREATED_AT);
+		return $count;
+	}
+
 	public function deleteExpired(): void {
 		$expiresBefore = time() - $this->settings->getCodeValidMinutes() * 60;
 		$creationTime = $this->config->getValuesByUsers(Application::APP_ID, self::KEY_CREATED_AT, ValueType::INT);
