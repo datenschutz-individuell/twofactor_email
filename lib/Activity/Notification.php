@@ -9,12 +9,23 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Activity;
 
+use OCA\TwoFactorEMail\Event\StateChangeActor;
+
 enum Notification: string {
 	case ENABLED_BY_USER = 'twofactor_email_enabled_by_user';
 	case DISABLED_BY_USER = 'twofactor_email_disabled_by_user';
 	case ENABLED_BY_ADMIN = 'twofactor_email_enabled_by_admin';
 	case DISABLED_BY_ADMIN = 'twofactor_email_disabled_by_admin';
 	case DISABLED_NO_EMAIL = 'twofactor_email_disabled_no_email';
+
+	public static function fromStateChange(StateChangeActor $actor, bool $enabled): self {
+		return match ($actor) {
+			StateChangeActor::USER => $enabled ? self::ENABLED_BY_USER : self::DISABLED_BY_USER,
+			StateChangeActor::ADMIN => $enabled ? self::ENABLED_BY_ADMIN : self::DISABLED_BY_ADMIN,
+			// The system only ever disables (account lost its email address)
+			StateChangeActor::SYSTEM => self::DISABLED_NO_EMAIL,
+		};
+	}
 
 	public function getSubjectText(): string {
 		return match ($this) {

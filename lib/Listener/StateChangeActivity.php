@@ -11,7 +11,6 @@ namespace OCA\TwoFactorEMail\Listener;
 
 use OCA\TwoFactorEMail\Activity\Notification;
 use OCA\TwoFactorEMail\AppInfo\Application;
-use OCA\TwoFactorEMail\Event\StateChangeActor;
 use OCA\TwoFactorEMail\Event\StateChanged;
 use OCP\Activity\IManager as ActivityManager;
 use OCP\EventDispatcher\Event;
@@ -31,16 +30,7 @@ final class StateChangeActivity implements IEventListener {
 		if (!$event instanceof StateChanged) {
 			return;
 		}
-		$notification = match ($event->getActor()) {
-			StateChangeActor::USER => $event->isEnabled()
-				? Notification::ENABLED_BY_USER
-				: Notification::DISABLED_BY_USER,
-			StateChangeActor::ADMIN => $event->isEnabled()
-				? Notification::ENABLED_BY_ADMIN
-				: Notification::DISABLED_BY_ADMIN,
-			// The system only ever disables (account lost its email address)
-			StateChangeActor::SYSTEM => Notification::DISABLED_NO_EMAIL,
-		};
+		$notification = Notification::fromStateChange($event->getActor(), $event->isEnabled());
 		$user = $event->getUser();
 
 		$activity = $this->activityManager->generateEvent();
