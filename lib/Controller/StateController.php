@@ -45,6 +45,14 @@ final class StateController extends ALoginSetupController {
 			], Http::STATUS_UNAUTHORIZED);
 		}
 
+		// Saving an unchanged state must not dispatch another StateChanged
+		// event — each dispatch creates an activity entry.
+		if ($state === $this->stateManager->isEnabled($user)) {
+			return new JSONResponse([
+				'enabled' => $state,
+			]);
+		}
+
 		if ($state) {
 			if ($user->getEMailAddress() === null) {
 				return new JSONResponse([
