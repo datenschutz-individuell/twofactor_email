@@ -10,6 +10,7 @@ namespace OCA\TwoFactorEMail\Test\Unit\Controller;
 use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Controller\AdminSettingsController;
 use OCA\TwoFactorEMail\Service\IAppSettings;
+use OCA\TwoFactorEMail\Service\SettingsValidator;
 use OCP\AppFramework\Http;
 use OCP\IRequest;
 use PHPUnit\Framework\MockObject\Exception;
@@ -33,6 +34,7 @@ class AdminSettingsControllerTest extends TestCase {
 			Application::APP_ID,
 			$this->createMock(IRequest::class),
 			$this->appSettings,
+			new SettingsValidator(),
 		);
 	}
 
