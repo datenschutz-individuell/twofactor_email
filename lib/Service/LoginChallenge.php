@@ -33,7 +33,8 @@ final class LoginChallenge implements ILoginChallenge {
 	 */
 	public function sendChallenge(IUser $user): bool {
 		/**
-		 * Store code securely and time-based attack resistent in case an attacker managed to elevate his privileges.
+		 * The code is stored hashed, so it stays secret and resistant to timing
+		 * attacks even if an attacker managed to elevate their privileges.
 		 */
 		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
 
@@ -94,7 +95,7 @@ final class LoginChallenge implements ILoginChallenge {
 		/*
 		 * We currently only delete the code if it was successfully used (and the user is verified / logged in).
 		 * We could always delete the code, even if the verification failed. That would be more secure but less
-		 * convenient. We want users to be able to retry in case the mistyped their code.
+		 * convenient. We want users to be able to retry in case they mistyped their code.
 		 */
 		if ($isValid) {
 			$this->codeStorage->deleteCode($user->getUID());

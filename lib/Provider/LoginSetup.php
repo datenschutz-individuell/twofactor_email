@@ -29,7 +29,7 @@ final class LoginSetup implements ILoginSetupProvider {
 		try {
 			$template = $this->templateManager->getTemplate(Application::APP_ID, 'LoginSetup');
 		} catch (TemplateNotFoundException $e) {
-			throw new RuntimeException('PersonalSettings template not found', previous: $e);
+			throw new RuntimeException('LoginSetup template not found', previous: $e);
 		}
 		$template->assign('urlGenerator', $this->urlGenerator);
 		return $template;
