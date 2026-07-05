@@ -11,12 +11,10 @@ css/
 
 /.php-cs-fixer.cache
 
-# Ignore NetBeans project
 /nbproject/
-# Ignore JetBrains project
 /.idea/
-# Ignore Claude preferences
 /.claude/
+/.envrc
 
 tests/clover.xml
 tests/.phpunit.result.cache
