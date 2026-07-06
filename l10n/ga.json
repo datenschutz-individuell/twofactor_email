@@ -16,8 +16,10 @@
     "Links: URLs are detected and rendered as linked URL text." : "Naisc: Braitear URLanna agus rindreáiltear iad mar théacs URL nasctha.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Sábháiltear na socruithe córais seo go huathoibríoch go gairid i ndiaidh an bhrú eochrach dheireanaigh.",
     "Authentication code" : "Cód fíordheimhnithe",
+    "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Fad agus bailíocht na gcód aonuaire a sheoltar trí ríomhphost, agus cé chomh luath agus is féidir le húsáideoir cód nua a iarraidh.",
     "Length (characters)" : "Fad (carachtair)",
     "Validity (minutes)" : "Bailíocht (nóiméid)",
+    "Resend cooldown (minutes)" : "Athsheol an t-am fuaraithe (nóiméid)",
     "Email template" : "Teimpléad ríomhphoist",
     "This template defines the email that delivers the one-time code to users. It is partially dynamic using placeholders." : "Sainmhíníonn an teimpléad seo an ríomhphost a sheachadann an cód aonuaire chuig úsáideoirí. Tá sé dinimiciúil go páirteach ag baint úsáide as áitchoinneálaithe.",
     "Subject" : "Ábhar",
@@ -31,10 +33,16 @@
     "Use two-factor authentication via email" : "Bain úsáid as fíordheimhniú dhá fhachtóir trí ríomhphost",
     "Password confirmation failed. Please try again." : "Theip ar dheimhniú an phasfhocail. Déan iarracht arís.",
     "Apparently your previously configured email address just vanished." : "Is cosúil gur imigh do sheoladh ríomhphoist a bhí cumraithe roimhe seo as radharc.",
+    "_You can request a new code in %n minute._::_You can request a new code in %n minutes._" : ["Is féidir leat cód nua a iarraidh i %n nóiméad.","Is féidir leat cód nua a iarraidh i %n nóiméad.","Is féidir leat cód nua a iarraidh i %n nóiméad.","Is féidir leat cód nua a iarraidh i %n nóiméad.","Is féidir leat cód nua a iarraidh i %n nóiméad."],
+    "You can request a new code in <1 minute." : "Is féidir leat cód nua a iarraidh i níos lú ná nóiméad amháin.",
+    "A new code was sent. Only the new code is valid now." : "Seoladh cód nua. Níl ach an cód nua bailí anois.",
+    "No email address is configured for your account." : "Níl aon seoladh ríomhphoist cumraithe do do chuntas.",
+    "The code could not be sent. Please try again later." : "Níorbh fhéidir an cód a sheoladh. Déan iarracht arís ar ball.",
     "An error occurred: No email address is configured in your personal settings. Please contact your administrator." : "Tharla earráid: Níl aon seoladh ríomhphoist cumraithe i do shocruithe pearsanta. Téigh i dteagmháil le do riarthóir.",
     "The verification email could not be sent. Please try again later or contact your administrator." : "Níorbh fhéidir an ríomhphost fíoraithe a sheoladh. Déan iarracht eile ar ball nó déan teagmháil le do riarthóir.",
     "A new authentication code was just sent. Please enter it:" : "Seoladh cód fíordheimhnithe nua díreach. Cuir isteach é le do thoil:",
     "Enter the authentication code that was sent to you:" : "Cuir isteach an cód fíordheimhnithe a seoladh chugat:",
-    "Submit" : "Cuir isteach"
+    "Submit" : "Cuir isteach",
+    "Send a new code" : "Seol cód nua"
 },"pluralForm" :"nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);"
 }

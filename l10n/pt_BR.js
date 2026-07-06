@@ -18,8 +18,10 @@ OC.L10N.register(
     "Links: URLs are detected and rendered as linked URL text." : "Links: os URLs são detectados e exibidos como texto com link.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Essas configurações gerais do sistema são salvas automaticamente logo após a última tecla ser pressionada.",
     "Authentication code" : "Código de autenticação",
+    "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Comprimento e validade dos códigos únicos enviados por e-mail, e em quanto tempo um usuário pode solicitar um novo código.",
     "Length (characters)" : "Comprimento (caracteres)",
     "Validity (minutes)" : "Validade (minutos)",
+    "Resend cooldown (minutes)" : "Tempo de espera para reenvio (minutos)",
     "Email template" : "Modelo de e-mail",
     "This template defines the email that delivers the one-time code to users. It is partially dynamic using placeholders." : "Este modelo define o e-mail que envia o código de uso único aos usuários. Ele é parcialmente dinâmico, utilizando espaços reservados.",
     "Subject" : "Assunto",
@@ -33,10 +35,16 @@ OC.L10N.register(
     "Use two-factor authentication via email" : "Usar a autenticação de dois fatores por e-mail",
     "Password confirmation failed. Please try again." : "A confirmação da senha falhou. Por favor, tente novamente.",
     "Apparently your previously configured email address just vanished." : "Parece que o endereço de e-mail que você havia configurado anteriormente simplesmente desapareceu.",
+    "_You can request a new code in %n minute._::_You can request a new code in %n minutes._" : ["Você pode solicitar um novo código em %n minuto.","Você pode solicitar um novo código em %n de minutos.","Você pode solicitar um novo código em %n minutos."],
+    "You can request a new code in <1 minute." : "Você pode solicitar um novo código em <1 minuto.",
+    "A new code was sent. Only the new code is valid now." : "Um novo código foi enviado. Agora, apenas o novo código é válido.",
+    "No email address is configured for your account." : "Não há nenhum endereço de e-mail configurado para sua conta.",
+    "The code could not be sent. Please try again later." : "Não foi possível enviar o código. Tente novamente mais tarde.",
     "An error occurred: No email address is configured in your personal settings. Please contact your administrator." : "Ocorreu um erro: não há nenhum endereço de e-mail configurado em suas configurações pessoais. Entre em contato com o administrador.",
     "The verification email could not be sent. Please try again later or contact your administrator." : "Não foi possível enviar o e-mail de verificação. Tente novamente mais tarde ou entre em contato com o administrador.",
     "A new authentication code was just sent. Please enter it:" : "Acabamos de enviar um novo código de autenticação. Digite-o:",
     "Enter the authentication code that was sent to you:" : "Digite o código de autenticação que lhe foi enviado:",
-    "Submit" : "Enviar"
+    "Submit" : "Enviar",
+    "Send a new code" : "Enviar um novo código"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

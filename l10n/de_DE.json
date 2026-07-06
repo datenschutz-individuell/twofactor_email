@@ -16,8 +16,10 @@
     "Links: URLs are detected and rendered as linked URL text." : "Links: URLs werden erkannt und als verlinkter URL-Text dargestellt.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Diese systemweiten Einstellungen werden automatisch kurz nach dem letzten Tastendruck gespeichert.",
     "Authentication code" : "Authentifizierungscode",
+    "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Dauer und Gültigkeit der per E-Mail versendeten Einmalcodes sowie der Zeitraum, nach dem ein Benutzer einen neuen Code anfordern kann.",
     "Length (characters)" : "Länge (Zeichen)",
     "Validity (minutes)" : "Gültigkeit (Minuten)",
+    "Resend cooldown (minutes)" : "Wartezeit bis zum erneuten Senden (Minuten)",
     "Email template" : "E-Mail-Vorlage",
     "This template defines the email that delivers the one-time code to users. It is partially dynamic using placeholders." : "Diese Vorlage definiert die E-Mail, mit der den Benutzern der Einmalcode zugestellt wird. Sie ist durch die Verwendung von Platzhaltern teilweise dynamisch gestaltet.",
     "Subject" : "Betreff",
@@ -31,10 +33,16 @@
     "Use two-factor authentication via email" : "Zwei-Faktor-Authentifizierung mittels E-Mail benutzen",
     "Password confirmation failed. Please try again." : "Passwortbestätigung fehlgeschlagen. Bitte erneut versuchen.",
     "Apparently your previously configured email address just vanished." : "Anscheinend ist Ihre zuvor eingerichtete E-Mail-Adresse einfach verschwunden.",
+    "_You can request a new code in %n minute._::_You can request a new code in %n minutes._" : ["Sie können in %n Minute einen neuen Code anfordern.","Sie können in %n Minuten einen neuen Code anfordern."],
+    "You can request a new code in <1 minute." : "Sie können in weniger als einer Minute einen neuen Code anfordern.",
+    "A new code was sent. Only the new code is valid now." : "Ein neuer Code wurde gesendet. Nur der neue Code ist jetzt gültig.",
+    "No email address is configured for your account." : "Für Ihr Konto ist keine E-Mail-Adresse konfiguriert.",
+    "The code could not be sent. Please try again later." : "Der Code konnte nicht gesendet werden. Bitte später noch einmal versuchen.",
     "An error occurred: No email address is configured in your personal settings. Please contact your administrator." : "Fehler: In den persönlichen Einstellungen ist keine E-Mail-Adresse eingerichtet. Bitte an die Administration wenden.",
     "The verification email could not be sent. Please try again later or contact your administrator." : "Die Bestätigungs-E-Mail konnte nicht versendet werden. Bitte später erneut versuchen oder an die Administration wenden.",
     "A new authentication code was just sent. Please enter it:" : "Gerade wurde ein neuer Bestätigungscode gesendet. Bitte diesen eingeben:",
     "Enter the authentication code that was sent to you:" : "Geben Sie den Bestätigungscode ein, den Sie erhalten haben:",
-    "Submit" : "Übermitteln"
+    "Submit" : "Übermitteln",
+    "Send a new code" : "Einen neuen Code senden"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

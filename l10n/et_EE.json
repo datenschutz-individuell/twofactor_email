@@ -16,8 +16,10 @@
     "Links: URLs are detected and rendered as linked URL text." : "Lingid: võrguaadressid tuvastatakse ja kuvatakse linkidena.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Need süsteemiülesed seadistused salvestatakse automaatselt õige pea viimase klahvivajutuse järel.",
     "Authentication code" : "Autentimiskood",
+    "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Ühekordselt kasutatavate e-postiga saadetavate koodide pikkus ja kestus ning ajavahemik järgmise võimaluseni küsida koodi e-postiga.",
     "Length (characters)" : "Pikkus (tähemärkides)",
     "Validity (minutes)" : "Kehtivus (minutites)",
+    "Resend cooldown (minutes)" : "Viivitus (minutites) koodi uuesti saatmisel",
     "Email template" : "E-kirja mall",
     "This template defines the email that delivers the one-time code to users. It is partially dynamic using placeholders." : "Selle malli alusel koostatakse e-kiri, millega saadetakse ühekordselt kasutatav kood kasutajale. Kiri on osaliselt dünaamiline ja saad selleks pruukida kohatäitjaid (muutujaid).",
     "Subject" : "Teema",
@@ -31,10 +33,16 @@
     "Use two-factor authentication via email" : "Kasuta kaheastmelist autentimist e-posti abil",
     "Password confirmation failed. Please try again." : "Salasõna kinnitamine ei õnnestunud. Palun proovi uuesti.",
     "Apparently your previously configured email address just vanished." : "Tundub, et sinu poolt varem seadistatud e-posti aadress on kuidagi kadunud.",
+    "_You can request a new code in %n minute._::_You can request a new code in %n minutes._" : ["Sa võid paluda uut koodisaatmist %n minuti pärast.","Sa võid paluda uut koodisaatmist %n minuti pärast."],
+    "You can request a new code in <1 minute." : "Sa võid paluda uut koodisaatmist vähem kui minuti pärast.",
+    "A new code was sent. Only the new code is valid now." : "Uus kood on saadetud. Hetkel kehtib vaid see uus kood.",
+    "No email address is configured for your account." : "Sinu kasutajakontole pole lisatud ühtegi e-posti aadressi.",
+    "The code could not be sent. Please try again later." : "Koodi saatmine ei õnnestunud. Palun proovi hiljem uuesti.",
     "An error occurred: No email address is configured in your personal settings. Please contact your administrator." : "Tekkis viga: sinu isiklikes seadistustes pole ühtegi e-posti aadressi seadistatud. Palun võta ühendust oma peakasutajaga.",
     "The verification email could not be sent. Please try again later or contact your administrator." : "Viga kinnituskirja saatmisel. Palun proovi hiljem uuesti või võta ühendust peakasutajaga.",
     "A new authentication code was just sent. Please enter it:" : "Just saatsime sulle uue autentimiskoodi. Palun sisesta ta siia:",
     "Enter the authentication code that was sent to you:" : "Sisesta sulle saadetud autentimiskood:",
-    "Submit" : "Saada"
+    "Submit" : "Saada",
+    "Send a new code" : "Saada uus kood"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
