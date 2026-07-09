@@ -45,10 +45,14 @@ final class TemplateRenderer {
 
 	/**
 	 * The subject is a single line of plain text — all placeholders are
-	 * inserted bare.
+	 * inserted bare. Line breaks are replaced after the substitution: the
+	 * admin text is validated single-line, but placeholder values like the
+	 * display name are not, and a line break in a mail header must never
+	 * reach the mailer (header injection, defense in depth).
 	 */
 	public function renderSubject(string $subject, IUser $user, string $code): string {
-		return strtr($subject, $this->placeholderValues($user, $code));
+		$rendered = strtr($subject, $this->placeholderValues($user, $code));
+		return str_replace(["\r\n", "\r", "\n"], ' ', $rendered);
 	}
 
 	/**
