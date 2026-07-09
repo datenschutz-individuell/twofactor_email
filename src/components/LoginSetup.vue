@@ -7,7 +7,7 @@
 <template>
 	<div id="twofactor_email-login_setup">
 		<span v-if="store.error === 'no-email'" class="error">
-			{{ t('twofactor_email', 'You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first.')
+			{{ t('twofactor_email', 'No email address available, please contact your administrator.')
 			}}
 		</span>
 		<span v-else-if="store.error === 'save-failed'" class="error">

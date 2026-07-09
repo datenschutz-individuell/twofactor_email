@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admins can delete the stored codes of one or all users via occ
 - Notify the user if an admin (de)activated this 2FA provider or the primary email address was deleted
 
+### Changed
+
+- Clearer message when no email address is set
+
 ### Fixed
 
 - Wrong and repeated activity entries for accounts without an email address

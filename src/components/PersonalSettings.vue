@@ -22,7 +22,7 @@
 		</div>
 		<div v-else>
 			<span class="notice">
-				{{ t('twofactor_email', 'You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first.')
+				{{ t('twofactor_email', 'No email address available, please set a primary email address in your personal settings first.')
 				}}
 			</span>
 		</div>
@@ -30,7 +30,7 @@
 			{{ t('twofactor_email', 'Password confirmation failed. Please try again.') }}
 		</span>
 		<span v-else-if="store.error === 'no-email'" class="error">
-			{{ t('twofactor_email', 'Apparently your previously configured email address just vanished.') }}
+			{{ t('twofactor_email', 'Your email address was removed in the meantime, please set a primary email address in your personal settings first.') }}
 		</span>
 		<span v-else-if="store.error === 'save-failed'" class="error">
 			{{ t('twofactor_email', 'Could not enable/disable two-factor authentication via email.') }}
