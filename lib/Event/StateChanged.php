@@ -17,7 +17,7 @@ final class StateChanged extends Event {
 	public function __construct(
 		private readonly IUser $user,
 		private readonly bool $enabled,
-		private readonly bool $byAdmin = false,
+		private readonly StateChangeActor $actor = StateChangeActor::USER,
 	) {
 		parent::__construct();
 	}
@@ -30,7 +30,7 @@ final class StateChanged extends Event {
 		return $this->enabled;
 	}
 
-	public function byAdmin(): bool {
-		return $this->byAdmin;
+	public function getActor(): StateChangeActor {
+		return $this->actor;
 	}
 }

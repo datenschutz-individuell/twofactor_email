@@ -12,7 +12,9 @@ namespace OCA\TwoFactorEMail\AppInfo;
 use OCA\TwoFactorEMail\Event\StateChanged;
 use OCA\TwoFactorEMail\Listener\EMailDeleted;
 use OCA\TwoFactorEMail\Listener\StateChangeActivity;
+use OCA\TwoFactorEMail\Listener\StateChangeNotification;
 use OCA\TwoFactorEMail\Listener\StateChangeRegistryUpdater;
+use OCA\TwoFactorEMail\Notification\Notifier;
 use OCA\TwoFactorEMail\Service\AppSettings;
 use OCA\TwoFactorEMail\Service\CodeStorage;
 use OCA\TwoFactorEMail\Service\EMailAddressMasker;
@@ -32,6 +34,7 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\User\Events\UserChangedEvent;
 
 final class Application extends App implements IBootstrap {
 	public const APP_ID = 'twofactor_email';
@@ -52,8 +55,12 @@ final class Application extends App implements IBootstrap {
 		$context->registerServiceAlias(IStateManager::class, StateManager::class);
 
 		$context->registerEventListener(StateChanged::class, StateChangeActivity::class);
+		$context->registerEventListener(StateChanged::class, StateChangeNotification::class);
 		$context->registerEventListener(StateChanged::class, StateChangeRegistryUpdater::class);
 		$context->registerEventListener(UserUpdatedEvent::class, EMailDeleted::class);
+		$context->registerEventListener(UserChangedEvent::class, EMailDeleted::class);
+
+		$context->registerNotifierService(Notifier::class);
 	}
 
 	public function boot(IBootContext $context): void {

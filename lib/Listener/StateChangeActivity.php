@@ -27,15 +27,10 @@ final class StateChangeActivity implements IEventListener {
 	}
 
 	public function handle(Event $event): void {
-		if ($event->byAdmin()) {
-			$notification = $event->isEnabled()
-				? Notification::ENABLED_BY_ADMIN
-				: Notification::DISABLED_BY_ADMIN;
-		} else {
-			$notification = $event->isEnabled()
-				? Notification::ENABLED_BY_USER
-				: Notification::DISABLED_BY_USER;
+		if (!$event instanceof StateChanged) {
+			return;
 		}
+		$notification = Notification::fromStateChange($event->getActor(), $event->isEnabled());
 		$user = $event->getUser();
 
 		$activity = $this->activityManager->generateEvent();
