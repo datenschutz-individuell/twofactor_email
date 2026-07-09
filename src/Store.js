@@ -9,29 +9,31 @@ import { persistAdminSettings, persistState, resetAdminSettings } from './servic
 
 export const pinia = createPinia()
 
+/**
+ * Loads the initial state from Nextcloud into the store (shared action).
+ * Only tries to fetch the given keys.
+ * All initial state keys must be the same as in the store.
+ *
+ * @param {string} keys keys to load from initial state
+ */
+function loadInitialState(...keys) {
+	const initialState = {}
+	for (const key of keys) {
+		initialState[key] = loadState('twofactor_email', key)
+	}
+	this.$patch(initialState)
+}
+
 export const usePersonalSettingsStore = defineStore('personalSettings', {
 	state: () => ({
 		enabled: false,
 		hasEmail: false,
-		maskedEmail: 'UNEXPECTED ERROR: no email address set',
-		email: 'UNEXPECTED ERROR: no email address set',
+		maskedEmail: '',
+		email: '',
 		error: false,
 	}),
 	actions: {
-		/**
-		 * Loads the initial state from Nextcloud into the Store.
-		 * Only tries to fetch the given keys.
-		 * All initial state keys must be the same as in the store.
-		 *
-		 * @param {string} keys keys to load from initial state
-		 */
-		loadInitialState(...keys) {
-			const initialState = {}
-			for (const key of keys) {
-				initialState[key] = loadState('twofactor_email', key)
-			}
-			this.$patch(initialState)
-		},
+		loadInitialState,
 		async save() {
 			const previousState = this.enabled
 			const result = await persistState(this.enabled)
@@ -60,20 +62,7 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 		error: false,
 	}),
 	actions: {
-		/**
-		 * Loads the initial state from Nextcloud into the Store.
-		 * Only tries to fetch the given keys.
-		 * All initial state keys must be the same as in the store.
-		 *
-		 * @param {string} keys keys to load from initial state
-		 */
-		loadInitialState(...keys) {
-			const initialState = {}
-			for (const key of keys) {
-				initialState[key] = loadState('twofactor_email', key)
-			}
-			this.$patch(initialState)
-		},
+		loadInitialState,
 		async save() {
 			const result = await persistAdminSettings({
 				codeLength: this.codeLength,

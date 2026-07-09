@@ -33,9 +33,43 @@ class StateControllerTest extends TestCase {
 		$this->userSession->expects($this->once())
 			->method('getUser')
 			->willReturn($user);
+		$this->stateManager->method('isEnabled')->willReturn(true);
 		$this->stateManager->expects($this->once())
 			->method('disable')
 			->with($user);
+
+		$expected = new JSONResponse([
+			'enabled' => false,
+		]);
+
+		$this->assertEquals($expected, $this->controller->save(false));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testSavingUnchangedStateDispatchesNothing() {
+		$user = $this->createMock(IUser::class);
+		$this->userSession->method('getUser')->willReturn($user);
+		$this->stateManager->method('isEnabled')->willReturn(true);
+		$this->stateManager->expects($this->never())->method('enable');
+		$this->stateManager->expects($this->never())->method('disable');
+
+		$expected = new JSONResponse([
+			'enabled' => true,
+		]);
+
+		$this->assertEquals($expected, $this->controller->save(true));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testSavingUnchangedDisabledStateDispatchesNothing() {
+		$user = $this->createMock(IUser::class);
+		$this->userSession->method('getUser')->willReturn($user);
+		$this->stateManager->method('isEnabled')->willReturn(false);
+		$this->stateManager->expects($this->never())->method('disable');
 
 		$expected = new JSONResponse([
 			'enabled' => false,
