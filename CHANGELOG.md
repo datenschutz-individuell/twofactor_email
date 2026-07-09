@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Wrong and repeated activity entries for accounts without an email address
+- Activity and notification texts could not be translated
 
 ## 3.2.0 (2026-07-05)
 
