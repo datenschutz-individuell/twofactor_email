@@ -69,6 +69,11 @@ at the bottom of "Personal Settings/Security").]]></description>
     <background-jobs>
         <job>OCA\TwoFactorEMail\BackgroundJob\CleanUpExpiredCodes</job>
     </background-jobs>
+    <repair-steps>
+        <post-migration>
+            <step>OCA\TwoFactorEMail\Migration\RemovePersistedDefaultTemplate</step>
+        </post-migration>
+    </repair-steps>
     <two-factor-providers>
         <provider>OCA\TwoFactorEMail\Provider\TwoFactorEMail</provider>
     </two-factor-providers>
