@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Activity;
 
 use OCA\TwoFactorEMail\Event\StateChangeActor;
+use OCP\IL10N;
 
 enum Notification: string {
 	case ENABLED_BY_USER = 'twofactor_email_enabled_by_user';
@@ -27,13 +28,18 @@ enum Notification: string {
 		};
 	}
 
-	public function getSubjectText(): string {
+	/**
+	 * The strings are literal $l->t() calls so the translation tool can
+	 * extract them — passing them through a variable would leave the texts
+	 * untranslatable.
+	 */
+	public function getTranslatedSubject(IL10N $l): string {
 		return match ($this) {
-			Notification::ENABLED_BY_USER => 'You enabled email two-factor authentication for your account',
-			Notification::DISABLED_BY_USER => 'You disabled email two-factor authentication for your account',
-			Notification::ENABLED_BY_ADMIN => 'Email two-factor authentication was enabled by an admin',
-			Notification::DISABLED_BY_ADMIN => 'Email two-factor authentication was disabled by an admin',
-			Notification::DISABLED_NO_EMAIL => 'Email two-factor authentication was disabled because your account has no email address',
+			Notification::ENABLED_BY_USER => $l->t('You enabled email two-factor authentication for your account'),
+			Notification::DISABLED_BY_USER => $l->t('You disabled email two-factor authentication for your account'),
+			Notification::ENABLED_BY_ADMIN => $l->t('Email two-factor authentication was enabled by an admin'),
+			Notification::DISABLED_BY_ADMIN => $l->t('Email two-factor authentication was disabled by an admin'),
+			Notification::DISABLED_NO_EMAIL => $l->t('Email two-factor authentication was disabled because your account has no email address'),
 		};
 	}
 }

@@ -30,6 +30,7 @@ class ProviderTest extends TestCase {
 			[Notification::DISABLED_BY_USER],
 			[Notification::ENABLED_BY_ADMIN],
 			[Notification::DISABLED_BY_ADMIN],
+			[Notification::DISABLED_NO_EMAIL],
 		];
 	}
 
@@ -55,6 +56,7 @@ class ProviderTest extends TestCase {
 		$lang = 'ru';
 		$event = $this->createMock(IEvent::class);
 		$l = $this->createMock(IL10N::class);
+		$l->method('t')->willReturnArgument(0);
 
 		$event->expects($this->once())
 			->method('getApp')
@@ -78,7 +80,8 @@ class ProviderTest extends TestCase {
 			->method('getSubject')
 			->willReturn($subject->value);
 		$event->expects($this->once())
-			->method('setSubject');
+			->method('setParsedSubject')
+			->with($subject->getTranslatedSubject($l));
 
 		$this->provider->parse($lang, $event);
 	}
