@@ -20,13 +20,14 @@ use OCP\BackgroundJob\TimedJob;
  * user preferences indefinitely (data minimization).
  */
 final class CleanUpExpiredCodes extends TimedJob {
+	private const CLEANUP_INTERVAL_SECONDS = 24 * 60 * 60; // 1 day
 
 	public function __construct(
 		ITimeFactory $time,
 		private readonly ICodeStorage $codeStorage,
 	) {
 		parent::__construct($time);
-		$this->setInterval(24 * 3600);
+		$this->setInterval(self::CLEANUP_INTERVAL_SECONDS);
 		$this->setTimeSensitivity(IJob::TIME_INSENSITIVE);
 	}
 
