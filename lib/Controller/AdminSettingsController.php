@@ -44,7 +44,7 @@ final class AdminSettingsController extends ALoginSetupController {
 	): JSONResponse {
 		$errors = $this->validator->validate($codeLength, $codeValidMinutes, $resendMinutes, $eMailSubject, $eMailTemplate);
 		if (!empty($errors)) {
-			return new JSONResponse(['error' => implode(', ', $errors)], Http::STATUS_BAD_REQUEST);
+			return new JSONResponse(['errors' => $errors], Http::STATUS_BAD_REQUEST);
 		}
 
 		$this->appSettings->setCodeLength($codeLength);
