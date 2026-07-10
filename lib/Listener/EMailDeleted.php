@@ -11,51 +11,58 @@ namespace OCA\TwoFactorEMail\Listener;
 
 use OCA\TwoFactorEMail\Event\StateChangeActor;
 use OCA\TwoFactorEMail\Service\IStateManager;
-use OCP\Accounts\UserUpdatedEvent;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
-use OCP\IUser;
 use OCP\User\Events\UserChangedEvent;
 
 /**
- * Disables the provider when an account loses its email address — codes
- * could no longer be delivered. Listens on both events that cover the two
- * UI paths: profile/account updates (UserUpdatedEvent) and direct email
- * changes, e.g. by an admin via the users page (UserChangedEvent).
+ * Disables email 2FA when an account loses its email address, but only when
+ * that removes no protection — it never silently downgrades an account to
+ * password-only.
  *
- * Not covered (Nextcloud fires no event): raw preference edits like
- * `occ user:setting <uid> settings email --delete`.
+ * Trigger: UserChangedEvent for the 'eMailAddress' feature. Every path that
+ * clears the address used for delivery goes through IUser::setSystemEMailAddress()
+ * (personal settings, the users page, the provisioning API, `occ user:setting`),
+ * which fires this event. Account-only changes (additional emails,
+ * `occ user:profile`) leave getEMailAddress() intact and are correctly ignored.
  *
- * @template-implements IEventListener<UserUpdatedEvent|UserChangedEvent>
+ * Once the address is gone and the provider is still enabled:
+ *   - another active provider remains → disable, no protection is lost;
+ *   - email was the sole factor → keep it enabled (fail-closed), whoever
+ *     cleared the address.
+ *
+ * Disabling the sole factor would drop the account to password-only. That would
+ * skip the password confirmation which turning 2FA off directly requires
+ * (StateController), and it would let anyone who may edit a user's email — a
+ * group subadmin, a directory sync, or someone on an unlocked session — remove
+ * a second factor without it. So the provider stays enabled and the challenge
+ * fails until the address is restored or an admin runs
+ * `occ twofactorauth:disable <uid> email`.
+ *
+ * @template-implements IEventListener<UserChangedEvent>
  */
 final class EMailDeleted implements IEventListener {
 
 	public function __construct(
-		private readonly IStateManager $service,
+		private readonly IStateManager $stateManager,
 	) {
 	}
 
 	public function handle(Event $event): void {
-		$user = $this->affectedUser($event);
-		if ($user === null || $user->getEMailAddress() !== null) {
+		if (!$event instanceof UserChangedEvent || $event->getFeature() !== 'eMailAddress') {
 			return;
 		}
-		// Only disable an enabled provider: without this guard, every profile
-		// update of a user without an email address would dispatch another
-		// StateChanged event and create a bogus activity entry.
-		if (!$this->service->isEnabled($user)) {
+		$user = $event->getUser();
+		if ($user->getEMailAddress() !== null) {
+			return; // still deliverable (e.g. the address was changed, not cleared)
+		}
+		if (!$this->stateManager->isEnabled($user)) {
 			return;
 		}
-		$this->service->disable($user, StateChangeActor::SYSTEM);
-	}
-
-	private function affectedUser(Event $event): ?IUser {
-		if ($event instanceof UserUpdatedEvent) {
-			return $event->getUser();
+		// Disable only when another factor remains; keep the sole factor enabled
+		// (fail-closed) — see the class docblock.
+		if ($this->stateManager->hasOtherActiveProvider($user)) {
+			$this->stateManager->disable($user, StateChangeActor::SYSTEM);
 		}
-		if ($event instanceof UserChangedEvent && $event->getFeature() === 'eMailAddress') {
-			return $event->getUser();
-		}
-		return null;
 	}
 }

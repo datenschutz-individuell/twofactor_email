@@ -29,7 +29,6 @@ use OCA\TwoFactorEMail\Service\IStateManager;
 use OCA\TwoFactorEMail\Service\LoginChallenge;
 use OCA\TwoFactorEMail\Service\NumericalCodeGenerator;
 use OCA\TwoFactorEMail\Service\StateManager;
-use OCP\Accounts\UserUpdatedEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -60,7 +59,6 @@ final class Application extends App implements IBootstrap {
 		$context->registerEventListener(StateChanged::class, StateChangeRegistryUpdater::class);
 		$context->registerEventListener(StateChanged::class, StateChangeActivity::class);
 		$context->registerEventListener(StateChanged::class, StateChangeNotification::class);
-		$context->registerEventListener(UserUpdatedEvent::class, EMailDeleted::class);
 		$context->registerEventListener(UserChangedEvent::class, EMailDeleted::class);
 
 		$context->registerNotifierService(Notifier::class);
