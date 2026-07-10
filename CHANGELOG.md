@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Wrong and repeated activity entries for accounts without an email address
+- Admin and automatic changes are no longer attributed to the affected user in the activity stream
 - Activity and notification texts could not be translated
 - Saving an unchanged on/off state created duplicate activity entries
 - Outdated notifications are dismissed when the provider state changes again

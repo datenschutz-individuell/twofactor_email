@@ -54,9 +54,12 @@ final class Application extends App implements IBootstrap {
 		$context->registerServiceAlias(IEMailSender::class, EMailSender::class);
 		$context->registerServiceAlias(IStateManager::class, StateManager::class);
 
+		// Persist the state first: if the registry write fails, the activity and
+		// notification listeners (which run afterwards) do not record a change
+		// that did not happen.
+		$context->registerEventListener(StateChanged::class, StateChangeRegistryUpdater::class);
 		$context->registerEventListener(StateChanged::class, StateChangeActivity::class);
 		$context->registerEventListener(StateChanged::class, StateChangeNotification::class);
-		$context->registerEventListener(StateChanged::class, StateChangeRegistryUpdater::class);
 		$context->registerEventListener(UserUpdatedEvent::class, EMailDeleted::class);
 		$context->registerEventListener(UserChangedEvent::class, EMailDeleted::class);
 

@@ -17,6 +17,7 @@ use OCP\Activity\IEvent;
 use OCP\Activity\IManager;
 use OCP\EventDispatcher\Event;
 use OCP\IUser;
+use OCP\IUserSession;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -24,63 +25,94 @@ class StateChangeActivityTest extends TestCase {
 
 	private StateChangeActivity $listener;
 
-	private IManager|MockObject $activityManager;
+	private IManager&MockObject $activityManager;
+
+	private IUserSession&MockObject $userSession;
 
 	/**
 	 * @throws Exception
 	 */
-	public function testHandleStateEvent() {
-		$uid = 'user234';
-		$user = $this->createMock(IUser::class);
-		$user->method('getUID')->willReturn($uid);
-		$event = new StateChanged($user, true);
-		$activityEvent = $this->createMock(IEvent::class);
-		$this->activityManager->expects($this->once())
-			->method('generateEvent')
-			->willReturn($activityEvent);
-		$activityEvent->expects($this->once())
-			->method('setApp')
-			->with('twofactor_email')
-			->willReturnSelf();
-		$activityEvent->expects($this->once())
-			->method('setType')
-			->with('security')
-			->willReturnSelf();
-		$activityEvent->expects($this->once())
-			->method('setAuthor')
-			->with($uid)
-			->willReturnSelf();
-		$activityEvent->expects($this->once())
-			->method('setAffectedUser')
-			->with($uid)
-			->willReturnSelf();
-		$this->activityManager->expects($this->once())
-			->method('publish')
-			->with($activityEvent);
-
-		$this->listener->handle($event);
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public function testSystemDisableCreatesNoEmailActivity(): void {
-		$user = $this->createMock(IUser::class);
-		$user->method('getUID')->willReturn('user234');
-		$event = new StateChanged($user, false, StateChangeActor::SYSTEM);
+	private function mockActivityEvent(): IEvent&MockObject {
 		$activityEvent = $this->createMock(IEvent::class);
 		$activityEvent->method('setApp')->willReturnSelf();
 		$activityEvent->method('setType')->willReturnSelf();
 		$activityEvent->method('setAuthor')->willReturnSelf();
 		$activityEvent->method('setAffectedUser')->willReturnSelf();
+		$activityEvent->method('setSubject')->willReturnSelf();
+		$this->activityManager->method('generateEvent')->willReturn($activityEvent);
+		return $activityEvent;
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function loginAs(?string $uid): void {
+		$actor = null;
+		if ($uid !== null) {
+			$actor = $this->createMock(IUser::class);
+			$actor->method('getUID')->willReturn($uid);
+		}
+		$this->userSession->method('getUser')->willReturn($actor);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testUserChangeIsAuthoredByTheUser(): void {
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('alice');
+		$activityEvent = $this->mockActivityEvent();
+		$this->loginAs('alice');
+		$activityEvent->expects($this->once())->method('setAuthor')->with('alice')->willReturnSelf();
+		$activityEvent->expects($this->once())->method('setAffectedUser')->with('alice')->willReturnSelf();
+		$this->activityManager->expects($this->once())->method('publish');
+
+		$this->listener->handle(new StateChanged($user, true, StateChangeActor::USER));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testAdminChangeIsAuthoredByTheActingAdmin(): void {
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('alice');
+		$activityEvent = $this->mockActivityEvent();
+		$this->loginAs('admin');
+		$activityEvent->expects($this->once())->method('setAuthor')->with('admin')->willReturnSelf();
+		$activityEvent->expects($this->once())->method('setAffectedUser')->with('alice')->willReturnSelf();
+
+		$this->listener->handle(new StateChanged($user, false, StateChangeActor::ADMIN));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testAdminChangeWithoutSessionHasNoAuthor(): void {
+		// e.g. `occ twofactorauth:disable` — no user in the session
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('alice');
+		$activityEvent = $this->mockActivityEvent();
+		$this->loginAs(null);
+		$activityEvent->expects($this->once())->method('setAuthor')->with('')->willReturnSelf();
+
+		$this->listener->handle(new StateChanged($user, false, StateChangeActor::ADMIN));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testSystemChangeHasNoAuthorAndTheNoEmailSubject(): void {
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('alice');
+		$activityEvent = $this->mockActivityEvent();
+		$this->loginAs('alice'); // even with a session, a SYSTEM change stays authorless
+		$activityEvent->expects($this->once())->method('setAuthor')->with('')->willReturnSelf();
 		$activityEvent->expects($this->once())
 			->method('setSubject')
 			->with('twofactor_email_disabled_no_email')
 			->willReturnSelf();
-		$this->activityManager->method('generateEvent')->willReturn($activityEvent);
-		$this->activityManager->expects($this->once())->method('publish');
 
-		$this->listener->handle($event);
+		$this->listener->handle(new StateChanged($user, false, StateChangeActor::SYSTEM));
 	}
 
 	public function testIgnoresForeignEvents(): void {
@@ -96,7 +128,8 @@ class StateChangeActivityTest extends TestCase {
 		parent::setUp();
 
 		$this->activityManager = $this->createMock(IManager::class);
+		$this->userSession = $this->createMock(IUserSession::class);
 
-		$this->listener = new StateChangeActivity($this->activityManager);
+		$this->listener = new StateChangeActivity($this->activityManager, $this->userSession);
 	}
 }
