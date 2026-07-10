@@ -9,13 +9,11 @@ OC.L10N.register(
     "Authentication code" : "Kod uwierzytelnienia",
     "Subject" : "Temat",
     "Body" : "Treść",
-    "You cannot enable two-factor authentication via email. You need to set a primary email address (in your personal settings) first." : "Nie można włączyć uwierzytelniania dwuskładnikowego przez e-mail. Najpierw ustaw główny adres e-mail (w ustawieniach osobistych)",
     "Could not enable/disable two-factor authentication via email." : "Nie udało się włączyć/wyłączyć uwierzytelniania dwuskładnikowego przez e-mail",
     "Unhandled error!" : "Nieobsłużony błąd!",
     "Codes will be sent to your primary email address:" : "Kody będą wysyłane na Twój główny adres e-mail:",
     "Proceed" : "Kontynuuj",
     "Use two-factor authentication via email" : "Użyj uwierzytelniania dwuskładnikowego przez e-mail",
-    "Apparently your previously configured email address just vanished." : "Wygląda na to, że wcześniej skonfigurowany adres e-mail zniknął",
     "A new authentication code was just sent. Please enter it:" : "Właśnie wysłano nowy kod uwierzytelniający. Wprowadź go:",
     "Enter the authentication code that was sent to you:" : "Wprowadź kod uwierzytelniający, który został do Ciebie wysłany:",
     "Submit" : "Wyślij"
