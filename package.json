@@ -77,6 +77,6 @@
     "@nextcloud/typings": "^1.10.0",
     "@nextcloud/vite-config": "^2.5.1",
     "eslint": "^10.0.1",
-    "vite": "^7.1.9"
+    "vite": "^8.1.4"
   }
 }
