@@ -6,6 +6,18 @@
 import { nextTick, reactive, ref, watch } from 'vue'
 import Logger from '../Logger.js'
 
+// Maps each backend validation error code to the settings field it concerns,
+// so a rejected save highlights only the offending field(s).
+const ERROR_FIELD_BY_CODE = {
+	'code-length-out-of-range': 'codeLength',
+	'code-valid-minutes-out-of-range': 'codeValidMinutes',
+	'resend-minutes-out-of-range': 'codeResendMinutes',
+	'email-subject-too-long': 'eMailSubject',
+	'email-subject-must-be-single-line': 'eMailSubject',
+	'email-template-too-long': 'eMailTemplate',
+	'email-code-placeholder-missing': 'eMailTemplate',
+}
+
 /**
  * Manages a single shared debounced timer and loading state across all admin
  * settings fields, with per-field success feedback. Eliminates race conditions
@@ -128,16 +140,27 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 				store[key] = inputValues[key]
 			}
 			const result = await store.save()
-			// Set per-field success based on the shared result
-			for (const key of fieldKeys) {
-				if (typeof result?.error !== 'string') {
+			if (Array.isArray(result?.errors)) {
+				// Backend rejected specific fields — flag only those; the rest
+				// stay idle since nothing is saved on a validation error.
+				const failed = new Set(result.errors.map((code) => ERROR_FIELD_BY_CODE[code]).filter(Boolean))
+				for (const key of fieldKeys) {
+					clearTimeout(successTimers[key])
+					successRefs[key] = failed.has(key) ? false : null
+				}
+			} else if (typeof result?.error === 'string') {
+				// Unexpected failure (network etc.) — flag all fields
+				for (const key of fieldKeys) {
+					successRefs[key] = false
+				}
+			} else {
+				// Success — every field was saved
+				for (const key of fieldKeys) {
 					clearTimeout(successTimers[key])
 					successRefs[key] = true
 					successTimers[key] = setTimeout(() => {
 						successRefs[key] = null
 					}, successMs)
-				} else {
-					successRefs[key] = false
 				}
 			}
 		} catch (saveError) {
