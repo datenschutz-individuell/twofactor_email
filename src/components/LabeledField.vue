@@ -12,7 +12,7 @@
 			:id="id"
 			v-model="model"
 			:error="result === false"
-			:helperText="helperText"
+			:helperText="displayedHelperText"
 			:labelOutside="true"
 			:loading="loading"
 			:placeholder="placeholder"
@@ -22,7 +22,7 @@
 			:id="id"
 			v-model="model"
 			:error="result === false"
-			:helperText="helperText"
+			:helperText="displayedHelperText"
 			:labelOutside="true"
 			:loading="loading"
 			:min="type === 'number' ? '1' : undefined"
@@ -34,6 +34,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 
@@ -50,7 +51,13 @@ const props = defineProps({
 	loading: { type: Boolean, default: false },
 	placeholder: { type: String, default: undefined },
 	helperText: { type: String, default: '' },
+	/** Validation message shown (in the error color) while the field is flagged */
+	errorMessage: { type: String, default: '' },
 })
+
+// Replace the helper text with the validation message while flagged; the
+// error state already renders the helper text in the error color.
+const displayedHelperText = computed(() => props.result === false && props.errorMessage ? props.errorMessage : props.helperText)
 
 /**
  * Blocks '-' (minus) and 'e' (scientific notation) in number inputs.

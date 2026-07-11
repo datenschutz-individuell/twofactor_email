@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { t } from '@nextcloud/l10n'
 import { nextTick, reactive, ref, watch } from 'vue'
 import Logger from '../Logger.js'
 
@@ -40,7 +41,41 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 	// and allows watch(() => inputValues[key]) to track changes correctly.
 	const inputValues = reactive(Object.fromEntries(fieldKeys.map((key) => [key, store[key]])))
 	const successRefs = reactive(Object.fromEntries(fieldKeys.map((key) => [key, null])))
+	const errorMessages = reactive(Object.fromEntries(fieldKeys.map((key) => [key, ''])))
 	const successTimers = Object.fromEntries(fieldKeys.map((key) => [key, null]))
+
+	// User-facing message per validation error code. Built here (not at module
+	// load) so t() runs once l10n is available.
+	const errorMessageByCode = {
+		'code-length-out-of-range': t('twofactor_email', 'The code length is outside the allowed range.'),
+		'code-valid-minutes-out-of-range': t('twofactor_email', 'The validity is outside the allowed range.'),
+		'resend-minutes-out-of-range': t('twofactor_email', 'The resend cooldown is outside the allowed range.'),
+		'email-subject-too-long': t('twofactor_email', 'The subject is too long.'),
+		'email-subject-must-be-single-line': t('twofactor_email', 'The subject must be a single line.'),
+		'email-template-too-long': t('twofactor_email', 'The body is too long.'),
+		'email-code-placeholder-missing': t('twofactor_email', 'The body must contain the {code} placeholder.'),
+	}
+
+	/**
+	 * Flags the fields named by the given error codes and shows each one's
+	 * message; all other fields go idle, since nothing is saved on an error.
+	 *
+	 * @param {string[]} codes - validation error codes from client or backend
+	 */
+	function applyErrors(codes) {
+		const messages = {}
+		for (const code of codes) {
+			const field = ERROR_FIELD_BY_CODE[code]
+			if (field) {
+				messages[field] = errorMessageByCode[code] ?? ''
+			}
+		}
+		for (const key of fieldKeys) {
+			clearTimeout(successTimers[key])
+			successRefs[key] = key in messages ? false : null
+			errorMessages[key] = messages[key] ?? ''
+		}
+	}
 
 	// Shared debounce timer — restarted by any field change
 	let debounceTimer = null
@@ -98,10 +133,10 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 
 	/**
 	 * Validates all input values before saving.
-	 * Returns an array of field keys that failed validation,
-	 * or an empty array if all values are valid.
+	 * Returns validation error codes (same vocabulary as the backend), or an
+	 * empty array if all values are valid.
 	 *
-	 * @return {string[]} field keys with validation errors
+	 * @return {string[]} validation error codes
 	 */
 	function validate() {
 		const errors = []
@@ -109,12 +144,12 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 		// which contains {code}, so only a customized body can lose it.
 		const body = inputValues.eMailTemplate ?? ''
 		if (body !== '' && !body.includes('{code}')) {
-			errors.push('eMailTemplate')
+			errors.push('email-code-placeholder-missing')
 			Logger.warn('Email body does not contain the {code} placeholder')
 		}
 		// The subject must stay a single line (email header)
 		if (/[\r\n]/.test(inputValues.eMailSubject ?? '')) {
-			errors.push('eMailSubject')
+			errors.push('email-subject-must-be-single-line')
 			Logger.warn('Email subject must not contain line breaks')
 		}
 		return errors
@@ -124,12 +159,10 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 		loading.value = true
 		store.$patch({ error: null })
 
-		// Validate before saving — set error state on failing fields and abort
-		const invalidFields = validate()
-		if (invalidFields.length > 0) {
-			for (const key of invalidFields) {
-				successRefs[key] = false
-			}
+		// Validate before saving — flag failing fields and abort
+		const invalidCodes = validate()
+		if (invalidCodes.length > 0) {
+			applyErrors(invalidCodes)
 			loading.value = false
 			return
 		}
@@ -141,23 +174,20 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 			}
 			const result = await store.save()
 			if (Array.isArray(result?.errors)) {
-				// Backend rejected specific fields — flag only those; the rest
-				// stay idle since nothing is saved on a validation error.
-				const failed = new Set(result.errors.map((code) => ERROR_FIELD_BY_CODE[code]).filter(Boolean))
-				for (const key of fieldKeys) {
-					clearTimeout(successTimers[key])
-					successRefs[key] = failed.has(key) ? false : null
-				}
+				// Backend rejected specific fields — flag only those
+				applyErrors(result.errors)
 			} else if (typeof result?.error === 'string') {
-				// Unexpected failure (network etc.) — flag all fields
+				// Unexpected failure (network etc.) — flag all fields, no message
 				for (const key of fieldKeys) {
 					successRefs[key] = false
+					errorMessages[key] = ''
 				}
 			} else {
 				// Success — every field was saved
 				for (const key of fieldKeys) {
 					clearTimeout(successTimers[key])
 					successRefs[key] = true
+					errorMessages[key] = ''
 					successTimers[key] = setTimeout(() => {
 						successRefs[key] = null
 					}, successMs)
@@ -167,6 +197,7 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 			store.$patch({ error: 'save-failed' })
 			for (const key of fieldKeys) {
 				successRefs[key] = false
+				errorMessages[key] = ''
 			}
 			Logger.error('Could not persist admin settings', saveError)
 		} finally {
@@ -174,5 +205,5 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 		}
 	}
 
-	return { inputValues, loading, successRefs }
+	return { inputValues, loading, successRefs, errorMessages }
 }
