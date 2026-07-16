@@ -21,7 +21,7 @@ final class SettingsValidator {
 
 	// Allowed range for code validity in minutes
 	public const MIN_CODE_VALID_MINUTES = 1;
-	public const MAX_CODE_VALID_MINUTES = 44640; // 1 month
+	public const MAX_CODE_VALID_MINUTES = 1440; // 1 day
 
 	// Allowed range for the resend cooldown in minutes
 	public const MIN_RESEND_MINUTES = 1;
