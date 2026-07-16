@@ -18,4 +18,10 @@ interface IStateManager {
 	public function disable(IUser $user, StateChangeActor $actor = StateChangeActor::USER): void;
 
 	public function isEnabled(IUser $user): bool;
+
+	/**
+	 * Whether the user has another active 2FA provider besides email, i.e.
+	 * disabling email would not leave the account without a second factor.
+	 */
+	public function hasOtherActiveProvider(IUser $user): bool;
 }

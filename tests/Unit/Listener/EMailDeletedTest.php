@@ -45,37 +45,43 @@ class EMailDeletedTest extends TestCase {
 		return $user;
 	}
 
-	public function testDisablesEnabledProviderOnAccountUpdateWithoutEmail(): void {
-		$user = $this->mockUser(null);
-		$this->stateManager->method('isEnabled')->with($user)->willReturn(true);
-		$this->stateManager->expects($this->once())->method('disable')->with($user, StateChangeActor::SYSTEM);
-
-		$this->listener->handle(new UserUpdatedEvent($user, []));
+	private function emailCleared(IUser $user): UserChangedEvent {
+		return new UserChangedEvent($user, 'eMailAddress', '', 'old@example.com');
 	}
 
-	public function testDisablesEnabledProviderWhenEmailFeatureIsCleared(): void {
+	public function testDisablesWhenAnotherProviderRemains(): void {
 		$user = $this->mockUser(null);
-		$this->stateManager->method('isEnabled')->with($user)->willReturn(true);
+		$this->stateManager->method('isEnabled')->willReturn(true);
+		$this->stateManager->method('hasOtherActiveProvider')->willReturn(true);
 		$this->stateManager->expects($this->once())->method('disable')->with($user, StateChangeActor::SYSTEM);
 
-		$this->listener->handle(new UserChangedEvent($user, 'eMailAddress', '', 'old@example.com'));
+		$this->listener->handle($this->emailCleared($user));
 	}
 
-	public function testKeepsProviderWhenEmailIsPresent(): void {
-		$user = $this->mockUser('alice@example.com');
+	public function testKeepsSoleFactorEnabledWhoeverRemovedTheEmail(): void {
+		// Fail-closed: the only second factor is never auto-disabled
+		$user = $this->mockUser(null);
+		$this->stateManager->method('isEnabled')->willReturn(true);
+		$this->stateManager->method('hasOtherActiveProvider')->willReturn(false);
 		$this->stateManager->expects($this->never())->method('disable');
 
-		$this->listener->handle(new UserUpdatedEvent($user, []));
+		$this->listener->handle($this->emailCleared($user));
+	}
+
+	public function testKeepsProviderWhenAddressStillPresent(): void {
+		// The address was changed, not cleared
+		$user = $this->mockUser('new@example.com');
+		$this->stateManager->expects($this->never())->method('disable');
+
+		$this->listener->handle(new UserChangedEvent($user, 'eMailAddress', 'new@example.com', 'old@example.com'));
 	}
 
 	public function testDoesNotDisableAnAlreadyDisabledProvider(): void {
-		// Guards against bogus activity entries on every profile update
-		// of users without an email address
 		$user = $this->mockUser(null);
-		$this->stateManager->method('isEnabled')->with($user)->willReturn(false);
+		$this->stateManager->method('isEnabled')->willReturn(false);
 		$this->stateManager->expects($this->never())->method('disable');
 
-		$this->listener->handle(new UserUpdatedEvent($user, []));
+		$this->listener->handle($this->emailCleared($user));
 	}
 
 	public function testIgnoresOtherChangedFeatures(): void {
@@ -83,6 +89,19 @@ class EMailDeletedTest extends TestCase {
 		$this->stateManager->expects($this->never())->method('disable');
 
 		$this->listener->handle(new UserChangedEvent($user, 'displayName', 'Alice'));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testIgnoresUnrelatedProfileUpdate(): void {
+		// Regression: a UserUpdatedEvent (any profile change) must not trigger a
+		// disable — even for a user who currently has no email address. Only a
+		// genuine email-change event (UserChangedEvent) is a trigger.
+		$user = $this->mockUser(null);
+		$this->stateManager->expects($this->never())->method('disable');
+
+		$this->listener->handle(new UserUpdatedEvent($user, []));
 	}
 
 	public function testIgnoresForeignEvents(): void {

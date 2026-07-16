@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Harden the challenge email subject against header injection (defense in depth)
+- Keep 2FA enabled instead of dropping to password-only when a user's only email address is removed
 
 ## 3.2.0 (2026-07-05)
 

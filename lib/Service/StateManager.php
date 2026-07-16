@@ -21,6 +21,9 @@ use OCP\IUser;
  * updating it here would create a circular dependency with the provider.
  */
 final class StateManager implements IStateManager {
+
+	private const PROVIDER_ID = 'email';
+
 	public function __construct(
 		private readonly IEventDispatcher $eventDispatcher,
 		private readonly IRegistry $registry,
@@ -36,6 +39,15 @@ final class StateManager implements IStateManager {
 	}
 
 	public function isEnabled(IUser $user): bool {
-		return $this->registry->getProviderStates($user)['email'] ?? false;
+		return $this->registry->getProviderStates($user)[self::PROVIDER_ID] ?? false;
+	}
+
+	public function hasOtherActiveProvider(IUser $user): bool {
+		foreach ($this->registry->getProviderStates($user) as $providerId => $enabled) {
+			if ($enabled && $providerId !== self::PROVIDER_ID) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
