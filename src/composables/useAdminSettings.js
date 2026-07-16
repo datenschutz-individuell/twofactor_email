@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import { nextTick, reactive, ref, watch } from 'vue'
 import Logger from '../Logger.js'
@@ -32,15 +33,19 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 	const errorMessages = reactive(Object.fromEntries(fieldKeys.map((key) => [key, ''])))
 	const successTimers = Object.fromEntries(fieldKeys.map((key) => [key, null]))
 
+	// Numeric limits per field, provided by the server, so the messages below
+	// can name the allowed range instead of duplicating the values.
+	const limits = loadState('twofactor_email', 'limits', {})
+
 	// User-facing message per validation error code. Built here (not at module
 	// load) so t() runs once l10n is available.
 	const errorMessageByCode = {
-		'code-length-out-of-range': t('twofactor_email', 'The code length is outside the allowed range.'),
-		'code-valid-minutes-out-of-range': t('twofactor_email', 'The validity is outside the allowed range.'),
-		'resend-minutes-out-of-range': t('twofactor_email', 'The resend cooldown is outside the allowed range.'),
-		'email-subject-too-long': t('twofactor_email', 'The subject is too long.'),
+		'code-length-out-of-range': t('twofactor_email', 'The code length must be between {min} and {max} characters.', { min: limits.codeLength?.min, max: limits.codeLength?.max }),
+		'code-valid-minutes-out-of-range': t('twofactor_email', 'The validity must be between {min} and {max} minutes.', { min: limits.codeValidMinutes?.min, max: limits.codeValidMinutes?.max }),
+		'resend-minutes-out-of-range': t('twofactor_email', 'The resend cooldown must be between {min} and {max} minutes.', { min: limits.codeResendMinutes?.min, max: limits.codeResendMinutes?.max }),
+		'email-subject-too-long': t('twofactor_email', 'The subject must not exceed {max} characters.', { max: limits.eMailSubject?.max }),
 		'email-subject-must-be-single-line': t('twofactor_email', 'The subject must be a single line.'),
-		'email-template-too-long': t('twofactor_email', 'The body is too long.'),
+		'email-template-too-long': t('twofactor_email', 'The body must not exceed {max} characters.', { max: limits.eMailTemplate?.max }),
 		'email-code-placeholder-missing': t('twofactor_email', 'The body must contain the {code} placeholder.'),
 	}
 

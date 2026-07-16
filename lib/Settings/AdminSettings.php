@@ -11,6 +11,7 @@ namespace OCA\TwoFactorEMail\Settings;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Service\IAppSettings;
+use OCA\TwoFactorEMail\Service\SettingsValidator;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IL10N;
@@ -33,6 +34,8 @@ final class AdminSettings implements IDelegatedSettings {
 		// Localized default texts, shown as placeholders in the empty form fields
 		$this->initialState->provideInitialState('eMailSubjectDefault', $this->appSettings->getDefaultEMailSubject());
 		$this->initialState->provideInitialState('eMailTemplateDefault', $this->appSettings->getDefaultEMailBody());
+		// Numeric limits, so validation messages can name the allowed range
+		$this->initialState->provideInitialState('limits', SettingsValidator::getLimits());
 
 		return new TemplateResponse(Application::APP_ID, 'AdminSettings', renderAs: TemplateResponse::RENDER_AS_BLANK);
 	}

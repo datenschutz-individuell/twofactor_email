@@ -32,6 +32,22 @@ final class SettingsValidator {
 	public const MAX_EMAIL_TEMPLATE_LENGTH = 10000;
 
 	/**
+	 * Returns the numeric limits per settings field, so the web UI can name
+	 * them in its validation messages without duplicating the values.
+	 *
+	 * @return array<string, array{min?: int, max: int}>
+	 */
+	public static function getLimits(): array {
+		return [
+			'codeLength' => ['min' => self::MIN_CODE_LENGTH, 'max' => self::MAX_CODE_LENGTH],
+			'codeValidMinutes' => ['min' => self::MIN_CODE_VALID_MINUTES, 'max' => self::MAX_CODE_VALID_MINUTES],
+			'codeResendMinutes' => ['min' => self::MIN_RESEND_MINUTES, 'max' => self::MAX_RESEND_MINUTES],
+			'eMailSubject' => ['max' => self::MAX_EMAIL_SUBJECT_LENGTH],
+			'eMailTemplate' => ['max' => self::MAX_EMAIL_TEMPLATE_LENGTH],
+		];
+	}
+
+	/**
 	 * Validates the given admin settings.
 	 * Returns a map of field name to error code, or an empty array if all
 	 * values are valid. The field names match the settings keys used by the
