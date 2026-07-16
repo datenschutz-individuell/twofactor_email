@@ -118,47 +118,18 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 		}, debounceMs)
 	}
 
-	/**
-	 * Validates all input values before saving.
-	 * Returns a field->code map (same vocabulary as the backend), or an empty
-	 * object if all values are valid.
-	 *
-	 * @return {Object<string, string>} field name to validation error code
-	 */
-	function validate() {
-		const errors = {}
-		// The code must reach the user: an empty body falls back to the default
-		// which contains {code}, so only a customized body can lose it.
-		const body = inputValues.eMailTemplate ?? ''
-		if (body !== '' && !body.includes('{code}')) {
-			errors.eMailTemplate = 'email-code-placeholder-missing'
-			Logger.warn('Email body does not contain the {code} placeholder')
-		}
-		// The subject must stay a single line (email header)
-		if (/[\r\n]/.test(inputValues.eMailSubject ?? '')) {
-			errors.eMailSubject = 'email-subject-must-be-single-line'
-			Logger.warn('Email subject must not contain line breaks')
-		}
-		return errors
-	}
-
 	async function scheduleAndSave() {
 		loading.value = true
 		store.$patch({ error: null })
-
-		// Validate before saving — flag failing fields and abort
-		const invalidFields = validate()
-		if (Object.keys(invalidFields).length > 0) {
-			applyErrors(invalidFields)
-			loading.value = false
-			return
-		}
 
 		try {
 			// Write all current inputValues into the store before saving
 			for (const key of fieldKeys) {
 				store[key] = inputValues[key]
 			}
+			// The backend validates every field and returns the full field->code
+			// map, so all currently invalid fields stay flagged (not just the
+			// one last edited).
 			const result = await store.save()
 			if (result?.errors && typeof result.errors === 'object') {
 				// Backend rejected specific fields — flag only those
