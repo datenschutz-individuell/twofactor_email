@@ -52,6 +52,26 @@ class CodeStorageTest extends TestCase {
 		$this->assertSame(['code', 'code_created_at'], $deletedKeys);
 	}
 
+	public function testDeleteCodeReturnsTrueWhenCodeWasStored(): void {
+		$this->config->method('getValueString')->willReturn('hashed-code');
+
+		$this->assertTrue($this->storage->deleteCode('alice'));
+	}
+
+	public function testDeleteCodeReturnsFalseWhenNoCodeWasStored(): void {
+		$this->config->method('getValueString')->willReturn('');
+
+		$this->assertFalse($this->storage->deleteCode('alice'));
+	}
+
+	public function testDeleteExpiredReturnsRemovedCount(): void {
+		// validity is 10 minutes: created_at 0 is expired, a fresh one is not
+		$this->config->method('getValuesByUsers')->willReturn(['old' => 0, 'fresh' => time()]);
+		$this->config->method('getValueString')->willReturn('hashed-code');
+
+		$this->assertSame(1, $this->storage->deleteExpired());
+	}
+
 	public function testSecondsSinceLastCodeForFreshCode(): void {
 		$this->config->method('getValueInt')->willReturn(time());
 		$this->config->method('getValueString')->willReturn('hashed-code');

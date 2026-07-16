@@ -53,7 +53,11 @@ final class DeleteCodes extends Command {
 
 		if ($all) {
 			$count = $this->codeStorage->deleteAllCodes();
-			$io->success(sprintf('Deleted the stored codes of %d user(s).', $count));
+			if ($count === 0) {
+				$io->info('No stored codes to delete.');
+			} else {
+				$io->success(sprintf('Deleted the stored codes of %d user(s).', $count));
+			}
 			return Command::SUCCESS;
 		}
 
@@ -62,8 +66,11 @@ final class DeleteCodes extends Command {
 		if ($this->userManager->get($uid) === null) {
 			$io->warning('No user with id "' . $uid . '" exists — deleting leftover codes anyway.');
 		}
-		$this->codeStorage->deleteCode($uid);
-		$io->success('Deleted the stored code of "' . $uid . '".');
+		if ($this->codeStorage->deleteCode($uid)) {
+			$io->success('Deleted the stored code of "' . $uid . '".');
+		} else {
+			$io->info('No code was stored for "' . $uid . '".');
+		}
 		return Command::SUCCESS;
 	}
 }

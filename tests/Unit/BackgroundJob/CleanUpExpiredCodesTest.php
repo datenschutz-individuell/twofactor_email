@@ -22,7 +22,7 @@ class CleanUpExpiredCodesTest extends TestCase {
 	 */
 	public function testRunDeletesExpiredCodes(): void {
 		$codeStorage = $this->createMock(ICodeStorage::class);
-		$codeStorage->expects($this->once())->method('deleteExpired');
+		$codeStorage->expects($this->once())->method('deleteExpired')->willReturn(0);
 		$job = new CleanUpExpiredCodes($this->createMock(ITimeFactory::class), $codeStorage);
 
 		// run() is protected by the TimedJob contract

@@ -20,7 +20,12 @@ interface ICodeStorage {
 
 	public function writeCode(string $userId, string $code, ?int $createdAt = null): void;
 
-	public function deleteCode(string $userId): void;
+	/**
+	 * Deletes the user's stored code.
+	 *
+	 * @return bool whether a code was stored (an expired one still counts)
+	 */
+	public function deleteCode(string $userId): bool;
 
 	/**
 	 * Deletes the stored codes of all users.
@@ -29,5 +34,10 @@ interface ICodeStorage {
 	 */
 	public function deleteAllCodes(): int;
 
-	public function deleteExpired(): void;
+	/**
+	 * Deletes all codes whose validity has elapsed.
+	 *
+	 * @return int the number of expired codes removed
+	 */
+	public function deleteExpired(): int;
 }
