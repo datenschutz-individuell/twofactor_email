@@ -51,13 +51,14 @@ export function persistState(enabled) {
 
 /**
  * On success the saved settings are returned; on a validation error `errors`
- * holds the failed check codes; on an unexpected failure `error` is set.
+ * maps each offending field to its error code; on an unexpected failure
+ * `error` is set.
  *
  * @typedef {{
  *   codeLength?: number,
  *   codeValidMinutes?: number,
  *   eMailTemplate?: string,
- *   errors?: string[],
+ *   errors?: Object<string, string>,
  *   error?: string
  * }} PersistAdminSettingsResult
  */
@@ -80,10 +81,10 @@ export function persistAdminSettings(settings) {
 				return resp.data
 			}
 		}).catch((error) => {
-			// A 400 carries the list of failed validation checks so the UI can
-			// flag the offending fields; anything else is an unexpected failure.
+			// A 400 carries a field->code map of the failed validation checks so
+			// the UI can flag the offending fields; anything else is unexpected.
 			const errors = error.response?.data?.errors
-			if (Array.isArray(errors)) {
+			if (errors && typeof errors === 'object' && !Array.isArray(errors)) {
 				return { errors }
 			}
 			Logger.error('failed to save two-factor email admin settings', error)

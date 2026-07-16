@@ -7,18 +7,6 @@ import { t } from '@nextcloud/l10n'
 import { nextTick, reactive, ref, watch } from 'vue'
 import Logger from '../Logger.js'
 
-// Maps each backend validation error code to the settings field it concerns,
-// so a rejected save highlights only the offending field(s).
-const ERROR_FIELD_BY_CODE = {
-	'code-length-out-of-range': 'codeLength',
-	'code-valid-minutes-out-of-range': 'codeValidMinutes',
-	'resend-minutes-out-of-range': 'codeResendMinutes',
-	'email-subject-too-long': 'eMailSubject',
-	'email-subject-must-be-single-line': 'eMailSubject',
-	'email-template-too-long': 'eMailTemplate',
-	'email-code-placeholder-missing': 'eMailTemplate',
-}
-
 /**
  * Manages a single shared debounced timer and loading state across all admin
  * settings fields, with per-field success feedback. Eliminates race conditions
@@ -57,23 +45,17 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 	}
 
 	/**
-	 * Flags the fields named by the given error codes and shows each one's
-	 * message; all other fields go idle, since nothing is saved on an error.
+	 * Flags each field named in the given field->code map with its message;
+	 * all other fields go idle, since nothing is saved on an error.
 	 *
-	 * @param {string[]} codes - validation error codes from client or backend
+	 * @param {Object<string, string>} fieldErrors - field name to error code
 	 */
-	function applyErrors(codes) {
-		const messages = {}
-		for (const code of codes) {
-			const field = ERROR_FIELD_BY_CODE[code]
-			if (field) {
-				messages[field] = errorMessageByCode[code] ?? ''
-			}
-		}
+	function applyErrors(fieldErrors) {
 		for (const key of fieldKeys) {
 			clearTimeout(successTimers[key])
-			successRefs[key] = key in messages ? false : null
-			errorMessages[key] = messages[key] ?? ''
+			const code = fieldErrors[key]
+			successRefs[key] = code ? false : null
+			errorMessages[key] = code ? (errorMessageByCode[code] ?? '') : ''
 		}
 	}
 
@@ -133,23 +115,23 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 
 	/**
 	 * Validates all input values before saving.
-	 * Returns validation error codes (same vocabulary as the backend), or an
-	 * empty array if all values are valid.
+	 * Returns a field->code map (same vocabulary as the backend), or an empty
+	 * object if all values are valid.
 	 *
-	 * @return {string[]} validation error codes
+	 * @return {Object<string, string>} field name to validation error code
 	 */
 	function validate() {
-		const errors = []
+		const errors = {}
 		// The code must reach the user: an empty body falls back to the default
 		// which contains {code}, so only a customized body can lose it.
 		const body = inputValues.eMailTemplate ?? ''
 		if (body !== '' && !body.includes('{code}')) {
-			errors.push('email-code-placeholder-missing')
+			errors.eMailTemplate = 'email-code-placeholder-missing'
 			Logger.warn('Email body does not contain the {code} placeholder')
 		}
 		// The subject must stay a single line (email header)
 		if (/[\r\n]/.test(inputValues.eMailSubject ?? '')) {
-			errors.push('email-subject-must-be-single-line')
+			errors.eMailSubject = 'email-subject-must-be-single-line'
 			Logger.warn('Email subject must not contain line breaks')
 		}
 		return errors
@@ -160,9 +142,9 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 		store.$patch({ error: null })
 
 		// Validate before saving — flag failing fields and abort
-		const invalidCodes = validate()
-		if (invalidCodes.length > 0) {
-			applyErrors(invalidCodes)
+		const invalidFields = validate()
+		if (Object.keys(invalidFields).length > 0) {
+			applyErrors(invalidFields)
 			loading.value = false
 			return
 		}
@@ -173,7 +155,7 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 				store[key] = inputValues[key]
 			}
 			const result = await store.save()
-			if (Array.isArray(result?.errors)) {
+			if (result?.errors && typeof result.errors === 'object') {
 				// Backend rejected specific fields — flag only those
 				applyErrors(result.errors)
 			} else if (typeof result?.error === 'string') {

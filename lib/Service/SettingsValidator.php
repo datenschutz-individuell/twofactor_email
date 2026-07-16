@@ -33,9 +33,13 @@ final class SettingsValidator {
 
 	/**
 	 * Validates the given admin settings.
-	 * Returns an array of error keys, or an empty array if all values are valid.
+	 * Returns a map of field name to error code, or an empty array if all
+	 * values are valid. The field names match the settings keys used by the
+	 * web UI, so callers can flag the offending field without knowing which
+	 * code belongs to which field. A field that trips more than one check
+	 * keeps its last error.
 	 *
-	 * @return string[]
+	 * @return array<string, string>
 	 */
 	public function validate(
 		int $codeLength,
@@ -46,28 +50,28 @@ final class SettingsValidator {
 	): array {
 		$errors = [];
 		if ($codeLength < self::MIN_CODE_LENGTH || $codeLength > self::MAX_CODE_LENGTH) {
-			$errors[] = 'code-length-out-of-range';
+			$errors['codeLength'] = 'code-length-out-of-range';
 		}
 		if ($codeValidMinutes < self::MIN_CODE_VALID_MINUTES || $codeValidMinutes > self::MAX_CODE_VALID_MINUTES) {
-			$errors[] = 'code-valid-minutes-out-of-range';
+			$errors['codeValidMinutes'] = 'code-valid-minutes-out-of-range';
 		}
 		if ($resendMinutes < self::MIN_RESEND_MINUTES || $resendMinutes > self::MAX_RESEND_MINUTES) {
-			$errors[] = 'resend-minutes-out-of-range';
+			$errors['codeResendMinutes'] = 'resend-minutes-out-of-range';
 		}
 		if (strlen($eMailSubject) > self::MAX_EMAIL_SUBJECT_LENGTH) {
-			$errors[] = 'email-subject-too-long';
+			$errors['eMailSubject'] = 'email-subject-too-long';
 		}
 		// Guard against header injection — the subject must stay a single line
 		if (preg_match('/[\r\n]/', $eMailSubject) === 1) {
-			$errors[] = 'email-subject-must-be-single-line';
+			$errors['eMailSubject'] = 'email-subject-must-be-single-line';
 		}
 		if (strlen($eMailTemplate) > self::MAX_EMAIL_TEMPLATE_LENGTH) {
-			$errors[] = 'email-template-too-long';
+			$errors['eMailTemplate'] = 'email-template-too-long';
 		}
 		// The code must reach the user: an empty body falls back to the default
 		// which contains {code}, so only a customized body can lose it.
 		if ($eMailTemplate !== '' && !str_contains($eMailTemplate, '{code}')) {
-			$errors[] = 'email-code-placeholder-missing';
+			$errors['eMailTemplate'] = 'email-code-placeholder-missing';
 		}
 		return $errors;
 	}

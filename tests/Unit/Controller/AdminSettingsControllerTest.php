@@ -63,7 +63,7 @@ class AdminSettingsControllerTest extends TestCase {
 		$response = $this->controller->save(6, 10, 'body without placeholder', '', 30);
 
 		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
-		$this->assertEquals(['errors' => ['email-code-placeholder-missing']], $response->getData());
+		$this->assertEquals(['errors' => ['eMailTemplate' => 'email-code-placeholder-missing']], $response->getData());
 	}
 
 	public function testSaveRejectsMultiLineSubject(): void {
@@ -72,28 +72,28 @@ class AdminSettingsControllerTest extends TestCase {
 		$response = $this->controller->save(6, 10, '', "evil\r\nBcc: spy@example.com", 30);
 
 		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
-		$this->assertEquals(['errors' => ['email-subject-must-be-single-line']], $response->getData());
+		$this->assertEquals(['errors' => ['eMailSubject' => 'email-subject-must-be-single-line']], $response->getData());
 	}
 
 	public function testSaveRejectsOutOfRangeCodeLength(): void {
 		$response = $this->controller->save(3, 10, '', '', 30);
 
 		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
-		$this->assertEquals(['errors' => ['code-length-out-of-range']], $response->getData());
+		$this->assertEquals(['errors' => ['codeLength' => 'code-length-out-of-range']], $response->getData());
 	}
 
 	public function testSaveRejectsOverlongSubject(): void {
 		$response = $this->controller->save(6, 10, '', str_repeat('x', 256), 30);
 
 		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
-		$this->assertEquals(['errors' => ['email-subject-too-long']], $response->getData());
+		$this->assertEquals(['errors' => ['eMailSubject' => 'email-subject-too-long']], $response->getData());
 	}
 
 	public function testSaveRejectsOutOfRangeResendCooldown(): void {
 		$response = $this->controller->save(6, 10, '', '', 99999);
 
 		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
-		$this->assertEquals(['errors' => ['resend-minutes-out-of-range']], $response->getData());
+		$this->assertEquals(['errors' => ['codeResendMinutes' => 'resend-minutes-out-of-range']], $response->getData());
 	}
 
 	public function testResetDelegatesToAppSettings(): void {
