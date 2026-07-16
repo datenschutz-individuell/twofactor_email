@@ -17,6 +17,7 @@
 					<LabeledField
 						id="twofactor_email-codeLength"
 						v-model="inputValues.codeLength"
+						:errorMessage="errorMessages.codeLength"
 						:label="t('twofactor_email', 'Length (characters)')"
 						:loading="loading"
 						:result="successRefs.codeLength"
@@ -24,6 +25,7 @@
 					<LabeledField
 						id="twofactor_email-codeValidMinutes"
 						v-model="inputValues.codeValidMinutes"
+						:errorMessage="errorMessages.codeValidMinutes"
 						:label="t('twofactor_email', 'Validity (minutes)')"
 						:loading="loading"
 						:result="successRefs.codeValidMinutes"
@@ -31,6 +33,7 @@
 					<LabeledField
 						id="twofactor_email-codeResendMinutes"
 						v-model="inputValues.codeResendMinutes"
+						:errorMessage="errorMessages.codeResendMinutes"
 						:label="t('twofactor_email', 'Resend cooldown (minutes)')"
 						:loading="loading"
 						:result="successRefs.codeResendMinutes"
@@ -46,6 +49,7 @@
 				<LabeledField
 					id="twofactor_email-eMailSubject"
 					v-model="inputValues.eMailSubject"
+					:errorMessage="errorMessages.eMailSubject"
 					:helperText="subjectHelperText"
 					:label="t('twofactor_email', 'Subject')"
 					:loading="loading"
@@ -54,6 +58,7 @@
 				<LabeledField
 					id="twofactor_email-eMailTemplate"
 					v-model="inputValues.eMailTemplate"
+					:errorMessage="errorMessages.eMailTemplate"
 					:helperText="bodyHelperText"
 					:label="t('twofactor_email', 'Body')"
 					:loading="loading"
@@ -102,7 +107,7 @@ const defaults = {
 	eMailTemplate: loadState('twofactor_email', 'eMailTemplateDefault', ''),
 }
 
-const { inputValues, loading, successRefs } = useAdminSettings(store, fieldKeys)
+const { inputValues, loading, successRefs, errorMessages } = useAdminSettings(store, fieldKeys)
 
 // Hints shown below the subject field
 // (rendered line by line via white-space: pre-line)
