@@ -41,7 +41,7 @@ class AdminSettingsControllerTest extends TestCase {
 	public function testSavePersistsAllSettings(): void {
 		$this->appSettings->expects($this->once())->method('setCodeLength')->with(6);
 		$this->appSettings->expects($this->once())->method('setCodeValidMinutes')->with(10);
-		$this->appSettings->expects($this->once())->method('setResendMinMinutes')->with(30);
+		$this->appSettings->expects($this->once())->method('setCodeResendMinutes')->with(30);
 		$this->appSettings->expects($this->once())->method('setEMailSubject')->with('Subject');
 		$this->appSettings->expects($this->once())->method('setEMailTemplate')->with('Use {code}');
 

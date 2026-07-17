@@ -83,7 +83,7 @@ final class Settings extends Command {
 		$io->table(['Setting', 'Value', 'Default'], [
 			['code_length', $this->appSettings->getCodeLength(), AppSettings::DEFAULT_CODE_LENGTH],
 			['code_valid_minutes', $this->appSettings->getCodeValidMinutes(), AppSettings::DEFAULT_CODE_VALID_MINUTES],
-			['resend_min_minutes', $this->appSettings->getResendMinMinutes(), AppSettings::DEFAULT_RESEND_MIN_MINUTES],
+			['resend_min_minutes', $this->appSettings->getCodeResendMinutes(), AppSettings::DEFAULT_RESEND_MIN_MINUTES],
 			['email_subject', $this->appSettings->getEMailSubject() ?: $emptyMeansDefault, $this->preview($this->appSettings->getDefaultEMailSubject())],
 			['email_template', $this->preview($this->appSettings->getEMailTemplate()) ?: $emptyMeansDefault, $this->preview($this->appSettings->getDefaultEMailBody())],
 		]);
@@ -104,7 +104,7 @@ final class Settings extends Command {
 		return match ($key) {
 			'code_length' => $this->appSettings->getCodeLength(),
 			'code_valid_minutes' => $this->appSettings->getCodeValidMinutes(),
-			'resend_min_minutes' => $this->appSettings->getResendMinMinutes(),
+			'resend_min_minutes' => $this->appSettings->getCodeResendMinutes(),
 			'email_subject' => $this->appSettings->getEMailSubject(),
 			'email_template' => $this->appSettings->getEMailTemplate(),
 		};
@@ -120,18 +120,18 @@ final class Settings extends Command {
 		// rules stay in one place (SettingsValidator, shared with the web UI).
 		$codeLength = $this->appSettings->getCodeLength();
 		$codeValidMinutes = $this->appSettings->getCodeValidMinutes();
-		$resendMinutes = $this->appSettings->getResendMinMinutes();
+		$codeResendMinutes = $this->appSettings->getCodeResendMinutes();
 		$eMailSubject = $this->appSettings->getEMailSubject();
 		$eMailTemplate = $this->appSettings->getEMailTemplate();
 		match ($key) {
 			'code_length' => $codeLength = (int)$value,
 			'code_valid_minutes' => $codeValidMinutes = (int)$value,
-			'resend_min_minutes' => $resendMinutes = (int)$value,
+			'resend_min_minutes' => $codeResendMinutes = (int)$value,
 			'email_subject' => $eMailSubject = $value,
 			'email_template' => $eMailTemplate = $value,
 		};
 
-		$errors = $this->validator->validate($codeLength, $codeValidMinutes, $resendMinutes, $eMailSubject, $eMailTemplate);
+		$errors = $this->validator->validate($codeLength, $codeValidMinutes, $codeResendMinutes, $eMailSubject, $eMailTemplate);
 		if (!empty($errors)) {
 			foreach ($errors as $error) {
 				$io->error($this->errorMessage($error));
@@ -142,7 +142,7 @@ final class Settings extends Command {
 		match ($key) {
 			'code_length' => $this->appSettings->setCodeLength((int)$value),
 			'code_valid_minutes' => $this->appSettings->setCodeValidMinutes((int)$value),
-			'resend_min_minutes' => $this->appSettings->setResendMinMinutes((int)$value),
+			'resend_min_minutes' => $this->appSettings->setCodeResendMinutes((int)$value),
 			'email_subject' => $this->appSettings->setEMailSubject($value),
 			'email_template' => $this->appSettings->setEMailTemplate($value),
 		};

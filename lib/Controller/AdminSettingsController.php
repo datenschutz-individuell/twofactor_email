@@ -40,16 +40,16 @@ final class AdminSettingsController extends ALoginSetupController {
 		int $codeValidMinutes,
 		string $eMailTemplate,
 		string $eMailSubject,
-		int $resendMinutes,
+		int $codeResendMinutes,
 	): JSONResponse {
-		$errors = $this->validator->validate($codeLength, $codeValidMinutes, $resendMinutes, $eMailSubject, $eMailTemplate);
+		$errors = $this->validator->validate($codeLength, $codeValidMinutes, $codeResendMinutes, $eMailSubject, $eMailTemplate);
 		if (!empty($errors)) {
 			return new JSONResponse(['errors' => $errors], Http::STATUS_BAD_REQUEST);
 		}
 
 		$this->appSettings->setCodeLength($codeLength);
 		$this->appSettings->setCodeValidMinutes($codeValidMinutes);
-		$this->appSettings->setResendMinMinutes($resendMinutes);
+		$this->appSettings->setCodeResendMinutes($codeResendMinutes);
 		$this->appSettings->setEMailSubject($eMailSubject);
 		$this->appSettings->setEMailTemplate($eMailTemplate);
 
@@ -67,7 +67,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		return new JSONResponse([
 			'codeLength' => $this->appSettings->getCodeLength(),
 			'codeValidMinutes' => $this->appSettings->getCodeValidMinutes(),
-			'codeResendMinutes' => $this->appSettings->getResendMinMinutes(),
+			'codeResendMinutes' => $this->appSettings->getCodeResendMinutes(),
 			'eMailSubject' => $this->appSettings->getEMailSubject(),
 			'eMailTemplate' => $this->appSettings->getEMailTemplate(),
 		]);

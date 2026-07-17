@@ -67,7 +67,7 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 			const result = await persistAdminSettings({
 				codeLength: this.codeLength,
 				codeValidMinutes: this.codeValidMinutes,
-				resendMinutes: this.codeResendMinutes,
+				codeResendMinutes: this.codeResendMinutes,
 				eMailSubject: this.eMailSubject,
 				eMailTemplate: this.eMailTemplate,
 			})

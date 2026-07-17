@@ -60,7 +60,7 @@ final class SettingsValidator {
 	public function validate(
 		int $codeLength,
 		int $codeValidMinutes,
-		int $resendMinutes,
+		int $codeResendMinutes,
 		string $eMailSubject,
 		string $eMailTemplate,
 	): array {
@@ -71,7 +71,7 @@ final class SettingsValidator {
 		if ($codeValidMinutes < self::MIN_CODE_VALID_MINUTES || $codeValidMinutes > self::MAX_CODE_VALID_MINUTES) {
 			$errors['codeValidMinutes'] = 'code-valid-minutes-out-of-range';
 		}
-		if ($resendMinutes < self::MIN_RESEND_MINUTES || $resendMinutes > self::MAX_RESEND_MINUTES) {
+		if ($codeResendMinutes < self::MIN_RESEND_MINUTES || $codeResendMinutes > self::MAX_RESEND_MINUTES) {
 			$errors['codeResendMinutes'] = 'resend-minutes-out-of-range';
 		}
 		if (strlen($eMailSubject) > self::MAX_EMAIL_SUBJECT_LENGTH) {

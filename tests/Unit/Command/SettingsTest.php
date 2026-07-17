@@ -31,7 +31,7 @@ class SettingsTest extends TestCase {
 		// Valid current values; single tests override where needed
 		$this->appSettings->method('getCodeLength')->willReturn(6);
 		$this->appSettings->method('getCodeValidMinutes')->willReturn(10);
-		$this->appSettings->method('getResendMinMinutes')->willReturn(1);
+		$this->appSettings->method('getCodeResendMinutes')->willReturn(1);
 		$this->appSettings->method('getEMailSubject')->willReturn('');
 		$this->appSettings->method('getEMailTemplate')->willReturn('');
 		$this->appSettings->method('getDefaultEMailSubject')->willReturn('Login attempt for {user} @ {cloud}');

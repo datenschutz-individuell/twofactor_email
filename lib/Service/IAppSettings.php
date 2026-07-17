@@ -28,7 +28,7 @@ interface IAppSettings {
 	 *
 	 * @return int minutes
 	 */
-	public function getResendMinMinutes(): int;
+	public function getCodeResendMinutes(): int;
 
 	/**
 	 * The resend cooldown in seconds. The setting is stored in minutes and
@@ -73,7 +73,7 @@ interface IAppSettings {
 
 	public function setCodeValidMinutes(int $codeValidMinutes): void;
 
-	public function setResendMinMinutes(int $resendMinutes): void;
+	public function setCodeResendMinutes(int $codeResendMinutes): void;
 
 	public function setEMailSubject(string $subject): void;
 

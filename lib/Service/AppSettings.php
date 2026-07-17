@@ -46,12 +46,12 @@ final class AppSettings implements IAppSettings {
 		return $this->appConfig->getValueInt(Application::APP_ID, self::KEY_CODE_VALID_MINUTES, self::DEFAULT_CODE_VALID_MINUTES);
 	}
 
-	public function getResendMinMinutes(): int {
+	public function getCodeResendMinutes(): int {
 		return $this->appConfig->getValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, self::DEFAULT_RESEND_MIN_MINUTES);
 	}
 
 	public function getResendCooldownSeconds(): int {
-		return $this->getResendMinMinutes() * 60;
+		return $this->getCodeResendMinutes() * 60;
 	}
 
 	public function getEMailSubject(): string {
@@ -86,8 +86,8 @@ final class AppSettings implements IAppSettings {
 		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_CODE_VALID_MINUTES, $codeValidMinutes);
 	}
 
-	public function setResendMinMinutes(int $resendMinutes): void {
-		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, $resendMinutes);
+	public function setCodeResendMinutes(int $codeResendMinutes): void {
+		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, $codeResendMinutes);
 	}
 
 	public function setEMailSubject(string $subject): void {
