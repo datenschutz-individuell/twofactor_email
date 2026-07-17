@@ -86,6 +86,12 @@ final class LoginChallenge implements ILoginChallenge {
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {
 		$submittedCode = trim($submittedCode);
 		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
+		// Accepted residual timing side channel: returning early when no code is
+		// stored is measurably faster than the hash verify, so the response time
+		// reveals whether an unexpired code currently exists — but only to someone
+		// who already passed the first factor, and the comparison itself stays
+		// constant-time (IHasher::verify). A dummy verify on the miss path was
+		// deliberately left out; the leak does not justify it.
 		if (is_null($storedCodeHash)) {
 			$isValid = false;
 		} else {
