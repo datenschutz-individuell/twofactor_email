@@ -66,15 +66,12 @@ class StateChangeNotificationTest extends TestCase {
 	 * @throws Exception
 	 */
 	private function expectNotificationWithSubject(string $subject): void {
-		// First createNotification() builds the dismiss filter, the second the new notification
-		$newNotification = $this->mockNotification();
-		$newNotification->expects($this->once())
+		$notification = $this->mockNotification();
+		$notification->expects($this->once())
 			->method('setSubject')
 			->with($subject)
 			->willReturnSelf();
-		$this->notificationManager->method('createNotification')
-			->willReturnOnConsecutiveCalls($this->mockNotification(), $newNotification);
-		$this->notificationManager->expects($this->once())->method('dismissNotification');
+		$this->notificationManager->method('createNotification')->willReturn($notification);
 		$this->notificationManager->expects($this->once())->method('notify');
 	}
 
@@ -90,19 +87,13 @@ class StateChangeNotificationTest extends TestCase {
 		$this->listener->handle(new StateChanged($this->mockUser(), false, StateChangeActor::SYSTEM));
 	}
 
-	/**
-	 * @throws Exception
-	 */
-	public function testDoesNotNotifyAboutOwnChangesButDismissesOutdatedOnes(): void {
-		$this->notificationManager->method('createNotification')->willReturn($this->mockNotification());
-		$this->notificationManager->expects($this->once())->method('dismissNotification');
+	public function testDoesNotNotifyAboutOwnChanges(): void {
 		$this->notificationManager->expects($this->never())->method('notify');
 
 		$this->listener->handle(new StateChanged($this->mockUser(), true, StateChangeActor::USER));
 	}
 
 	public function testIgnoresForeignEvents(): void {
-		$this->notificationManager->expects($this->never())->method('dismissNotification');
 		$this->notificationManager->expects($this->never())->method('notify');
 
 		$this->listener->handle(new Event());

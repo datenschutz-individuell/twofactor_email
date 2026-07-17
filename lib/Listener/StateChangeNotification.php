@@ -38,20 +38,13 @@ final class StateChangeNotification implements IEventListener {
 		if (!$event instanceof StateChanged) {
 			return;
 		}
-		$uid = $event->getUser()->getUID();
-
-		// An earlier notification about this provider's state is outdated now,
-		// whoever caused the change — dismiss it before possibly adding a new one.
-		$outdated = $this->notificationManager->createNotification();
-		$outdated->setApp(Application::APP_ID)
-			->setUser($uid)
-			->setObject('twofactor_email_state', $uid);
-		$this->notificationManager->dismissNotification($outdated);
-
 		if ($event->getActor() === StateChangeActor::USER) {
+			// The user changed the state themselves and sees the result in the
+			// settings UI, so no notification is needed.
 			return;
 		}
 
+		$uid = $event->getUser()->getUID();
 		$subject = Notification::fromStateChange($event->getActor(), $event->isEnabled());
 
 		$notification = $this->notificationManager->createNotification();
