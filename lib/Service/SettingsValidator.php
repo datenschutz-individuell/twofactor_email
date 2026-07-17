@@ -21,7 +21,7 @@ final class SettingsValidator {
 
 	// Allowed range for code validity in minutes
 	public const MIN_CODE_VALID_MINUTES = 1;
-	public const MAX_CODE_VALID_MINUTES = 44640; // 1 month
+	public const MAX_CODE_VALID_MINUTES = 1440; // 1 day
 
 	// Allowed range for the resend cooldown in minutes
 	public const MIN_RESEND_MINUTES = 1;
@@ -30,6 +30,22 @@ final class SettingsValidator {
 	// Maximum allowed lengths for the email template parts in characters
 	public const MAX_EMAIL_SUBJECT_LENGTH = 255;
 	public const MAX_EMAIL_TEMPLATE_LENGTH = 10000;
+
+	/**
+	 * Returns the numeric limits per settings field, so the web UI can name
+	 * them in its validation messages without duplicating the values.
+	 *
+	 * @return array<string, array{min?: int, max: int}>
+	 */
+	public static function getLimits(): array {
+		return [
+			'codeLength' => ['min' => self::MIN_CODE_LENGTH, 'max' => self::MAX_CODE_LENGTH],
+			'codeValidMinutes' => ['min' => self::MIN_CODE_VALID_MINUTES, 'max' => self::MAX_CODE_VALID_MINUTES],
+			'codeResendMinutes' => ['min' => self::MIN_RESEND_MINUTES, 'max' => self::MAX_RESEND_MINUTES],
+			'eMailSubject' => ['max' => self::MAX_EMAIL_SUBJECT_LENGTH],
+			'eMailTemplate' => ['max' => self::MAX_EMAIL_TEMPLATE_LENGTH],
+		];
+	}
 
 	/**
 	 * Validates the given admin settings.

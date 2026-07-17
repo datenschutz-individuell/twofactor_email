@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import { nextTick, reactive, ref, watch } from 'vue'
 import Logger from '../Logger.js'
@@ -32,15 +33,19 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 	const errorMessages = reactive(Object.fromEntries(fieldKeys.map((key) => [key, ''])))
 	const successTimers = Object.fromEntries(fieldKeys.map((key) => [key, null]))
 
+	// Numeric limits per field, provided by the server, so the messages below
+	// can name the allowed range instead of duplicating the values.
+	const limits = loadState('twofactor_email', 'limits', {})
+
 	// User-facing message per validation error code. Built here (not at module
 	// load) so t() runs once l10n is available.
 	const errorMessageByCode = {
-		'code-length-out-of-range': t('twofactor_email', 'The code length is outside the allowed range.'),
-		'code-valid-minutes-out-of-range': t('twofactor_email', 'The validity is outside the allowed range.'),
-		'resend-minutes-out-of-range': t('twofactor_email', 'The resend cooldown is outside the allowed range.'),
-		'email-subject-too-long': t('twofactor_email', 'The subject is too long.'),
+		'code-length-out-of-range': t('twofactor_email', 'The code length must be between {min} and {max} characters.', { min: limits.codeLength?.min, max: limits.codeLength?.max }),
+		'code-valid-minutes-out-of-range': t('twofactor_email', 'The validity must be between {min} and {max} minutes.', { min: limits.codeValidMinutes?.min, max: limits.codeValidMinutes?.max }),
+		'resend-minutes-out-of-range': t('twofactor_email', 'The resend cooldown must be between {min} and {max} minutes.', { min: limits.codeResendMinutes?.min, max: limits.codeResendMinutes?.max }),
+		'email-subject-too-long': t('twofactor_email', 'The subject must not exceed {max} characters.', { max: limits.eMailSubject?.max }),
 		'email-subject-must-be-single-line': t('twofactor_email', 'The subject must be a single line.'),
-		'email-template-too-long': t('twofactor_email', 'The body is too long.'),
+		'email-template-too-long': t('twofactor_email', 'The body must not exceed {max} characters.', { max: limits.eMailTemplate?.max }),
 		'email-code-placeholder-missing': t('twofactor_email', 'The body must contain the {code} placeholder.'),
 	}
 
@@ -113,47 +118,18 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 		}, debounceMs)
 	}
 
-	/**
-	 * Validates all input values before saving.
-	 * Returns a field->code map (same vocabulary as the backend), or an empty
-	 * object if all values are valid.
-	 *
-	 * @return {Object<string, string>} field name to validation error code
-	 */
-	function validate() {
-		const errors = {}
-		// The code must reach the user: an empty body falls back to the default
-		// which contains {code}, so only a customized body can lose it.
-		const body = inputValues.eMailTemplate ?? ''
-		if (body !== '' && !body.includes('{code}')) {
-			errors.eMailTemplate = 'email-code-placeholder-missing'
-			Logger.warn('Email body does not contain the {code} placeholder')
-		}
-		// The subject must stay a single line (email header)
-		if (/[\r\n]/.test(inputValues.eMailSubject ?? '')) {
-			errors.eMailSubject = 'email-subject-must-be-single-line'
-			Logger.warn('Email subject must not contain line breaks')
-		}
-		return errors
-	}
-
 	async function scheduleAndSave() {
 		loading.value = true
 		store.$patch({ error: null })
-
-		// Validate before saving — flag failing fields and abort
-		const invalidFields = validate()
-		if (Object.keys(invalidFields).length > 0) {
-			applyErrors(invalidFields)
-			loading.value = false
-			return
-		}
 
 		try {
 			// Write all current inputValues into the store before saving
 			for (const key of fieldKeys) {
 				store[key] = inputValues[key]
 			}
+			// The backend validates every field and returns the full field->code
+			// map, so all currently invalid fields stay flagged (not just the
+			// one last edited).
 			const result = await store.save()
 			if (result?.errors && typeof result.errors === 'object') {
 				// Backend rejected specific fields — flag only those
