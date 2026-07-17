@@ -163,4 +163,82 @@ class LoginChallengeTest extends TestCase {
 		// min(1800, 600) - 60 = 540
 		$this->assertSame(540, $this->challenge->secondsUntilResendAllowed($this->mockUser()));
 	}
+
+	/**
+	 * @throws SendEMailFailed
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testSendChallengeIssuesAndStoresACodeWhenNoneIsStored(): void {
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->with('alice')->willReturn(null);
+		$this->codeGenerator->method('generateChallengeCode')->willReturn('123456');
+		$this->emailSender->expects($this->once())->method('sendChallengeEMail')->with($user, '123456');
+		$this->hasher->method('hash')->with('123456')->willReturn('hashed');
+		$this->codeStorage->expects($this->once())->method('writeCode')->with('alice', 'hashed');
+
+		$this->assertTrue($this->challenge->sendChallenge($user));
+	}
+
+	/**
+	 * @throws SendEMailFailed
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testSendChallengeSkipsWhileAValidCodeStillExists(): void {
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->with('alice')->willReturn('existing-hash');
+		$this->emailSender->expects($this->never())->method('sendChallengeEMail');
+		$this->codeStorage->expects($this->never())->method('writeCode');
+
+		$this->assertFalse($this->challenge->sendChallenge($user));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testVerifyChallengeAcceptsAValidCodeAndDeletesIt(): void {
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->with('alice')->willReturn('stored-hash');
+		$this->hasher->method('verify')->with('123456', 'stored-hash')->willReturn(true);
+		$this->codeStorage->expects($this->once())->method('deleteCode')->with('alice');
+
+		$this->assertTrue($this->challenge->verifyChallenge($user, '123456'));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testVerifyChallengeRejectsAWrongCodeAndKeepsItForRetry(): void {
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->with('alice')->willReturn('stored-hash');
+		$this->hasher->method('verify')->with('123456', 'stored-hash')->willReturn(false);
+		$this->codeStorage->expects($this->never())->method('deleteCode');
+
+		$this->assertFalse($this->challenge->verifyChallenge($user, '123456'));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testVerifyChallengeRejectsWhenNoCodeIsStored(): void {
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->with('alice')->willReturn(null);
+		$this->hasher->expects($this->never())->method('verify');
+		$this->codeStorage->expects($this->never())->method('deleteCode');
+
+		$this->assertFalse($this->challenge->verifyChallenge($user, '123456'));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testVerifyChallengeTrimsTheSubmittedCode(): void {
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->with('alice')->willReturn('stored-hash');
+		// Surrounding whitespace must be stripped before verifying
+		$this->hasher->expects($this->once())->method('verify')->with('123456', 'stored-hash')->willReturn(true);
+
+		$this->assertTrue($this->challenge->verifyChallenge($user, "  123456\n"));
+	}
 }

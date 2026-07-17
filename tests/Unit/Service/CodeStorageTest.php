@@ -82,4 +82,26 @@ class CodeStorageTest extends TestCase {
 		$this->assertGreaterThanOrEqual(0, $elapsed);
 		$this->assertLessThan(60, $elapsed);
 	}
+
+	public function testReadCodeReturnsTheStoredCodeWhenFresh(): void {
+		$this->config->method('getValueInt')->willReturn(time());
+		$this->config->method('getValueString')->willReturn('stored-hash');
+
+		$this->assertSame('stored-hash', $this->storage->readCode('alice'));
+	}
+
+	public function testReadCodeReturnsNullAndClearsAnExpiredCode(): void {
+		// created_at 0 is far older than the validity window → expired
+		$this->config->method('getValueInt')->willReturn(0);
+		$this->config->expects($this->atLeastOnce())->method('deleteUserConfig');
+
+		$this->assertNull($this->storage->readCode('alice'));
+	}
+
+	public function testReadCodeReturnsNullWhenTheStoredCodeIsEmpty(): void {
+		$this->config->method('getValueInt')->willReturn(time());
+		$this->config->method('getValueString')->willReturn('');
+
+		$this->assertNull($this->storage->readCode('alice'));
+	}
 }
