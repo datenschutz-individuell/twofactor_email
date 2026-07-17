@@ -56,7 +56,9 @@ final class CodeStorage implements ICodeStorage {
 
 	public function writeCode(string $userId, string $code, ?int $createdAt = null): void {
 		$createdAt ??= time();
-		$this->config->setValueString($userId, Application::APP_ID, self::KEY_CODE, $code);
+		// The stored value is a hash, but flag it sensitive so it is masked in
+		// occ config:list and system/support reports.
+		$this->config->setValueString($userId, Application::APP_ID, self::KEY_CODE, $code, flags: IUserConfig::FLAG_SENSITIVE);
 		$this->config->setValueInt($userId, Application::APP_ID, self::KEY_CREATED_AT, $createdAt);
 	}
 
