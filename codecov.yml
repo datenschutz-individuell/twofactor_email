@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
+# SPDX-License-Identifier: MIT
+
+# Turns the existing Codecov upload into a light gate: a noticeable drop in
+# overall coverage fails the check, while per-PR (patch) coverage is only
+# reported, not enforced — so PRs touching code without a natural unit test
+# (e.g. plumbing or the untested frontend) are not blocked.
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        informational: true
