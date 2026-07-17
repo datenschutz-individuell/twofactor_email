@@ -32,8 +32,8 @@ final class CleanUp extends Command {
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$io = new SymfonyStyle($input, $output);
 		$io->title('Removing expired two-factor email codes');
-		$this->codeStorage->deleteExpired();
-		$io->success('Done.');
+		$count = $this->codeStorage->deleteExpired();
+		$io->success(sprintf('Removed %d expired code(s).', $count));
 		return Command::SUCCESS;
 	}
 }

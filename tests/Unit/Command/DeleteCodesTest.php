@@ -42,17 +42,28 @@ class DeleteCodesTest extends TestCase {
 	 */
 	public function testDeletesCodeOfSingleUser(): void {
 		$this->userManager->method('get')->with('alice')->willReturn($this->createMock(IUser::class));
-		$this->codeStorage->expects($this->once())->method('deleteCode')->with('alice');
+		$this->codeStorage->expects($this->once())->method('deleteCode')->with('alice')->willReturn(true);
 		$this->codeStorage->expects($this->never())->method('deleteAllCodes');
 
 		$exitCode = $this->tester->execute(['uid' => 'alice']);
 
 		$this->assertSame(Command::SUCCESS, $exitCode);
+		$this->assertStringContainsString('Deleted the stored code of "alice"', $this->tester->getDisplay());
+	}
+
+	public function testReportsWhenNoCodeWasStored(): void {
+		$this->userManager->method('get')->with('alice')->willReturn($this->createMock(IUser::class));
+		$this->codeStorage->expects($this->once())->method('deleteCode')->with('alice')->willReturn(false);
+
+		$exitCode = $this->tester->execute(['uid' => 'alice']);
+
+		$this->assertSame(Command::SUCCESS, $exitCode);
+		$this->assertStringContainsString('No code was stored for "alice"', $this->tester->getDisplay());
 	}
 
 	public function testWarnsAboutUnknownUserButStillDeletes(): void {
 		$this->userManager->method('get')->with('ghost')->willReturn(null);
-		$this->codeStorage->expects($this->once())->method('deleteCode')->with('ghost');
+		$this->codeStorage->expects($this->once())->method('deleteCode')->with('ghost')->willReturn(true);
 
 		$exitCode = $this->tester->execute(['uid' => 'ghost']);
 
@@ -68,6 +79,16 @@ class DeleteCodesTest extends TestCase {
 
 		$this->assertSame(Command::SUCCESS, $exitCode);
 		$this->assertStringContainsString('3 user(s)', $this->tester->getDisplay());
+	}
+
+	public function testAllReportsWhenNothingToDelete(): void {
+		$this->codeStorage->expects($this->once())->method('deleteAllCodes')->willReturn(0);
+		$this->codeStorage->expects($this->never())->method('deleteCode');
+
+		$exitCode = $this->tester->execute(['--all' => true]);
+
+		$this->assertSame(Command::SUCCESS, $exitCode);
+		$this->assertStringContainsString('No stored codes to delete', $this->tester->getDisplay());
 	}
 
 	public function testRejectsMissingUserIdAndAll(): void {

@@ -47,9 +47,11 @@ final class CodeStorage implements ICodeStorage {
 		return max(0, time() - $createdAt);
 	}
 
-	public function deleteCode(string $userId): void {
+	public function deleteCode(string $userId): bool {
+		$existed = $this->config->getValueString($userId, Application::APP_ID, self::KEY_CODE) !== '';
 		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CODE);
 		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CREATED_AT);
+		return $existed;
 	}
 
 	public function writeCode(string $userId, string $code, ?int $createdAt = null): void {
@@ -65,14 +67,17 @@ final class CodeStorage implements ICodeStorage {
 		return $count;
 	}
 
-	public function deleteExpired(): void {
+	public function deleteExpired(): int {
 		$expiresBefore = time() - $this->settings->getCodeValidMinutes() * 60;
 		$creationTime = $this->config->getValuesByUsers(Application::APP_ID, self::KEY_CREATED_AT, ValueType::INT);
 
+		$count = 0;
 		foreach ($creationTime as $userId => $createdAt) {
 			if ($createdAt < $expiresBefore) {
 				$this->deleteCode($userId);
+				$count++;
 			}
 		}
+		return $count;
 	}
 }
