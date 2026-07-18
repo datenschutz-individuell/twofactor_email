@@ -45,6 +45,8 @@
     "You can request a new code in <1 minute." : "Sa võid paluda uut autentimiskoodi saatmist vähem kui minuti pärast.",
     "A new code was sent. Only the new code is valid now." : "Uus autentimiskood on saadetud. Hetkel kehtib vaid see uus kood.",
     "The code could not be sent. Please try again later." : "Autentimiskoodi saatmine ei õnnestunud. Palun proovi hiljem uuesti.",
+    "The subject must be a single line." : "E-kirja pealkiri peab olema üherealine.",
+    "The body must contain the {code} placeholder." : "E-kirja sisus peab leiduma „{code}“ kohatäitja.",
     "The verification email could not be sent. Please try again later or contact your administrator." : "Viga kinnituskirja saatmisel. Palun proovi hiljem uuesti või võta ühendust peakasutajaga.",
     "A new authentication code was just sent. Please enter it:" : "Just saatsime sulle uue autentimiskoodi. Palun sisesta ta siia:",
     "Enter the authentication code that was sent to you:" : "Sisesta sulle saadetud autentimiskood:",

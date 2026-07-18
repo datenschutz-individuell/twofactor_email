@@ -45,6 +45,8 @@
     "You can request a new code in <1 minute." : "您可以在1分鐘內索取新的驗證碼。",
     "A new code was sent. Only the new code is valid now." : "已傳送新的驗證碼。目前僅新的驗證碼有效。",
     "The code could not be sent. Please try again later." : "無法傳送驗證碼。請稍後再試。",
+    "The subject must be a single line." : "主旨只能有一行。",
+    "The body must contain the {code} placeholder." : "內文必須包含 {code} 佔位字串。",
     "The verification email could not be sent. Please try again later or contact your administrator." : "無法寄送驗證電子郵件。請稍後再試，或聯絡您的系統管理員。",
     "A new authentication code was just sent. Please enter it:" : "已寄送新的驗證碼。請輸入：",
     "Enter the authentication code that was sent to you:" : "請輸入已寄送給您的驗證碼：",

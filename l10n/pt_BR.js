@@ -47,6 +47,8 @@ OC.L10N.register(
     "You can request a new code in <1 minute." : "Você pode solicitar um novo código em <1 minuto.",
     "A new code was sent. Only the new code is valid now." : "Um novo código foi enviado. Agora, apenas o novo código é válido.",
     "The code could not be sent. Please try again later." : "Não foi possível enviar o código. Tente novamente mais tarde.",
+    "The subject must be a single line." : "O assunto deve conter apenas uma linha.",
+    "The body must contain the {code} placeholder." : "O corpo deve conter o marcador de posição {code}.",
     "The verification email could not be sent. Please try again later or contact your administrator." : "Não foi possível enviar o e-mail de verificação. Tente novamente mais tarde ou entre em contato com o administrador.",
     "A new authentication code was just sent. Please enter it:" : "Acabamos de enviar um novo código de autenticação. Digite-o:",
     "Enter the authentication code that was sent to you:" : "Digite o código de autenticação que lhe foi enviado:",
