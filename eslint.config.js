@@ -9,6 +9,9 @@ import { recommendedJavascript } from '@nextcloud/eslint-config'
 export default [
 	...recommendedJavascript,
 	{
+		// Test files are handled by @nextcloud/eslint-config without the jsdoc
+		// plugin, so scoping this rule out of them keeps its plugin reference valid.
+		ignores: ['**/*.test.js', '**/*.spec.js'],
 		rules: {
 			'jsdoc/require-jsdoc': [
 				'warn',
