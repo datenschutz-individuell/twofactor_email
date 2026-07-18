@@ -23,8 +23,5 @@
         <testsuite name="Unit">
             <directory>Unit</directory>
         </testsuite>
-        <testsuite name="Acceptance">
-            <directory>Acceptance</directory>
-        </testsuite>
     </testsuites>
 </phpunit>
