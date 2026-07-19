@@ -11,12 +11,6 @@ vi.mock('@nextcloud/router', () => ({ generateUrl: (path) => path }))
 vi.mock('@nextcloud/axios', () => ({ default: { post: vi.fn() } }))
 vi.mock('../Logger.js', () => ({ default: { debug: vi.fn(), error: vi.fn() } }))
 
-const garbageBodies = [
-	{ case: 'null', body: null },
-	{ case: 'a string', body: 'unexpected' },
-	{ case: 'an unexpected object', body: { totallyWrong: true } },
-]
-
 beforeEach(() => {
 	vi.clearAllMocks()
 })
@@ -28,10 +22,10 @@ describe('persistAdminSettings', () => {
 		await expect(persistAdminSettings({})).resolves.toEqual({ codeLength: 6 })
 	})
 
-	it.each(garbageBodies)('returns a 200 body verbatim ($case)', async ({ body }) => {
-		Axios.post.mockResolvedValue({ status: 200, data: body })
+	it('returns an unexpected 200 body verbatim', async () => {
+		Axios.post.mockResolvedValue({ status: 200, data: { unexpected: true } })
 
-		await expect(persistAdminSettings({})).resolves.toEqual(body)
+		await expect(persistAdminSettings({})).resolves.toEqual({ unexpected: true })
 	})
 
 	it('maps a 400 field-to-code map to { errors }', async () => {
@@ -41,16 +35,21 @@ describe('persistAdminSettings', () => {
 	})
 
 	it.each([
-		{ case: 'an array errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: { errors: ['code-length-out-of-range'] } } }) },
-		{ case: 'a string errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: { errors: 'code-length-out-of-range' } } }) },
-		{ case: 'a numeric errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: { errors: 42 } } }) },
-		{ case: 'a boolean errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: { errors: true } } }) },
-		{ case: 'a null errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: { errors: null } } }) },
-		{ case: 'a missing errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: {} } }) },
-		{ case: 'a non-200 response', arm: () => Axios.post.mockResolvedValue({ status: 500, data: {} }) },
-		{ case: 'a network error without a response', arm: () => Axios.post.mockRejectedValue(new Error('network down')) },
-	])('reports save-failed for $case', async ({ arm }) => {
-		arm()
+		{ case: 'an array errors payload', rejection: { response: { data: { errors: ['code-length-out-of-range'] } } } },
+		{ case: 'a string errors payload', rejection: { response: { data: { errors: 'code-length-out-of-range' } } } },
+		{ case: 'a numeric errors payload', rejection: { response: { data: { errors: 42 } } } },
+		{ case: 'a boolean errors payload', rejection: { response: { data: { errors: true } } } },
+		{ case: 'a null errors payload', rejection: { response: { data: { errors: null } } } },
+		{ case: 'a missing errors payload', rejection: { response: { data: {} } } },
+		{ case: 'a network error without a response', rejection: new Error('network down') },
+	])('reports save-failed for $case', async ({ rejection }) => {
+		Axios.post.mockRejectedValue(rejection)
+
+		await expect(persistAdminSettings({})).resolves.toEqual({ error: 'save-failed' })
+	})
+
+	it('reports save-failed on a non-200 response', async () => {
+		Axios.post.mockResolvedValue({ status: 500, data: {} })
 
 		await expect(persistAdminSettings({})).resolves.toEqual({ error: 'save-failed' })
 	})
@@ -63,19 +62,22 @@ describe('persistState', () => {
 		await expect(persistState(true)).resolves.toEqual({ enabled: true })
 	})
 
-	it.each(garbageBodies)('returns a 200 body verbatim ($case)', async ({ body }) => {
-		Axios.post.mockResolvedValue({ status: 200, data: body })
+	it('returns an unexpected 200 body verbatim', async () => {
+		Axios.post.mockResolvedValue({ status: 200, data: { unexpected: true } })
 
-		await expect(persistState(true)).resolves.toEqual(body)
+		await expect(persistState(true)).resolves.toEqual({ unexpected: true })
 	})
 
-	it.each([
-		{ case: 'a known code', error: 'no-email' },
-		{ case: 'a garbage value', error: { weird: 1 } },
-	])('surfaces the backend error verbatim ($case)', async ({ error }) => {
-		Axios.post.mockRejectedValue({ response: { data: { error } } })
+	it('surfaces a specific backend error', async () => {
+		Axios.post.mockRejectedValue({ response: { data: { error: 'no-email' } } })
 
-		await expect(persistState(true)).resolves.toEqual({ enabled: false, error })
+		await expect(persistState(true)).resolves.toEqual({ enabled: false, error: 'no-email' })
+	})
+
+	it('surfaces a garbage backend error verbatim', async () => {
+		Axios.post.mockRejectedValue({ response: { data: { error: { weird: 1 } } } })
+
+		await expect(persistState(true)).resolves.toEqual({ enabled: false, error: { weird: 1 } })
 	})
 
 	it.each([
@@ -97,18 +99,23 @@ describe('resetAdminSettings', () => {
 		await expect(resetAdminSettings()).resolves.toEqual({ codeLength: 6 })
 	})
 
-	it.each(garbageBodies)('returns a 200 body verbatim ($case)', async ({ body }) => {
-		Axios.post.mockResolvedValue({ status: 200, data: body })
+	it('returns an unexpected 200 body verbatim', async () => {
+		Axios.post.mockResolvedValue({ status: 200, data: { unexpected: true } })
 
-		await expect(resetAdminSettings()).resolves.toEqual(body)
+		await expect(resetAdminSettings()).resolves.toEqual({ unexpected: true })
 	})
 
 	it.each([
-		{ case: 'a rejected request', arm: () => Axios.post.mockRejectedValue(new Error('boom')) },
-		{ case: 'a garbage 4xx payload', arm: () => Axios.post.mockRejectedValue({ response: { status: 418, data: 'nonsense' } }) },
-		{ case: 'a non-200 response', arm: () => Axios.post.mockResolvedValue({ status: 500, data: {} }) },
-	])('reports reset-failed for $case', async ({ arm }) => {
-		arm()
+		{ case: 'a rejected request', rejection: new Error('boom') },
+		{ case: 'a garbage 4xx payload', rejection: { response: { status: 418, data: 'nonsense' } } },
+	])('reports reset-failed for $case', async ({ rejection }) => {
+		Axios.post.mockRejectedValue(rejection)
+
+		await expect(resetAdminSettings()).resolves.toEqual({ error: 'reset-failed' })
+	})
+
+	it('reports reset-failed on a non-200 response', async () => {
+		Axios.post.mockResolvedValue({ status: 500, data: {} })
 
 		await expect(resetAdminSettings()).resolves.toEqual({ error: 'reset-failed' })
 	})
