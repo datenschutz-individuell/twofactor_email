@@ -44,7 +44,9 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "stylelint": "stylelint src/**/*.{css,vue}",
-    "stylelint:fix": "stylelint src/**/*.{css,vue} --fix"
+    "stylelint:fix": "stylelint src/**/*.{css,vue} --fix",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@nextcloud/auth": "^2.6.0",
@@ -76,7 +78,9 @@
     "@nextcloud/stylelint-config": "^3.1.0",
     "@nextcloud/typings": "^1.10.0",
     "@nextcloud/vite-config": "^2.5.1",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^10.0.1",
-    "vite": "^7.1.9"
+    "vite": "^7.1.9",
+    "vitest": "^4.1.10"
   }
 }

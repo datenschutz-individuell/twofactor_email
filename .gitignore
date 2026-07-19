@@ -8,6 +8,7 @@ build/
 vendor/
 js/
 css/
+/coverage/
 
 /.php-cs-fixer.cache
 
