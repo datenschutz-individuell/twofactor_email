@@ -49,7 +49,7 @@ describe('persistAdminSettings', () => {
 	})
 
 	it('reports save-failed on a non-200 response', async () => {
-		Axios.post.mockResolvedValue({ status: 500, data: {} })
+		Axios.post.mockResolvedValue({ status: 204, data: '' })
 
 		await expect(persistAdminSettings({})).resolves.toEqual({ error: 'save-failed' })
 	})
@@ -115,7 +115,7 @@ describe('resetAdminSettings', () => {
 	})
 
 	it('reports reset-failed on a non-200 response', async () => {
-		Axios.post.mockResolvedValue({ status: 500, data: {} })
+		Axios.post.mockResolvedValue({ status: 204, data: '' })
 
 		await expect(resetAdminSettings()).resolves.toEqual({ error: 'reset-failed' })
 	})
