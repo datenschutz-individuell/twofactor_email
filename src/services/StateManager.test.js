@@ -41,15 +41,16 @@ describe('persistAdminSettings', () => {
 	})
 
 	it.each([
-		{ case: 'an array errors payload', rejection: { response: { data: { errors: ['code-length-out-of-range'] } } } },
-		{ case: 'a string errors payload', rejection: { response: { data: { errors: 'code-length-out-of-range' } } } },
-		{ case: 'a numeric errors payload', rejection: { response: { data: { errors: 42 } } } },
-		{ case: 'a boolean errors payload', rejection: { response: { data: { errors: true } } } },
-		{ case: 'a null errors payload', rejection: { response: { data: { errors: null } } } },
-		{ case: 'a missing errors payload', rejection: { response: { data: {} } } },
-		{ case: 'a network error without a response', rejection: new Error('network down') },
-	])('reports save-failed for $case', async ({ rejection }) => {
-		Axios.post.mockRejectedValue(rejection)
+		{ case: 'an array errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: { errors: ['code-length-out-of-range'] } } }) },
+		{ case: 'a string errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: { errors: 'code-length-out-of-range' } } }) },
+		{ case: 'a numeric errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: { errors: 42 } } }) },
+		{ case: 'a boolean errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: { errors: true } } }) },
+		{ case: 'a null errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: { errors: null } } }) },
+		{ case: 'a missing errors payload', arm: () => Axios.post.mockRejectedValue({ response: { data: {} } }) },
+		{ case: 'a non-200 response', arm: () => Axios.post.mockResolvedValue({ status: 500, data: {} }) },
+		{ case: 'a network error without a response', arm: () => Axios.post.mockRejectedValue(new Error('network down')) },
+	])('reports save-failed for $case', async ({ arm }) => {
+		arm()
 
 		await expect(persistAdminSettings({})).resolves.toEqual({ error: 'save-failed' })
 	})
