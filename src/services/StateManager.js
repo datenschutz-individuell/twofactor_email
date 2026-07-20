@@ -8,6 +8,18 @@ import { generateUrl } from '@nextcloud/router'
 import Logger from '../Logger.js'
 
 /**
+ * A well-formed backend result is always a plain object. Anything else on a
+ * 2xx response (null, an empty 204 body, an array, a primitive) breaks the
+ * contract and must not be handed to the store, which dereferences it.
+ *
+ * @param {unknown} data The response body to check
+ * @return {boolean} Whether the body is a usable result object
+ */
+function isResultObject(data) {
+	return !!data && typeof data === 'object' && !Array.isArray(data)
+}
+
+/**
  * @typedef {{
  *   enabled: boolean,
  *   error: string|boolean
@@ -30,6 +42,9 @@ export function persistState(enabled) {
 	return Axios.post(url, data)
 		.then((resp) => {
 			// here HTTP 2xx only, HTTP 4xx error codes go to catch
+			if (!isResultObject(resp.data)) {
+				return { enabled: false, error: 'save-failed' }
+			}
 			return resp.data
 		}).catch((error) => {
 			Logger.error('failed to save two-factor email state', error)
@@ -75,11 +90,10 @@ export function persistAdminSettings(settings) {
 	Logger.debug('sending two-factor email admin settings', settings)
 	return Axios.post(url, settings)
 		.then((resp) => {
-			if (resp.status !== 200) {
+			if (resp.status !== 200 || !isResultObject(resp.data)) {
 				return { error: 'save-failed' }
-			} else {
-				return resp.data
 			}
+			return resp.data
 		}).catch((error) => {
 			// A 400 carries a field->code map of the failed validation checks so
 			// the UI can flag the offending fields; anything else is unexpected.
@@ -103,11 +117,10 @@ export function resetAdminSettings() {
 	Logger.debug('resetting two-factor email admin settings to defaults')
 	return Axios.post(url)
 		.then((resp) => {
-			if (resp.status !== 200) {
+			if (resp.status !== 200 || !isResultObject(resp.data)) {
 				return { error: 'reset-failed' }
-			} else {
-				return resp.data
 			}
+			return resp.data
 		}).catch(() => {
 			return { error: 'reset-failed' }
 		})
