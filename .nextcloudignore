@@ -12,6 +12,7 @@
 /.tx
 /build
 /.claude
+/codecov.yml
 /composer.*
 /krankerl.toml
 /node_modules
@@ -25,3 +26,4 @@
 /vendor/bin
 /vendor-bin
 /vite.config.js
+/vitest.config.js
