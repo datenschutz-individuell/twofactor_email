@@ -12,6 +12,10 @@ import Logger from '../Logger.js'
  * 2xx response (null, an empty 204 body, an array, a primitive) breaks the
  * contract and must not be handed to the store, which dereferences it.
  *
+ * This only guards the shape: an object with unexpected keys still passes
+ * through, as validating the values would duplicate the backend
+ * SettingsValidator for a trusted first-party endpoint.
+ *
  * @param {unknown} data The response body to check
  * @return {boolean} Whether the body is a usable result object
  */
