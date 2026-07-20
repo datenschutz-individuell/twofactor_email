@@ -55,3 +55,6 @@ jobs:
 
       - name: Run coding standards check
         run: composer run psalm -- --threads=1 --monochrome --no-progress --output-format=github
+
+      - name: Run taint analysis
+        run: composer run psalm:taint -- --threads=1 --monochrome --no-progress --output-format=github

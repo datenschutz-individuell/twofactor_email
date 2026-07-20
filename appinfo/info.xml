@@ -63,7 +63,7 @@ at the bottom of "Personal Settings/Security").]]></description>
         https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/screenshots/challenge.webp
     </screenshot>
     <dependencies>
-        <php min-version="8.1" max-version="8.5"/>
+        <php min-version="8.2" max-version="8.5"/>
         <nextcloud min-version="32" max-version="34"/>
     </dependencies>
     <background-jobs>
