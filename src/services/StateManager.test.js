@@ -11,6 +11,16 @@ vi.mock('@nextcloud/router', () => ({ generateUrl: (path) => path }))
 vi.mock('@nextcloud/axios', () => ({ default: { post: vi.fn() } }))
 vi.mock('../Logger.js', () => ({ default: { debug: vi.fn(), error: vi.fn() } }))
 
+// 2xx responses whose body is not a usable result object; the store would
+// crash or misbehave on these, so they must collapse to the failure shape.
+const malformedBodies = [
+	{ case: 'a null body', body: null },
+	{ case: 'an empty body', body: '' },
+	{ case: 'an array body', body: [] },
+	{ case: 'a numeric body', body: 42 },
+	{ case: 'a boolean body', body: true },
+]
+
 beforeEach(() => {
 	vi.clearAllMocks()
 })
@@ -22,7 +32,7 @@ describe('persistAdminSettings', () => {
 		await expect(persistAdminSettings({})).resolves.toEqual({ codeLength: 6 })
 	})
 
-	it('returns an unexpected 200 body verbatim', async () => {
+	it('passes an unexpected object body through unchanged', async () => {
 		Axios.post.mockResolvedValue({ status: 200, data: { unexpected: true } })
 
 		await expect(persistAdminSettings({})).resolves.toEqual({ unexpected: true })
@@ -48,8 +58,14 @@ describe('persistAdminSettings', () => {
 		await expect(persistAdminSettings({})).resolves.toEqual({ error: 'save-failed' })
 	})
 
-	it('reports save-failed on a non-200 response', async () => {
-		Axios.post.mockResolvedValue({ status: 204, data: '' })
+	it.each(malformedBodies)('reports save-failed for $case on a 200', async ({ body }) => {
+		Axios.post.mockResolvedValue({ status: 200, data: body })
+
+		await expect(persistAdminSettings({})).resolves.toEqual({ error: 'save-failed' })
+	})
+
+	it('reports save-failed on a non-200 response even with a valid body', async () => {
+		Axios.post.mockResolvedValue({ status: 201, data: { codeLength: 6 } })
 
 		await expect(persistAdminSettings({})).resolves.toEqual({ error: 'save-failed' })
 	})
@@ -62,7 +78,7 @@ describe('persistState', () => {
 		await expect(persistState(true)).resolves.toEqual({ enabled: true })
 	})
 
-	it('returns an unexpected 200 body verbatim', async () => {
+	it('passes an unexpected object body through unchanged', async () => {
 		Axios.post.mockResolvedValue({ status: 200, data: { unexpected: true } })
 
 		await expect(persistState(true)).resolves.toEqual({ unexpected: true })
@@ -90,6 +106,12 @@ describe('persistState', () => {
 
 		await expect(persistState(true)).resolves.toEqual({ enabled: false, error: 'save-failed' })
 	})
+
+	it.each(malformedBodies)('reports save-failed for $case on a 200', async ({ body }) => {
+		Axios.post.mockResolvedValue({ status: 200, data: body })
+
+		await expect(persistState(true)).resolves.toEqual({ enabled: false, error: 'save-failed' })
+	})
 })
 
 describe('resetAdminSettings', () => {
@@ -99,7 +121,7 @@ describe('resetAdminSettings', () => {
 		await expect(resetAdminSettings()).resolves.toEqual({ codeLength: 6 })
 	})
 
-	it('returns an unexpected 200 body verbatim', async () => {
+	it('passes an unexpected object body through unchanged', async () => {
 		Axios.post.mockResolvedValue({ status: 200, data: { unexpected: true } })
 
 		await expect(resetAdminSettings()).resolves.toEqual({ unexpected: true })
@@ -114,8 +136,14 @@ describe('resetAdminSettings', () => {
 		await expect(resetAdminSettings()).resolves.toEqual({ error: 'reset-failed' })
 	})
 
-	it('reports reset-failed on a non-200 response', async () => {
-		Axios.post.mockResolvedValue({ status: 204, data: '' })
+	it.each(malformedBodies)('reports reset-failed for $case on a 200', async ({ body }) => {
+		Axios.post.mockResolvedValue({ status: 200, data: body })
+
+		await expect(resetAdminSettings()).resolves.toEqual({ error: 'reset-failed' })
+	})
+
+	it('reports reset-failed on a non-200 response even with a valid body', async () => {
+		Axios.post.mockResolvedValue({ status: 201, data: { codeLength: 6 } })
 
 		await expect(resetAdminSettings()).resolves.toEqual({ error: 'reset-failed' })
 	})
