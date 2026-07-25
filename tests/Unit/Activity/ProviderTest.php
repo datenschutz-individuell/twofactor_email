@@ -15,6 +15,7 @@ use OCP\Activity\IEvent;
 use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\L10N\IFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -49,9 +50,9 @@ class ProviderTest extends TestCase {
 	}
 
 	/**
-	 * @dataProvider subjectData
 	 * @throws Exception
 	 */
+	#[DataProvider('subjectData')]
 	public function testParse(Notification $subject) {
 		$lang = 'ru';
 		$event = $this->createMock(IEvent::class);
