@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 /*
  * This class may NOT be renamed to e.g. 'Challenge.php' since Nextcloud USES the class suffix 'Controller'.
- * The route is declared via the #[FrontpageRoute] attribute below.
  */
 
 namespace OCA\TwoFactorEMail\Controller;
