@@ -1,0 +1,33 @@
+# For developers
+
+The app plugs into Nextcloud's [two-factor provider framework](https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/two-factor-provider.html) and is built against Nextcloud's public interfaces ([`OCP`](https://github.com/nextcloud-deps/ocp)). See [architecture.md](architecture.md) for how the components fit together and where data lives.
+
+## Building & testing
+
+- Set up a local dev environment with Docker: see [development-setup.md](development-setup.md).
+- Build the release package with `krankerl package`, or follow the manual steps in the README's [Building yourself](../README.md#building-yourself).
+- **PHP:** PHPUnit for the services, php-cs-fixer for style, and Psalm (including taint analysis) for static analysis. Psalm runs on the app's minimum PHP version, not on newer runtimes it does not yet support.
+- **Frontend:** Vitest for the logic and components, plus ESLint and Stylelint; `npm run build` produces the bundle.
+- Contributions are welcome — see [CONTRIBUTORS](../CONTRIBUTORS.md) and please discuss larger ideas first via the [idea collection](https://github.com/datenschutz-individuell/twofactor_email/issues/8).
+
+## Security mechanisms
+
+- **Code generation.** `NumericalCodeGenerator` uses `OCP\Security\ISecureRandom` (a CSPRNG) with `CHAR_DIGITS` and the configured length. No `rand()`/`mt_rand()`.
+- **Storage at rest.** `CodeStorage` stores `IHasher::hash($code)` — never the plaintext — in the user's config, plus a creation timestamp. The value is flagged `IUserConfig::FLAG_SENSITIVE`, so it is masked in `occ config:list` and in system/support reports.
+- **Verification.** `IHasher::verify()` is constant-time. The code is deleted only on **successful** verification (so a mistyped code can be retried); wrong tries are absorbed by Nextcloud's brute-force protection.
+- **Issuance policy.** A new code is issued only when no valid code is stored, which stops login-page reloads from flooding the mailbox. The new hash is persisted **only after** the email was sent successfully, so a failed delivery leaves the previous code valid.
+- **Resend throttling.** `ChallengeController::resend()` carries `#[NoAdminRequired]`, `#[NoTwoFactorRequired]`, `#[UserRateLimit(limit: 1, period: 60)]` and `#[BruteForceProtection]`, on top of the app-level resend cooldown (`ResendTooSoon`). See Nextcloud's [rate limiting](https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/security.html#rate-limiting) docs.
+- **Sensitive-action confirmation & CSRF.** `StateController::save()` (enable/disable) carries `#[PasswordConfirmationRequired]`. All controllers are session-authenticated Nextcloud controllers subject to its CSRF protection.
+- **Email content safety (`TemplateRenderer`).** Everything is HTML-escaped (`htmlspecialchars`); raw HTML is impossible. Placeholders (`{code}`, `{user}`, `{cloud}`, `{validity}`, `{logo}`) and detected URLs are escaped individually, and inserted values (e.g. a display name) cannot smuggle in placeholders. The **subject** has CR/LF stripped as defense-in-depth against header injection.
+- **Input validation.** `SettingsValidator` enforces numeric ranges and string limits for every admin setting and is the single validation path shared by the web controller and the `occ` command.
+
+## Assurance
+
+- **Static analysis:** Psalm (errorLevel 3) plus **Psalm taint analysis** (source-to-sink SAST, added in 3.4.0) — currently **no findings**. Taint rides on the annotations shipped in [`nextcloud/ocp`](https://github.com/nextcloud-deps/ocp), so it needs no extra stubs.
+- **Tests:** PHPUnit for the PHP services, Vitest for the frontend logic and components.
+- **Frontend SAST:** CodeQL (JavaScript) via the repository's default setup.
+- **Supply chain:** `roave/security-advisories` blocks known-vulnerable composer packages; Dependabot tracks npm/composer updates; the release package ships only runtime files.
+
+## Licensing
+
+The app is licensed [AGPL-3.0-or-later](../LICENSES/) and is [REUSE](https://reuse.software/)/SPDX compliant: every file carries clear copyright and licence metadata, inline or via `REUSE.toml`, and CI verifies it. Bundled assets keep their own licences (e.g. the app icon).

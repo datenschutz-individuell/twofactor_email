@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 690" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4b6a88"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="640" height="690" fill="#ffffff"/>
+
+  <!-- box + diamond styles applied inline -->
+  <g fill="#eef2f6" stroke="#4b6a88" stroke-width="1.5">
+    <rect x="40" y="20"  width="360" height="56" rx="8"/>
+    <rect x="40" y="100" width="360" height="56" rx="8"/>
+    <rect x="40" y="262" width="360" height="98" rx="8"/>
+    <rect x="40" y="404" width="360" height="46" rx="8"/>
+    <rect x="40" y="490" width="360" height="60" rx="8"/>
+    <rect x="40" y="592" width="360" height="60" rx="8"/>
+  </g>
+  <!-- reuse note -->
+  <rect x="452" y="178" width="160" height="54" rx="8" fill="#eaf4ec" stroke="#3f8f5a" stroke-width="1.5"/>
+  <!-- decision diamond -->
+  <polygon points="220,171 292,206 220,241 148,206" fill="#fbe4c9" stroke="#b8860b" stroke-width="1.5"/>
+
+  <!-- arrows -->
+  <g stroke="#4b6a88" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M220,76 L220,100"/>
+    <path d="M220,156 L220,171"/>
+    <path d="M220,241 L220,262"/>              <!-- no -> issue -->
+    <path d="M292,206 L452,206"/>              <!-- yes -> reuse -->
+    <path d="M220,360 L220,404"/>              <!-- issue -> enter -->
+    <path d="M532,232 L532,427 L400,427"/>     <!-- reuse -> enter -->
+    <path d="M220,450 L220,490"/>
+    <path d="M220,550 L220,592"/>
+  </g>
+
+  <!-- edge labels -->
+  <g fill="#5a6b7a" font-size="12">
+    <text x="232" y="256">no</text>
+    <text x="360" y="198">yes</text>
+  </g>
+
+  <!-- box text -->
+  <g fill="#1b2733" text-anchor="middle">
+    <text x="220" y="43">First stage succeeds</text>
+    <text x="220" y="61" fill="#5a6b7a" font-size="12">password — or a passkey / passwordless login</text>
+
+    <text x="220" y="123">Nextcloud asks TwoFactorEMail (IProvider)</text>
+    <text x="220" y="141" fill="#5a6b7a" font-size="12">for a second-factor challenge</text>
+
+    <text x="220" y="206" font-size="12">unexpired code stored?</text>
+
+    <text x="220" y="285" font-weight="600">Issue a new code</text>
+    <text x="60" y="308" text-anchor="start" font-size="12">1 · generate — ISecureRandom (digits)</text>
+    <text x="60" y="328" text-anchor="start" font-size="12">2 · email → the user's mailbox</text>
+    <text x="60" y="348" text-anchor="start" font-size="12">3 · store the hash (only after the email is sent)</text>
+
+    <text x="220" y="432">User enters the code</text>
+
+    <text x="220" y="515">verifyChallenge() — IHasher::verify</text>
+    <text x="220" y="533" fill="#5a6b7a" font-size="12">constant-time comparison</text>
+
+    <text x="220" y="617">On success: delete the stored code,</text>
+    <text x="220" y="635" fill="#5a6b7a" font-size="12">login proceeds</text>
+  </g>
+
+  <text x="532" y="201" text-anchor="middle" fill="#1b2733" font-size="12">reuse it —</text>
+  <text x="532" y="219" text-anchor="middle" fill="#5a6b7a" font-size="12">no new email</text>
+</svg>
