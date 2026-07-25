@@ -10,9 +10,21 @@ Two-factor email adds a second step to your Nextcloud login: after your password
 
 ## Using it at login
 
-When you sign in, after your password you are asked for a short one-time code. The app sends that code to your email address, and you enter it to finish logging in. If it does not arrive, you can request a fresh one after a short cooldown.
+When you sign in, you enter your username and password as usual. If email is your only second factor you go straight to the code step; if you have several methods enabled, Nextcloud first asks which one to use — choose **Email verification**:
 
-Once any 2FA is active, apps that cannot show the web login (some desktop/mobile clients) need an [app password](https://docs.nextcloud.com/server/latest/user_manual/en/session_management.html) instead of your account password.
+![Choosing email verification at login](../screenshots/select-auth_thumb.png)
+
+The app then emails you a short one-time code and shows the code-entry screen. Your address is displayed masked, so a bystander cannot read it. Enter the code to finish signing in:
+
+![Entering the emailed code on the login screen](../screenshots/challenge.png)
+
+If the mail does not arrive, request a fresh one with **Resend** after a short cooldown. Each code is single-use and only one is valid at a time, so reloading the page never floods your inbox.
+
+## Desktop and mobile apps
+
+Once any 2FA is active, apps that cannot show the web login — most desktop and mobile sync clients — can no longer sign in with your normal password. The Nextcloud manual covers this under [*Using client applications with two-factor authentication*](https://docs.nextcloud.com/server/stable/user_manual/en/user_2fa.html#using-client-applications-with-two-factor-authentication): you generate a **device-specific password** (also called an *app password*) for each such app and use that instead.
+
+Create them under *Personal settings › Security › Devices & sessions* — see [Manage connected browsers and devices](https://docs.nextcloud.com/server/stable/user_manual/en/session_management.html). One thing specific to email 2FA: an app password skips the second step entirely, so treat each one like a full password — give every device its own, name them clearly, and revoke any you no longer use.
 
 ## What protects your codes
 
