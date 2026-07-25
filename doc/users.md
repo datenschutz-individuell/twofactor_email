@@ -8,6 +8,8 @@ Two-factor email adds a second step to your Nextcloud login: after your password
 - Enable **Email** under *Personal settings › Security › Two-Factor Authentication*.
 - From then on, each login asks for a code after your password.
 
+![Enabling email two-factor authentication in Personal settings](../screenshots/personal-settings.png)
+
 ## Using it at login
 
 When you sign in, you enter your username and password as usual. If email is your only second factor you go straight to the code step; if you have several methods enabled, Nextcloud first asks which one to use — choose **Email verification**:
