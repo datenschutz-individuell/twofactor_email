@@ -48,6 +48,11 @@ final readonly class EMailDeleted implements IEventListener {
 	) {
 	}
 
+	/**
+	 * @psalm-suppress DocblockTypeContradiction Deliberate fail-closed guard:
+	 *   the generic narrows $event to UserChangedEvent, but we still verify it
+	 *   at runtime rather than trust the dispatcher registration.
+	 */
 	public function handle(Event $event): void {
 		if (!$event instanceof UserChangedEvent || $event->getFeature() !== 'eMailAddress') {
 			return;
