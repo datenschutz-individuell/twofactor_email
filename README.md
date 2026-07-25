@@ -21,7 +21,7 @@ To report a security vulnerability, see [SECURITY.md](SECURITY.md).
 
 ## State of the app
 
-This version 3.x.x ("v3") is the successor of the deprecated [twofactor_email](https://github.com/nursoda/twofactor_email/) app 2.x.x ("v2"). v2 will remain in the [Nextcloud App Store](https://apps.nextcloud.com/apps/twofactor_email) alongside v3 as long as upcoming security issues may be fixed with reasonable effort. After that, or after all supported Nextcloud versions may use v3, it will be pulled from the App Store. v3 is based on [twofactor_totp](https://github.com/nextcloud/twofactor_totp/) but has been refactored. v2 is installable on NC ≤33, v3 on NC ≥32.
+This version 3.x.x ("v3") is the successor of the deprecated [twofactor_email](https://github.com/nursoda/twofactor_email/) app 2.x.x ("v2"). v2 will remain in the [Nextcloud App Store](https://apps.nextcloud.com/apps/twofactor_email) alongside v3 as long as upcoming security issues may be fixed with reasonable effort. After that, or after all supported Nextcloud versions may use v3, it will be pulled from the App Store. v3 is based on [twofactor_totp](https://github.com/nextcloud/twofactor_totp/) but has been refactored. v2 is installable on NC ≤33, v3 on NC ≥33 (v3.0–3.3 also ran on NC 32).
 
 The code is stable now. There are plans for further enhancements. See open tasks in the [roadmap](https://github.com/datenschutz-individuell/twofactor_email/issues/7). It keeps the status of whether this provider is enabled for a specific user or not when migrating from v2 to v3. However, from 3.1.1 onwards, v2 codes are no longer migrated to v3 since most of them were obsolete. Mind that the look and some behaviour changed or was enhanced.
 
