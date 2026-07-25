@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <psalm
         errorLevel="3"
-        phpVersion="8.1"
+        phpVersion="8.2"
         findUnusedCode="false"
         ensureOverrideAttribute="false"
         autoloader="tests/bootstrap.php"
