@@ -20,11 +20,20 @@ updates:
       interval: "weekly"
       day: "saturday"
 
-  # Enable version updates for Docker
+  # Enable version updates for npm
   - package-ecosystem: "npm"
     # Look for `package.json` and `package-lock.json` files in the `root` directory
     directory: "/"
     # Check the npm registry for updates on each saturday
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+
+  # Enable version updates for the GitHub Actions used in our workflows
+  - package-ecosystem: "github-actions"
+    # Look for workflow files in `.github/workflows`
+    directory: "/"
+    # Check for action updates on each saturday
     schedule:
       interval: "weekly"
       day: "saturday"
