@@ -64,7 +64,7 @@ at the bottom of "Personal Settings/Security").]]></description>
     </screenshot>
     <dependencies>
         <php min-version="8.2" max-version="8.5"/>
-        <nextcloud min-version="32" max-version="34"/>
+        <nextcloud min-version="33" max-version="34"/>
     </dependencies>
     <background-jobs>
         <job>OCA\TwoFactorEMail\BackgroundJob\CleanUpExpiredCodes</job>

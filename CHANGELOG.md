@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Require PHP 8.2 or newer
+- Drop support for Nextcloud 32 (which still allows PHP 8.1)
 
 ## 3.3.0 (2026-07-20)
 
