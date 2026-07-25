@@ -19,7 +19,7 @@
   },
   "require-dev": {
     "bamarni/composer-bin-plugin": "^1.9.1",
-    "christophwurst/nextcloud_testing": "^2.0",
+    "christophwurst/nextcloud_testing": "^3.0",
     "nextcloud/ocp": "^33 || ^34",
     "psalm/phar": "^6.8",
     "roave/security-advisories": "dev-latest",
