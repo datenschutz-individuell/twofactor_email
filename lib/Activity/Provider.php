@@ -17,10 +17,10 @@ use OCP\IURLGenerator;
 use OCP\L10N\IFactory as L10nFactory;
 use ValueError;
 
-final class Provider implements IProvider {
+final readonly class Provider implements IProvider {
 	public function __construct(
-		private readonly L10nFactory $l10n,
-		private readonly IURLGenerator $urlGenerator,
+		private L10nFactory $l10n,
+		private IURLGenerator $urlGenerator,
 	) {
 	}
 

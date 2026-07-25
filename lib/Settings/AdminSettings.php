@@ -17,11 +17,11 @@ use OCP\AppFramework\Services\IInitialState;
 use OCP\IL10N;
 use OCP\Settings\IDelegatedSettings;
 
-final class AdminSettings implements IDelegatedSettings {
+final readonly class AdminSettings implements IDelegatedSettings {
 	public function __construct(
-		private readonly IAppSettings $appSettings,
-		private readonly IInitialState $initialState,
-		private readonly IL10N $l10n,
+		private IAppSettings $appSettings,
+		private IInitialState $initialState,
+		private IL10N $l10n,
 	) {
 	}
 

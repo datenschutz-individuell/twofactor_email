@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 /*
  * This class may NOT be renamed to e.g. 'AdminSettings.php' since Nextcloud USES the class suffix 'Controller'.
- * See routes.php.
  */
 
 namespace OCA\TwoFactorEMail\Controller;
@@ -19,6 +18,7 @@ use OCA\TwoFactorEMail\Service\SettingsValidator;
 use OCA\TwoFactorEMail\Settings\AdminSettings;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
+use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
 use OCP\IRequest;
@@ -34,6 +34,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		parent::__construct($appName, $request);
 	}
 
+	#[FrontpageRoute(verb: 'POST', url: '/admin/save')]
 	#[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function save(
 		int $codeLength,
@@ -56,6 +57,7 @@ final class AdminSettingsController extends ALoginSetupController {
 		return $this->currentSettingsResponse();
 	}
 
+	#[FrontpageRoute(verb: 'POST', url: '/admin/reset')]
 	#[AuthorizedAdminSetting(settings: AdminSettings::class)]
 	public function reset(): JSONResponse {
 		$this->appSettings->resetToDefaults();

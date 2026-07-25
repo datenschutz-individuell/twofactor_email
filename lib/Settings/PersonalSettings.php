@@ -16,10 +16,10 @@ use OCP\Template\ITemplateManager;
 use OCP\Template\TemplateNotFoundException;
 use RuntimeException;
 
-final class PersonalSettings implements IPersonalProviderSettings {
+final readonly class PersonalSettings implements IPersonalProviderSettings {
 
 	public function __construct(
-		private readonly ITemplateManager $templateManager,
+		private ITemplateManager $templateManager,
 	) {
 	}
 

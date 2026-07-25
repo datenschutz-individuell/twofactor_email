@@ -41,13 +41,18 @@ use OCP\User\Events\UserChangedEvent;
  *
  * @template-implements IEventListener<UserChangedEvent>
  */
-final class EMailDeleted implements IEventListener {
+final readonly class EMailDeleted implements IEventListener {
 
 	public function __construct(
-		private readonly IStateManager $stateManager,
+		private IStateManager $stateManager,
 	) {
 	}
 
+	/**
+	 * @psalm-suppress DocblockTypeContradiction Deliberate fail-closed guard:
+	 *   the generic narrows $event to UserChangedEvent, but we still verify it
+	 *   at runtime rather than trust the dispatcher registration.
+	 */
 	public function handle(Event $event): void {
 		if (!$event instanceof UserChangedEvent || $event->getFeature() !== 'eMailAddress') {
 			return;

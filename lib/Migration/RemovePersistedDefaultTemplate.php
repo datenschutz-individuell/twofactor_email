@@ -24,7 +24,7 @@ use OCP\Migration\IRepairStep;
  * to the 3.1 default text (which was never localized), so the current
  * default applies again. Real customizations are left untouched.
  */
-final class RemovePersistedDefaultTemplate implements IRepairStep {
+final readonly class RemovePersistedDefaultTemplate implements IRepairStep {
 
 	// The hardcoded default body of twofactor_email 3.1.0 – 3.1.2, verbatim
 	private const OLD_DEFAULT_TEMPLATE
@@ -34,7 +34,7 @@ final class RemovePersistedDefaultTemplate implements IRepairStep {
 		. 'or username – and your password!';
 
 	public function __construct(
-		private readonly IAppSettings $appSettings,
+		private IAppSettings $appSettings,
 	) {
 	}
 

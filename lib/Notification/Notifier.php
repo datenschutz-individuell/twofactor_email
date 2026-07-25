@@ -21,11 +21,11 @@ use OCP\Notification\UnknownNotificationException;
  * Renders the notifications sent by StateChangeNotification. The subject
  * texts are shared with the activity entries (Activity\Notification).
  */
-final class Notifier implements INotifier {
+final readonly class Notifier implements INotifier {
 
 	public function __construct(
-		private readonly L10nFactory $l10nFactory,
-		private readonly IURLGenerator $urlGenerator,
+		private L10nFactory $l10nFactory,
+		private IURLGenerator $urlGenerator,
 	) {
 	}
 

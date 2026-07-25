@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 /*
  * This class may NOT be renamed to e.g. 'Challenge.php' since Nextcloud USES the class suffix 'Controller'.
- * See routes.php.
  */
 
 namespace OCA\TwoFactorEMail\Controller;
@@ -21,6 +20,7 @@ use OCA\TwoFactorEMail\Service\ILoginChallenge;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\BruteForceProtection;
+use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoTwoFactorRequired;
 use OCP\AppFramework\Http\Attribute\UserRateLimit;
@@ -49,6 +49,7 @@ final class ChallengeController extends ALoginSetupController {
 	 * minimum allowed resend cooldown (currently 1 minute), so it never rejects a
 	 * legitimately allowed resend.
 	 */
+	#[FrontpageRoute(verb: 'POST', url: '/challenge/resend')]
 	#[NoAdminRequired]
 	#[NoTwoFactorRequired]
 	#[UserRateLimit(limit: 1, period: 60)]

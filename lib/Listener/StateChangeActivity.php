@@ -21,11 +21,11 @@ use OCP\IUserSession;
 /**
  * @template-implements IEventListener<StateChanged>
  */
-final class StateChangeActivity implements IEventListener {
+final readonly class StateChangeActivity implements IEventListener {
 
 	public function __construct(
-		private readonly ActivityManager $activityManager,
-		private readonly IUserSession $userSession,
+		private ActivityManager $activityManager,
+		private IUserSession $userSession,
 	) {
 	}
 
