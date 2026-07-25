@@ -9,13 +9,14 @@ declare(strict_types=1);
 
 /*
  * This class may NOT be renamed to e.g. 'State.php' since Nextcloud USES the class suffix 'Controller'.
- * See routes.php.
+ * The route is declared via the #[FrontpageRoute] attribute below.
  */
 
 namespace OCA\TwoFactorEMail\Controller;
 
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\PasswordConfirmationRequired;
 use OCP\AppFramework\Http\JSONResponse;
@@ -34,6 +35,7 @@ final class StateController extends ALoginSetupController {
 		parent::__construct($appName, $request);
 	}
 
+	#[FrontpageRoute(verb: 'POST', url: '/state/save')]
 	#[NoAdminRequired]
 	#[PasswordConfirmationRequired]
 	public function save(bool $state): JSONResponse {
