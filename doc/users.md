@@ -12,7 +12,7 @@ Two-factor email adds a second step to your Nextcloud login: after your password
 
 ## Using it at login
 
-When you sign in, you enter your username and password as usual. If email is your only second factor you go straight to the code step; if you have several methods enabled, Nextcloud first asks which one to use — choose **Email verification**:
+When you sign in, you enter your username and password as usual. If email is your only second factor, you go straight to the code step; if you have several methods enabled, Nextcloud first asks which one to use — choose **Email verification**:
 
 ![Choosing email verification at login](../screenshots/select-auth_thumb.png)
 
@@ -20,7 +20,7 @@ The app then emails you a short one-time code and shows the code-entry screen. Y
 
 ![Entering the emailed code on the login screen](../screenshots/challenge.png)
 
-If the mail does not arrive, request a fresh one with **Resend** after a short cooldown. Each code is single-use and only one is valid at a time, so reloading the page never floods your inbox.
+If the email does not arrive, request a fresh one with **Resend** after a short cooldown. Each code is single-use and only one is valid at a time, so reloading the page never floods your inbox.
 
 ## Desktop and mobile apps
 
@@ -32,7 +32,7 @@ Create them under *Personal settings › Security › Devices & sessions* — se
 
 - Codes are **randomly generated** and **short-lived** — your admin sets how long they stay valid (for example 10 minutes).
 - A code is **single-use**: once it logs you in, it is gone.
-- Only **one** code is valid at a time. Reloading the login page does **not** send you a flood of new mails.
+- Only **one** code is valid at a time. Reloading the login page does **not** send you a flood of new emails.
 - The server never keeps your actual code — only a one-way **fingerprint** (hash) of it, so the code cannot be read back out of the system.
 - On the login screen your address is shown **masked** (like `a*@*.com`), so someone glancing at your screen does not learn your full email address.
 - Turning email 2FA **on or off** asks for your password again.
