@@ -6,8 +6,7 @@ SPDX-PackageSupplier = "Two-Factor email Support <twofactor-email@datenschutz-in
 SPDX-PackageDownloadLocation = "https://github.com/datenschutz-individuell/twofactor_email"
 
 [[annotations]]
-path = [".github/CODEOWNERS", ".github/renovate.json",
-    "CHANGELOG.md", "CONTRIBUTORS.md", "README.md", "SECURITY.md", "doc/**",
+path = ["CHANGELOG.md", "CONTRIBUTORS.md", "README.md", "SECURITY.md", "doc/**",
     "composer.json", "composer.lock", "package.json", "package-lock.json",
     "vendor-bin/cs-fixer/composer.json", "vendor-bin/cs-fixer/composer.lock",
     "psalm.xml"]
