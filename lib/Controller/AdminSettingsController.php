@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 /*
  * This class may NOT be renamed to e.g. 'AdminSettings.php' since Nextcloud USES the class suffix 'Controller'.
- * The routes are declared via the #[FrontpageRoute] attributes below.
  */
 
 namespace OCA\TwoFactorEMail\Controller;
