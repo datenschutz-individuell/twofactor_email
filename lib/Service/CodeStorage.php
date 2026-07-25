@@ -11,13 +11,13 @@ use OCA\TwoFactorEMail\AppInfo\Application;
 use OCP\Config\IUserConfig;
 use OCP\Config\ValueType;
 
-final class CodeStorage implements ICodeStorage {
+final readonly class CodeStorage implements ICodeStorage {
 	private const KEY_CODE = 'code';
 	private const KEY_CREATED_AT = 'code_created_at';
 
 	public function __construct(
-		private readonly IAppSettings $settings,
-		private readonly IUserConfig $config,
+		private IAppSettings $settings,
+		private IUserConfig $config,
 	) {
 	}
 

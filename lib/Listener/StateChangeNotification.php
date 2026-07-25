@@ -26,11 +26,11 @@ use OCP\Notification\IManager as NotificationManager;
  *
  * @template-implements IEventListener<StateChanged>
  */
-final class StateChangeNotification implements IEventListener {
+final readonly class StateChangeNotification implements IEventListener {
 
 	public function __construct(
-		private readonly NotificationManager $notificationManager,
-		private readonly ITimeFactory $timeFactory,
+		private NotificationManager $notificationManager,
+		private ITimeFactory $timeFactory,
 	) {
 	}
 

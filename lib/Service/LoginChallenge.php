@@ -16,14 +16,14 @@ use OCP\IUser;
 use OCP\Security\IHasher;
 use Psr\Log\LoggerInterface;
 
-final class LoginChallenge implements ILoginChallenge {
+final readonly class LoginChallenge implements ILoginChallenge {
 	public function __construct(
-		private readonly ICodeGenerator $codeGenerator,
-		private readonly ICodeStorage $codeStorage,
-		private readonly IEMailSender $emailSender,
-		private readonly IHasher $hasher,
-		private readonly IAppSettings $settings,
-		private readonly LoggerInterface $logger,
+		private ICodeGenerator $codeGenerator,
+		private ICodeStorage $codeStorage,
+		private IEMailSender $emailSender,
+		private IHasher $hasher,
+		private IAppSettings $settings,
+		private LoggerInterface $logger,
 	) {
 	}
 

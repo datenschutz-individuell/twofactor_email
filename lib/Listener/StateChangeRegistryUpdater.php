@@ -18,11 +18,11 @@ use OCP\EventDispatcher\IEventListener;
 /**
  * @template-implements IEventListener<StateChanged>
  */
-final class StateChangeRegistryUpdater implements IEventListener {
+final readonly class StateChangeRegistryUpdater implements IEventListener {
 
 	public function __construct(
-		private readonly IRegistry $registry,
-		private readonly TwoFactorEMail $provider,
+		private IRegistry $registry,
+		private TwoFactorEMail $provider,
 	) {
 	}
 

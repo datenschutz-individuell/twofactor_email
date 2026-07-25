@@ -20,13 +20,13 @@ use OCP\IUser;
  * updated in \OCA\TwoFactorEMail\Listener\StateChangeRegistryUpdater, because
  * updating it here would create a circular dependency with the provider.
  */
-final class StateManager implements IStateManager {
+final readonly class StateManager implements IStateManager {
 
 	private const PROVIDER_ID = 'email';
 
 	public function __construct(
-		private readonly IEventDispatcher $eventDispatcher,
-		private readonly IRegistry $registry,
+		private IEventDispatcher $eventDispatcher,
+		private IRegistry $registry,
 	) {
 	}
 

@@ -17,11 +17,11 @@ use OCP\Template\ITemplateManager;
 use OCP\Template\TemplateNotFoundException;
 use RuntimeException;
 
-final class LoginSetup implements ILoginSetupProvider {
+final readonly class LoginSetup implements ILoginSetupProvider {
 
 	public function __construct(
-		private readonly IURLGenerator $urlGenerator,
-		private readonly ITemplateManager $templateManager,
+		private IURLGenerator $urlGenerator,
+		private ITemplateManager $templateManager,
 	) {
 	}
 

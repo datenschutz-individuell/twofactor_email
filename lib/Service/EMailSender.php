@@ -17,12 +17,12 @@ use OCP\IUser;
 use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
 
-final class EMailSender implements IEMailSender {
+final readonly class EMailSender implements IEMailSender {
 	public function __construct(
-		private readonly LoggerInterface $logger,
-		private readonly IMailer $mailer,
-		private readonly IAppSettings $appSettings,
-		private readonly TemplateRenderer $templateRenderer,
+		private LoggerInterface $logger,
+		private IMailer $mailer,
+		private IAppSettings $appSettings,
+		private TemplateRenderer $templateRenderer,
 	) {
 	}
 

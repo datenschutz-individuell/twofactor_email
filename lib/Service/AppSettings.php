@@ -13,7 +13,7 @@ use OCA\TwoFactorEMail\AppInfo\Application;
 use OCP\IAppConfig;
 use OCP\IL10N;
 
-final class AppSettings implements IAppSettings {
+final readonly class AppSettings implements IAppSettings {
 
 	// Config keys used to store the settings in the app config
 	private const KEY_CODE_LENGTH = 'code_length';
@@ -33,8 +33,8 @@ final class AppSettings implements IAppSettings {
 	private const DEFAULT_EMAIL_TEMPLATE = '';
 
 	public function __construct(
-		private readonly IAppConfig $appConfig,
-		private readonly IL10N $l10n,
+		private IAppConfig $appConfig,
+		private IL10N $l10n,
 	) {
 	}
 

@@ -32,14 +32,14 @@ use OCP\IUser;
  *     subject all are inserted bare
  * Everything else is HTML-escaped — raw HTML is not possible.
  */
-final class TemplateRenderer {
+final readonly class TemplateRenderer {
 
 	private const URL_PATTERN = '~https?://[^\s<>"]+~i';
 
 	public function __construct(
-		private readonly Defaults $defaults,
-		private readonly IURLGenerator $urlGenerator,
-		private readonly IAppSettings $appSettings,
+		private Defaults $defaults,
+		private IURLGenerator $urlGenerator,
+		private IAppSettings $appSettings,
 	) {
 	}
 

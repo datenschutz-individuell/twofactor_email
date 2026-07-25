@@ -41,10 +41,10 @@ use OCP\User\Events\UserChangedEvent;
  *
  * @template-implements IEventListener<UserChangedEvent>
  */
-final class EMailDeleted implements IEventListener {
+final readonly class EMailDeleted implements IEventListener {
 
 	public function __construct(
-		private readonly IStateManager $stateManager,
+		private IStateManager $stateManager,
 	) {
 	}
 

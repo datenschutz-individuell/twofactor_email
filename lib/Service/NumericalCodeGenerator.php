@@ -11,10 +11,10 @@ namespace OCA\TwoFactorEMail\Service;
 
 use OCP\Security\ISecureRandom;
 
-final class NumericalCodeGenerator implements ICodeGenerator {
+final readonly class NumericalCodeGenerator implements ICodeGenerator {
 	public function __construct(
-		private readonly ISecureRandom $secureRandom,
-		private readonly IAppSettings $settings,
+		private ISecureRandom $secureRandom,
+		private IAppSettings $settings,
 	) {
 	}
 
