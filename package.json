@@ -83,5 +83,9 @@
     "happy-dom": "^20.11.1",
     "vite": "^8.1.5",
     "vitest": "^4.1.10"
+  },
+  "allowScripts": {
+    "@parcel/watcher": false,
+    "core-js": false
   }
 }
