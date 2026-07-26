@@ -121,19 +121,17 @@ occ app:enable twofactor_email
 Nextcloud is at `http://localhost:8080` (admin/admin), the mailbox at
 `http://localhost:8025`. `docker compose down -v` removes everything again.
 
-To reach the login challenge you need the provider switched on for the user. That is
-a user setting, so a script can do it without opening the browser:
+To reach the login challenge, switch the provider on for the user. The app keeps this
+state in Nextcloud's own two-factor registry, so `occ` can do it without a browser:
 
 ```
-occ user:setting admin twofactor_email verified true
+occ twofactorauth:enable admin email
+occ twofactorauth:state admin        # email must be listed under "Enabled providers"
 ```
 
-The next login then asks for the code, which you read in the mail catcher. Note that
-`occ twofactorauth:enable` cannot do this — it answers "The provider does not support
-this operation" — and `occ twofactorauth:state` still lists the app as disabled,
-because the app keeps its own state instead of using Nextcloud's provider registry.
+The next login then asks for the code, which you read in the mail catcher.
 
-Two things that look like bugs but are not:
+Three things that look like bugs but are not:
 
 - **The admin password cannot be changed to a weak one later.** `password_policy` is
   active in the image and asks for ten characters and a password that is not on the
@@ -143,11 +141,16 @@ Two things that look like bugs but are not:
 - **A `curl` login needs an `Origin` header.** Nextcloud rejects a POST to `/login`
   without a trusted `Origin` before it ever checks the password, and answers with a
   redirect to `?direct=1&user=…` plus a misleading `Logging out` line in the log. It
-  looks exactly like a wrong password:
+  looks exactly like a wrong password.
+- **Send the request token as a header, not as a form field.** The token is base64, so
+  it often contains a `+`. `curl -d` sends the body verbatim and PHP turns that `+`
+  into a space while decoding, which breaks the token — but only for the tokens that
+  happen to contain one, so the same command works about one time in three. As a
+  header it needs no encoding:
 
   ```
-  curl -b jar -c jar -H 'Origin: http://localhost:8080' \
-    -d user=admin -d password=admin -d "requesttoken=$TOKEN" http://localhost:8080/login
+  curl -b jar -c jar -H 'Origin: http://localhost:8080' -H "requesttoken: $TOKEN" \
+    -d user=admin -d password=admin http://localhost:8080/login
   ```
 
 If the Docker daemon refuses to start with `error initializing graphdriver: driver
