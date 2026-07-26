@@ -71,9 +71,12 @@ post() {
 	shift 2
 	local args=() kv
 	for kv in "$@"; do args+=(-d "$kv"); done
+	# ${args[@]+…} because two callers pass no data at all (resend, admin/reset) and
+	# expanding an empty array under `set -u` aborts on bash < 4.4 — macOS still ships
+	# 3.2 as /bin/bash.
 	curl -s -X POST -b "$TMP/jar" -c "$TMP/jar" \
 		-H "Origin: $BASE" -H "requesttoken: $tok" \
-		-o "$TMP/body" -w '%{http_code}' "${args[@]}" "$url"
+		-o "$TMP/body" -w '%{http_code}' ${args[@]+"${args[@]}"} "$url"
 }
 
 mails() { curl -s "$MAILBOX/api/v1/messages?limit=20"; }
@@ -201,7 +204,14 @@ run_checks() {
 		[ "$code_" = "200" ] || { bad "asset $url -> $code_"; broken=$((broken + 1)); }
 	done < <(grep -oP '(src|href)="\K/(dist|apps/twofactor_email)[^"]+' "$TMP/challenge.html" \
 		| sed 's/&amp;/\&/g' | sort -u)
-	[ "$broken" = 0 ] && ok "all $count assets of the challenge page were served"
+	# The count has to be checked too: if the extraction ever matches nothing, the loop
+	# body never runs and a bare "$broken = 0" would report a pass for having tested
+	# nothing at all. That false pass was observed while building this.
+	if [ "$count" = 0 ]; then
+		bad "no assets found on the challenge page — the page or the extraction changed"
+	elif [ "$broken" = 0 ]; then
+		ok "all $count assets of the challenge page were served"
+	fi
 
 	echo "-- server log"
 	if docker compose exec -T nextcloud sh -c 'cat /var/www/html/data/nextcloud.log' 2>/dev/null \
@@ -259,7 +269,17 @@ for tag in "${TAGS[@]}"; do
 		continue
 	fi
 
+	before=$fail
 	run_checks
+	# Dump the log while the containers still exist. Doing this afterwards — or from a
+	# following CI step — cannot work: the teardown below has already removed them.
+	if [ "$fail" -gt "$before" ]; then
+		echo "-- server log (last 40 lines, this instance failed)"
+		docker compose exec -T nextcloud sh -c 'tail -n 40 /var/www/html/data/nextcloud.log' \
+			2>/dev/null | cut -c1-200 | sed 's/^/     /' || echo "     (log not readable)"
+		echo "-- container log (last 20 lines)"
+		docker compose logs --tail 20 nextcloud 2>/dev/null | sed 's/^/     /'
+	fi
 	if [ "$KEEP" = 1 ]; then
 		echo "  instance left running: $BASE (admin/$PW) · $MAILBOX"
 		break
