@@ -13,7 +13,7 @@
 #
 #   ./smoke.sh                   # min and max supported Nextcloud version
 #   NC_TAG=33-apache ./smoke.sh  # one specific server version
-#   SLOW=1 ./smoke.sh            # also check the successful resend (waits 65 s)
+#   SLOW=0 ./smoke.sh            # skip the successful resend, saving 65 s per version
 #   KEEP=1 ./smoke.sh            # leave the instance running afterwards
 #
 # Exit code: number of failed checks, so CI can gate on it.
@@ -29,7 +29,9 @@ cd "$(dirname "$0")"
 : "${APP_TARBALL:=$ROOT/build/artifacts/twofactor_email.tar.gz}"
 : "${HTTP_PORT:=8080}"
 : "${MAIL_PORT:=8025}"
-: "${SLOW:=0}"
+# On by default: the successful resend is the half of that route which a cooldown
+# rejection cannot prove, and 65 s per version is a fair price for it.
+: "${SLOW:=1}"
 : "${KEEP:=0}"
 BASE="http://localhost:$HTTP_PORT"
 MAILBOX="http://localhost:$MAIL_PORT"
@@ -137,7 +139,7 @@ run_checks() {
 		body_has "response reports the mail was sent" '"status":"sent"'
 		is "a second mail arrived" "$(mail_count)" "2"
 	else
-		note "successful resend not checked (SLOW=1 adds the wait)"
+		note "successful resend not checked (SLOW=0 was set)"
 	fi
 
 	echo "-- submitting the code"

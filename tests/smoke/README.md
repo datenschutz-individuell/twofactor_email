@@ -24,13 +24,18 @@ Docker with the compose plugin, `python3`, `curl`, and a built package
 cd tests/smoke
 ./smoke.sh                   # both ends of the supported server range
 NC_TAG=33-apache ./smoke.sh  # one specific server version
-SLOW=1 ./smoke.sh            # also the successful resend (adds a 65 s wait)
+SLOW=0 ./smoke.sh            # skip the successful resend, saving 65 s per version
 KEEP=1 ./smoke.sh            # leave the instance up to look at it
 ./setup.sh                   # just an instance, no checks (needs NC_TAG)
 ```
 
 The exit code is the number of failed checks. Ports and package can be overridden
 with `HTTP_PORT`, `MAIL_PORT` and `APP_TARBALL`.
+
+A full run takes about six minutes per server version. Most of the extra time is one
+deliberate 65-second wait: the resend cooldown has to pass before the *successful*
+resend can be checked, and a rejected resend only proves half of that route. `SLOW=0`
+drops it when you are iterating.
 
 ## Switching the provider on without a browser
 
