@@ -36,12 +36,7 @@ The app should now appear in Nextcloud and work once enabled.
   cd apps/twofactor_email/
   composer run-script test
   ```
-- **Test against a specific Nextcloud version** — pick a branch or tag from [nextcloud/server](https://github.com/nextcloud/server) and mount your local checkout (replace `/PATH/TO` with the path to your `nextcloud-docker-dev` clone):
-  ```
-  docker run --rm -p 8080:80 -e SERVER_BRANCH=v27.1.7 \
-    -v /PATH/TO/nextcloud-docker-dev/workspace/server/apps/twofactor_email:/var/www/html/apps/twofactor_email \
-    ghcr.io/juliushaertl/nextcloud-dev-php80:latest
-  ```
+- **Test against a specific Nextcloud version** — see below.
 
 ## Minimalist setup on Arch Linux
 
@@ -71,3 +66,61 @@ cd nextcloud-docker-dev
 docker compose up --pull always -d nextcloud
 # Nextcloud is then reachable at http://nextcloud.local/  (user: admin, password: admin)
 ```
+
+## Throwaway instance for a specific Nextcloud version
+
+The app supports a range of Nextcloud versions, and a bug can be specific to one of
+them. The quickest way to check one is a disposable instance built from the official
+image. SQLite is enough, and a mail catcher is **required** — without SMTP the
+challenge email never arrives, so the login flow cannot be tested at all.
+
+`compose.yaml`:
+
+```yaml
+services:
+  nextcloud:
+    image: nextcloud:33-apache          # pick the version you want to test
+    ports: ["8080:80"]
+    environment:
+      SQLITE_DATABASE: nextcloud
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: admin
+      NEXTCLOUD_TRUSTED_DOMAINS: localhost
+    volumes:
+      - nc-data:/var/www/html
+      # the built app, not the working tree — test what gets shipped
+      - ./twofactor_email:/var/www/html/custom_apps/twofactor_email:ro
+  mailpit:
+    image: axllent/mailpit
+    ports: ["8025:8025"]                # the challenge codes land here
+volumes:
+  nc-data:
+```
+
+Unpack a built package next to it and start the stack:
+
+```
+tar xzf build/artifacts/twofactor_email.tar.gz -C .
+docker compose up -d
+```
+
+Then point Nextcloud at the mail catcher, give the admin an address (the provider
+cannot be enabled without one) and enable the app:
+
+```
+occ() { docker compose exec -T -u www-data nextcloud php occ "$@"; }
+occ config:system:set mail_smtpmode --value=smtp
+occ config:system:set mail_smtphost --value=mailpit
+occ config:system:set mail_smtpport --value=1025
+occ config:system:set mail_from_address --value=nextcloud
+occ config:system:set mail_domain --value=example.org
+occ user:setting admin settings email admin@example.org
+occ app:enable twofactor_email
+```
+
+Nextcloud is at `http://localhost:8080` (admin/admin), the mailbox at
+`http://localhost:8025`. `docker compose down -v` removes everything again.
+
+If the Docker daemon refuses to start with `error initializing graphdriver: driver
+not supported`, the kernel was updated without a reboot since — the modules of the
+running kernel are gone, so overlayfs cannot be loaded. Rebooting fixes it.
