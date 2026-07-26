@@ -19,3 +19,4 @@ css/
 
 tests/clover.xml
 tests/.phpunit.result.cache
+/tests/smoke/app/
