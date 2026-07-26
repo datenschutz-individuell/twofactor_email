@@ -121,6 +121,35 @@ occ app:enable twofactor_email
 Nextcloud is at `http://localhost:8080` (admin/admin), the mailbox at
 `http://localhost:8025`. `docker compose down -v` removes everything again.
 
+To reach the login challenge you need the provider switched on for the user. That is
+a user setting, so a script can do it without opening the browser:
+
+```
+occ user:setting admin twofactor_email verified true
+```
+
+The next login then asks for the code, which you read in the mail catcher. Note that
+`occ twofactorauth:enable` cannot do this — it answers "The provider does not support
+this operation" — and `occ twofactorauth:state` still lists the app as disabled,
+because the app keeps its own state instead of using Nextcloud's provider registry.
+
+Two things that look like bugs but are not:
+
+- **The admin password cannot be changed to a weak one later.** `password_policy` is
+  active in the image and asks for ten characters and a password that is not on the
+  breach list. It does not apply while the instance is being installed, which is why
+  `admin/admin` works, but a later `occ user:resetpassword` to `admin` fails. Pick a
+  strong password, or throw the instance away and set it up again.
+- **A `curl` login needs an `Origin` header.** Nextcloud rejects a POST to `/login`
+  without a trusted `Origin` before it ever checks the password, and answers with a
+  redirect to `?direct=1&user=…` plus a misleading `Logging out` line in the log. It
+  looks exactly like a wrong password:
+
+  ```
+  curl -b jar -c jar -H 'Origin: http://localhost:8080' \
+    -d user=admin -d password=admin -d "requesttoken=$TOKEN" http://localhost:8080/login
+  ```
+
 If the Docker daemon refuses to start with `error initializing graphdriver: driver
 not supported`, the kernel was updated without a reboot since — the modules of the
 running kernel are gone, so overlayfs cannot be loaded. Rebooting fixes it.
