@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Require PHP 8.2 or newer
 - Drop support for Nextcloud 32 (which still allows PHP 8.1)
+- Internal cleanups and a refreshed build toolchain (no change in behaviour)
+
+### Security
+
+- Static taint analysis (source to sink) now runs in CI — currently no findings
 
 ## 3.3.0 (2026-07-20)
 
