@@ -12,6 +12,8 @@
 /.tx
 /build
 /.claude
+/CLAUDE.md
+/REVIEW.md
 /codecov.yml
 /doc
 /composer.*
