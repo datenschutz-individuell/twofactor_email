@@ -8,7 +8,29 @@ The app plugs into Nextcloud's [two-factor provider framework](https://docs.next
 - Build the release package with `krankerl package`, or follow the manual steps in the README's [Building yourself](../README.md#building-yourself).
 - **PHP:** PHPUnit for the services, php-cs-fixer for style, and Psalm (including taint analysis) for static analysis. Psalm runs on the app's minimum PHP version, not on newer runtimes it does not yet support.
 - **Frontend:** Vitest for the logic and components, plus ESLint and Stylelint; `npm run build` produces the bundle.
-- Contributions are welcome — see [CONTRIBUTORS](../CONTRIBUTORS.md) and please discuss larger ideas first via the [idea collection](https://github.com/datenschutz-individuell/twofactor_email/issues/8).
+
+## Contributing
+
+Contributions are welcome — see [CONTRIBUTORS](../CONTRIBUTORS.md).
+
+1. **Discuss larger ideas first** in the [idea collection](https://github.com/datenschutz-individuell/twofactor_email/issues/8), so nobody builds something that will not be merged.
+2. **Branch off `main`** and keep one topic per pull request. A focused change can be reviewed properly; a mixed one usually cannot.
+3. **Run the checks locally before opening the PR** — CI runs the same ones, but finding it out yourself is faster:
+   ```
+   composer test:unit:dev && composer psalm && composer cs:check
+   npm run lint && npm run stylelint && npm test && npm run build
+   ```
+   `composer cs:fix` applies the style fixes automatically. Some of the tools cap
+   the PHP version they accept — Psalm in particular — so if your distribution
+   ships a newer default PHP you need an older interpreter for them (on Arch
+   Linux, for example, `php-legacy vendor/bin/psalm.phar`).
+4. **Add SPDX headers to new files.** The project is [REUSE](https://reuse.software/) compliant and CI enforces it; files that cannot carry a header (images, generated files) are annotated centrally in `REUSE.toml`.
+5. **Describe *why* in the commit message**, not *what* — the diff already shows what changed.
+6. **CI is the gate.** All checks have to pass; a red run will not be merged.
+
+If a change affects behaviour, say how you verified it. Unit tests cover the
+services and the frontend logic, but route registration, emails and the login flow
+only show up in a running Nextcloud — see [development-setup.md](development-setup.md).
 
 ## Security mechanisms
 
