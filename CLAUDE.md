@@ -101,6 +101,11 @@ treating them as background noise, and re-check whether the existing pins and
   supported server. The annotation goes when `min-version` reaches 34.
 - **`symfony/console` is held at `^6.4.42`.** Nextcloud bundles Symfony 6.4, and `occ`
   commands must build against the same major.
+- **`allowScripts` in `package.json` lists `fsevents`, which is never installed here.**
+  It is darwin-only; the entry exists for macOS machines, where npm would otherwise
+  warn about its install script. `npm install-scripts prune` reports it as unused and
+  removes it on Linux — do not run that blindly, and note that
+  `npm install-scripts deny fsevents` cannot recreate it here (`ENOMATCH`).
 - **`@nextcloud/vite-config` is pinned to a pre-release.** Only that version allows
   Vite 8; the stable line is still on Vite 7. **This one expires:** switch as soon as a
   stable release supports Vite 8, and treat the pin as a finding from then on.
