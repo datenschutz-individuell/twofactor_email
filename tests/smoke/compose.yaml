@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# A disposable Nextcloud for testing the built app against one server version.
+# Driven by setup.sh and smoke.sh — see README.md.
+#
+# SQLite is enough for functional tests, and a mail catcher is required: without
+# SMTP the challenge email never arrives, so the login flow cannot be tested.
+
+services:
+  nextcloud:
+    image: "nextcloud:${NC_TAG:?set NC_TAG, e.g. 34-apache}"
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    environment:
+      # The official image installs itself when these are present.
+      SQLITE_DATABASE: nextcloud
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: admin
+      NEXTCLOUD_TRUSTED_DOMAINS: localhost
+    volumes:
+      - nc-data:/var/www/html
+      # The built package, not the working tree — this tests what gets shipped.
+      # Read-only so the container cannot modify the build under test.
+      - "${APP_DIR:?set APP_DIR}:/var/www/html/custom_apps/twofactor_email:ro"
+
+  mailpit:
+    # Pinned by digest: an unpinned mail catcher can fail a run for reasons that have
+    # nothing to do with the app. The Nextcloud image above is deliberately NOT pinned —
+    # 33-apache/34-apache are meant to move, that is what is under test. To update, pull
+    # the tag and
+    # read `docker image inspect axllent/mailpit --format '{{index .RepoDigests 0}}'`.
+    image: axllent/mailpit@sha256:b868afa176bfd6cce2323ea316cd99ccad77915e51e595748f6d786700ecf109
+    ports:
+      - "${MAIL_PORT:-8025}:8025"
+
+volumes:
+  nc-data:
