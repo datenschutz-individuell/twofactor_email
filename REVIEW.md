@@ -8,9 +8,8 @@ The general facts about the project — supported versions, layout, commands —
 
 ## Worth flagging
 
-**Correctness before everything.** This app guards a login. A defect that lets a
-second factor be skipped, accepted twice, or brute-forced matters more than anything
-about style.
+**Correctness comes first here.** This app guards a login, so a defect that lets a second
+factor be skipped, accepted twice or brute-forced outweighs any question of style.
 
 - **Security-relevant attributes on controllers.** A route reachable by a **fully
   logged-in** user that changes state without `#[PasswordConfirmationRequired]`; a
