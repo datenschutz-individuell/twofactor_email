@@ -1,0 +1,109 @@
+# SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# UNTESTED. Read this before trusting a green or a red result.
+#
+# The script it drives is exercised locally against both supported server versions, but
+# THIS WORKFLOW HAS NEVER RUN: a workflow can only be proven by pushing it, so its
+# first run is the one on the pull request that adds it. Expect one or two rounds of
+# adjustment — the likely candidates are the krankerl download, the PHP extensions
+# needed by the build, and how long the image pull takes on a runner.
+#
+# What it does: runs the smoke test against every Nextcloud version the app declares
+# support for. The version list comes from appinfo/info.xml, so it cannot drift from
+# what info.xml claims. Roughly 5 minutes per version.
+
+name: Smoke test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: smoke-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  versions:
+    runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.read.outputs.tags }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Read the supported server range from info.xml
+        id: read
+        run: |
+          spec=$(grep -oP '<nextcloud[^>]*' appinfo/info.xml)
+          min=$(printf '%s' "$spec" | grep -oP 'min-version="\K[0-9]+')
+          max=$(printf '%s' "$spec" | grep -oP 'max-version="\K[0-9]+')
+          if [ "$min" = "$max" ]; then
+            tags="[\"$min-apache\"]"
+          else
+            tags="[\"$min-apache\", \"$max-apache\"]"
+          fi
+          echo "tags=$tags" >> "$GITHUB_OUTPUT"
+          echo "testing against: $tags"
+
+  smoke:
+    needs: versions
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ${{ fromJson(needs.versions.outputs.tags) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.2'
+          extensions: gd, zip
+          coverage: none
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      # The package must be built the way it is shipped, otherwise the test proves
+      # something else. krankerl packages the committed state and applies
+      # .nextcloudignore; rebuilding that logic here would be a second source of truth.
+      # Pinned on purpose: a build tool that moves on its own can change what gets
+      # packaged without anyone deciding it. Bump deliberately.
+      # Worth adding once someone has checked it: a sha256 next to the download.
+      - name: Install krankerl
+        env:
+          KRANKERL_VERSION: v0.14.0
+        run: |
+          # -f is essential: without it an HTTP error page is written into the file,
+          # `install` makes it executable, and the failure only surfaces later as a
+          # confusing exec-format error.
+          curl -fsSL -o krankerl \
+            "https://github.com/ChristophWurst/krankerl/releases/download/$KRANKERL_VERSION/krankerl"
+          sudo install -m 755 krankerl /usr/local/bin/krankerl
+          krankerl --version
+
+      - name: Build the package
+        run: krankerl package
+
+      # SLOW is not set here on purpose: waiting for the resend cooldown is the
+      # script's default, and repeating it would just be a second place to forget.
+      - name: Smoke test on Nextcloud ${{ matrix.tag }}
+        env:
+          NC_TAG: ${{ matrix.tag }}
+        run: tests/smoke/smoke.sh
+
+      # No log-dumping step here on purpose: smoke.sh tears the containers down at the
+      # end of each version, so a following step would find nothing to read — and it
+      # would need NC_TAG/APP_DIR again, which do not carry over between steps. The
+      # script therefore dumps the log itself, while the containers still exist.
