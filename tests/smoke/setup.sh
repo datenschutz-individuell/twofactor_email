@@ -26,18 +26,25 @@ docker info >/dev/null 2>&1 || {
 	exit 1
 }
 
-[ -f "$APP_TARBALL" ] || {
-	echo "No package at $APP_TARBALL — run 'krankerl package' first." >&2
-	exit 1
-}
-
-# Always unpack afresh, otherwise a second run silently tests the previous build.
-# Note that krankerl packages the committed state, so an uncommitted fix is not in
-# here — a mistake that is easy to make and hard to see.
-rm -rf app
-mkdir -p app
-tar xzf "$APP_TARBALL" -C app
-export APP_DIR="$PWD/app/twofactor_email"
+if [ -n "${APP_DIR:-}" ]; then
+	# The caller pointed us at a directory: mount it as it is. This is the way in
+	# without krankerl, and the way to see your working tree in a real server.
+	echo "using the directory as it is: $APP_DIR"
+	export APP_DIR
+else
+	[ -f "$APP_TARBALL" ] || {
+		echo "No package at $APP_TARBALL — run 'krankerl package', or point APP_DIR at a" >&2
+		echo "directory to mount instead." >&2
+		exit 1
+	}
+	# Always unpack afresh, otherwise a second run silently tests the previous build.
+	# Note that krankerl packages the committed state, so an uncommitted fix is not in
+	# here — a mistake that is easy to make and hard to see.
+	rm -rf app
+	mkdir -p app
+	tar xzf "$APP_TARBALL" -C app
+	export APP_DIR="$PWD/app/twofactor_email"
+fi
 
 docker compose up -d --quiet-pull
 

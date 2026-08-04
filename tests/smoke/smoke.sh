@@ -15,6 +15,8 @@
 #   NC_TAG=33-apache ./smoke.sh  # one specific server version
 #   SLOW=0 ./smoke.sh            # skip the successful resend, saving 65 s per version
 #   KEEP=1 ./smoke.sh            # leave the instance running afterwards
+#   BUILD=1 ./smoke.sh           # build the package first (needs krankerl)
+#   APP_DIR=$(git rev-parse --show-toplevel) ./smoke.sh   # test a directory, no krankerl
 #
 # Exit code: number of failed checks, so CI can gate on it.
 #
@@ -31,6 +33,10 @@ cd "$(dirname "$0")"
 : "${MAIL_PORT:=8025}"
 # On by default: the successful resend is the half of that route which a cooldown
 # rejection cannot prove, and 65 s per version is a fair price for it.
+: "${BUILD:=0}"
+# An APP_DIR from the caller means "mount this directory as it is". Then there is no
+# package, so the version comparison has nothing to compare and is skipped.
+if [ -n "${APP_DIR:-}" ]; then PACKAGED=0; else PACKAGED=1; fi
 : "${SLOW:=1}"
 : "${KEEP:=0}"
 BASE="http://localhost:$HTTP_PORT"
@@ -97,9 +103,13 @@ run_checks() {
 
 	echo "-- version"
 	local want got
-	want=$(tar xzOf "$APP_TARBALL" twofactor_email/appinfo/info.xml | grep -oP '<version>\K[^<]+')
-	got=$(occ app:list | grep -A1 '^  - twofactor_email' | grep -oP 'twofactor_email: \K.*' | tr -d ' \r')
-	is "installed version matches the package" "$got" "$want"
+	if [ "$PACKAGED" = 1 ]; then
+		want=$(tar xzOf "$APP_TARBALL" twofactor_email/appinfo/info.xml | grep -oP '<version>\K[^<]+')
+		got=$(occ app:list | grep -A1 '^  - twofactor_email' | grep -oP 'twofactor_email: \K.*' | tr -d ' \r')
+		is "installed version matches the package" "$got" "$want"
+	else
+		note "version not compared — a directory is mounted, there is no package"
+	fi
 
 	# The app keeps this state in Nextcloud's own two-factor registry, so occ can set
 	# it. (The 2.x branch used a user setting of its own — not interchangeable.)
@@ -235,14 +245,97 @@ else
 	if [ "$min" = "$max" ]; then TAGS=("$min-apache"); else TAGS=("$min-apache" "$max-apache"); fi
 fi
 
-echo "package: $APP_TARBALL"
+# Refuse to test a package that cannot contain the current work. krankerl packages the
+# COMMITTED state, so a stale package and uncommitted changes both mean "you are testing
+# something else" — and that has happened here: a smoke test once passed against a
+# package built before the change it was meant to prove.
+preflight_package() {
+	if [ "$BUILD" = 1 ]; then
+		command -v krankerl >/dev/null || {
+			echo "BUILD=1 needs krankerl in PATH." >&2
+			echo "  APP_DIR=$ROOT $0     # or test the working tree instead" >&2
+			exit 1
+		}
+		( cd "$ROOT" && krankerl package ) || exit 1
+	fi
+
+	local paths='lib src templates appinfo css js composer.json package.json'
+	if [ ! -f "$APP_TARBALL" ]; then
+		echo "No package at $APP_TARBALL. Pick one:"
+		echo "  krankerl package     — build it, then run again"
+		echo "  BUILD=1 $0"
+		echo "  APP_DIR=$ROOT $0"
+		exit 1
+	fi
+
+	local dirty source_ts package_ts
+	# shellcheck disable=SC2086
+	dirty=$(git -C "$ROOT" status --porcelain -- $paths)
+	# The last commit that touched the app itself — a docs-only commit must not make a
+	# perfectly good package look stale.
+	# shellcheck disable=SC2086
+	source_ts=$(git -C "$ROOT" log -1 --format=%ct -- $paths)
+	package_ts=$(stat -c %Y "$APP_TARBALL")
+	if [ -n "$dirty" ] || [ "$package_ts" -lt "$source_ts" ]; then
+		echo "The package does not match the current state of the app:"
+		printf '  package %s\n' "$(date -d "@$package_ts" '+%F %T')"
+		printf '  sources %s (last commit touching the app)\n' "$(date -d "@$source_ts" '+%F %T')"
+		if [ -n "$dirty" ]; then
+			echo "  uncommitted:"
+			printf '%s\n' "$dirty" | sed 's/^/    /'
+		fi
+		cat <<TXT
+
+krankerl packages the committed state, so the above is not in the package. Pick one:
+
+  krankerl package
+      rebuild, then run again
+  BUILD=1 $0
+      build and run in one go
+  APP_DIR=$ROOT $0
+      test the working tree instead of the package
+TXT
+		exit 1
+	fi
+}
+
+# Never take over an instance that is already up: compose would recreate the container
+# of whoever is using it. This happened — a test run recreated a colleague's manual
+# instance because both used the same project name and ports.
+# Asked via the compose project LABEL, not via `docker compose ps`: the latter has to
+# interpolate compose.yaml first, and compose.yaml requires APP_DIR — so without it the
+# command fails, the error goes to /dev/null and the count silently becomes zero. A
+# check that cannot fail loudly is not a check.
+project=${COMPOSE_PROJECT_NAME:-$(basename "$PWD")}
+running=$(docker ps --quiet --filter "label=com.docker.compose.project=$project" | wc -l)
+if [ "$running" != 0 ]; then
+	cat >&2 <<TXT
+An instance of this project is already running ($running container(s)).
+Starting now would recreate it and pull it away from whoever is using it.
+
+  docker compose down -v                       stop and remove it, then run again
+  COMPOSE_PROJECT_NAME=tfe-2 HTTP_PORT=8081 MAIL_PORT=8026 $0
+                                               run a second, independent instance
+TXT
+	exit 1
+fi
+
+if [ "$PACKAGED" = 1 ]; then
+	preflight_package
+	echo "package: $APP_TARBALL"
+else
+	echo "directory: $APP_DIR  (mounted as it is, not a package)"
+fi
 echo "servers: ${TAGS[*]}"
 
 # compose needs these in the environment of EVERY call, not just of setup.sh —
 # otherwise `docker compose exec` fails, every occ call comes back empty and the run
 # reports a dozen misleading failures instead of one clear one.
 export APP_TARBALL HTTP_PORT MAIL_PORT ROOT
-export APP_DIR="$PWD/app/twofactor_email"
+# In packaged mode APP_DIR must stay UNSET here: setup.sh unpacks the tarball and sets
+# it. Exporting it beforehand made setup.sh take the "mount a directory" branch and
+# hand compose a path that did not exist yet, so the container never started.
+if [ "$PACKAGED" = 1 ]; then unset APP_DIR; else export APP_DIR; fi
 
 for tag in "${TAGS[@]}"; do
 	echo
@@ -256,6 +349,8 @@ for tag in "${TAGS[@]}"; do
 		rm -rf app
 		continue
 	fi
+	# setup.sh unpacked it; our own compose calls need the same value.
+	[ "$PACKAGED" = 1 ] && export APP_DIR="$PWD/app/twofactor_email"
 	grep -E 'versionstring|twofactor_email' "$TMP/setup.log" | sed 's/^/  /'
 
 	# Fail fast and loudly: if occ does not answer, every following check would fail

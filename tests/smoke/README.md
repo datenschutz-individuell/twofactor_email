@@ -26,8 +26,26 @@ cd tests/smoke
 NC_TAG=33-apache ./smoke.sh  # one specific server version
 SLOW=0 ./smoke.sh            # skip the successful resend, saving 65 s per version
 KEEP=1 ./smoke.sh            # leave the instance up to look at it
+BUILD=1 ./smoke.sh           # build the package first, then run
 ./setup.sh                   # just an instance, no checks (needs NC_TAG)
 ```
+
+## Without krankerl
+
+`krankerl` is only needed to build the package. If it does not work for you — it has
+been known to fail with `reference 'refs/remotes/origin/master' not found`, which comes
+from libgit2 inside it, not from your repository — mount your working tree instead:
+
+```bash
+composer install -o          # only the autoloader is needed at runtime
+npm ci && npm run build      # produces js/ and css/
+APP_DIR="$(git rev-parse --show-toplevel)" ./smoke.sh
+```
+
+Everything is checked as usual, except the comparison of the installed version against
+the package: there is no package. The trade-off is stated in the output, and it is
+real — a file missing from the release because of `.nextcloudignore` cannot show up
+this way. Use the packaged run before a release, this one while developing.
 
 The exit code is the number of failed checks. Ports and package can be overridden
 with `HTTP_PORT`, `MAIL_PORT` and `APP_TARBALL`.
@@ -48,6 +66,25 @@ docker compose exec -T -u www-data nextcloud php occ twofactorauth:enable admin 
 
 `setup.sh` prints this too. Note that the 2.x branch used a user setting of its own
 instead — `occ user:setting … twofactor_email verified true` does nothing here.
+
+## Why it may refuse to start
+
+The script compares the package against the state of the app and stops if they do not
+match:
+
+```
+The package does not match the current state of the app:
+  package 2026-07-26 22:41:03
+  sources 2026-07-27 23:05:11 (last commit touching the app)
+  uncommitted:
+    M src/LoginChallenge.js
+```
+
+This is not pedantry. `krankerl package` packages the **committed** state, so a stale
+package or an uncommitted change means the run proves something other than what you are
+working on — which has happened here: a smoke test once passed against a package built
+before the change it was meant to verify. `BUILD=1` rebuilds and runs in one go,
+`APP_DIR=…` tests the working tree instead.
 
 ## What it checks
 
@@ -85,6 +122,11 @@ That still needs a person with a browser — `KEEP=1` leaves an instance running
   instead.
 - **`krankerl package` packages the committed state.** An uncommitted fix is not in the
   package, and the test will keep proving the old behaviour.
+- **"The token expired" on the first login attempt.** Nextcloud's login form is only
+  valid for five minutes (`login_form_timeout`). Opening the page while the instance is
+  still installing and submitting afterwards therefore fails once; reloading is enough.
+  `occ config:system:set login_form_timeout --value=3600 --type=integer` if you want to
+  take your time.
 - **The admin password cannot be changed to a weak one afterwards.**
   `password_policy` is active in the image; it does not apply during installation,
   which is why `admin/admin` works at all. Throw the instance away instead.
