@@ -87,6 +87,7 @@
   },
   "allowScripts": {
     "@parcel/watcher": false,
-    "core-js": false
+    "core-js": false,
+    "fsevents": false
   }
 }
