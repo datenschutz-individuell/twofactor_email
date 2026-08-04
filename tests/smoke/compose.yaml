@@ -25,7 +25,12 @@ services:
       - "${APP_DIR:?set APP_DIR}:/var/www/html/custom_apps/twofactor_email:ro"
 
   mailpit:
-    image: axllent/mailpit
+    # Pinned by digest: an unpinned mail catcher can fail a run for reasons that have
+    # nothing to do with the app. The Nextcloud image above is deliberately NOT pinned —
+    # 33-apache/34-apache are meant to move, that is what is under test. To update, pull
+    # the tag and
+    # read `docker image inspect axllent/mailpit --format '{{index .RepoDigests 0}}'`.
+    image: axllent/mailpit@sha256:b868afa176bfd6cce2323ea316cd99ccad77915e51e595748f6d786700ecf109
     ports:
       - "${MAIL_PORT:-8025}:8025"
 

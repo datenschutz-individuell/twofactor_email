@@ -16,7 +16,10 @@ built package** into it, and check exactly that.
 ## Requirements
 
 Docker with the compose plugin, `python3`, `curl`, and a built package
-(`krankerl package`). Nothing else, and nothing leaves your machine.
+(`krankerl package`) — or a directory to mount, see below. Nothing leaves your machine.
+
+The scripts use GNU `grep -oP`, `stat -c` and `date -d`, so they need a GNU userland:
+Linux, or macOS with GNU coreutils and grep ahead of the stock ones in `PATH`.
 
 ## Use
 
@@ -26,9 +29,15 @@ cd tests/smoke
 NC_TAG=33-apache ./smoke.sh  # one specific server version
 SLOW=0 ./smoke.sh            # skip the successful resend, saving 65 s per version
 KEEP=1 ./smoke.sh            # leave the instance up to look at it
-BUILD=1 ./smoke.sh           # build the package first, then run
-./setup.sh                   # just an instance, no checks (needs NC_TAG)
+NC_TAG=34-apache ./setup.sh   # just an instance, no checks
+COMPOSE_PROJECT_NAME=tfe-2 HTTP_PORT=8081 MAIL_PORT=8026 ./smoke.sh   # a second instance
 ```
+
+`setup.sh` writes `tests/smoke/.env` (gitignored) with the values compose needs, which is
+why a later `docker compose down -v`, `logs` or `exec` works in that directory without
+setting anything. It records the **last** setup run, so with two instances around name the
+project when tearing one down:
+`COMPOSE_PROJECT_NAME=tfe-smoke docker compose down -v`.
 
 ## Without krankerl
 
@@ -41,6 +50,10 @@ composer install -o          # only the autoloader is needed at runtime
 npm ci && npm run build      # produces js/ and css/
 APP_DIR="$(git rev-parse --show-toplevel)" ./smoke.sh
 ```
+
+Naming a directory switches the mode: nothing is unpacked, that directory is mounted.
+`setup.sh` takes the same route, and `UNPACK` states it explicitly if you ever need to
+override the default (`UNPACK=0` mount, `UNPACK=1` unpack the package).
 
 Everything is checked as usual, except the comparison of the installed version against
 the package: there is no package. The trade-off is stated in the output, and it is
@@ -70,21 +83,26 @@ instead — `occ user:setting … twofactor_email verified true` does nothing he
 ## Why it may refuse to start
 
 The script compares the package against the state of the app and stops if they do not
-match:
+match — either because something is uncommitted:
 
 ```
-The package does not match the current state of the app:
+Uncommitted changes to the app:
+    M src/LoginChallenge.js
+```
+
+or because the package predates the last commit that touched the app:
+
+```
+The package is older than the app it should contain:
   package 2026-07-26 22:41:03
   sources 2026-07-27 23:05:11 (last commit touching the app)
-  uncommitted:
-    M src/LoginChallenge.js
 ```
 
 This is not pedantry. `krankerl package` packages the **committed** state, so a stale
 package or an uncommitted change means the run proves something other than what you are
 working on — which has happened here: a smoke test once passed against a package built
-before the change it was meant to verify. `BUILD=1` rebuilds and runs in one go,
-`APP_DIR=…` tests the working tree instead.
+before the change it was meant to verify. Rebuild with `krankerl package`, or
+test the working tree instead with `APP_DIR=…`.
 
 ## What it checks
 

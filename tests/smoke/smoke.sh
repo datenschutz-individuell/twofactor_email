@@ -15,14 +15,25 @@
 #   NC_TAG=33-apache ./smoke.sh  # one specific server version
 #   SLOW=0 ./smoke.sh            # skip the successful resend, saving 65 s per version
 #   KEEP=1 ./smoke.sh            # leave the instance running afterwards
-#   BUILD=1 ./smoke.sh           # build the package first (needs krankerl)
 #   APP_DIR=$(git rev-parse --show-toplevel) ./smoke.sh   # test a directory, no krankerl
+#   COMPOSE_PROJECT_NAME=tfe-2 HTTP_PORT=8081 MAIL_PORT=8026 ./smoke.sh   # second instance
 #
 # Exit code: number of failed checks, so CI can gate on it.
 #
 # Not covered, and deliberately so: how it looks. Layout, dark mode and translations
 # still need a pair of eyes.
 set -uo pipefail
+
+# An APP_DIR from the caller is relative to the CALLER's directory, so it has to be made
+# absolute before the cd below changes what it means — and compose needs an absolute path
+# for a bind mount anyway.
+if [ -n "${APP_DIR:-}" ]; then
+	app_dir_abs=$(cd "$APP_DIR" 2>/dev/null && pwd) || {
+		echo "APP_DIR is not a directory: $APP_DIR" >&2
+		exit 1
+	}
+	APP_DIR=$app_dir_abs
+fi
 cd "$(dirname "$0")"
 
 # ROOT can be set to run these scripts from outside a checkout (used while developing
@@ -31,12 +42,24 @@ cd "$(dirname "$0")"
 : "${APP_TARBALL:=$ROOT/build/artifacts/twofactor_email.tar.gz}"
 : "${HTTP_PORT:=8080}"
 : "${MAIL_PORT:=8025}"
+# An APP_DIR from the caller means "mount this directory as it is": then there is no
+# package, so the version comparison has nothing to compare. Decided once here and never
+# changed again — setup.sh gets the mode as an explicit UNPACK value rather than
+# inferring it from a path, and our own compose calls read tests/smoke/.env.
+if [ -n "${APP_DIR:-}" ]; then
+	PACKAGED=0
+	export APP_DIR UNPACK=0
+else
+	PACKAGED=1
+	# Exported explicitly, not left to whatever the caller happens to have in the
+	# environment: UNPACK=0 without APP_DIR would make setup.sh mount the default path
+	# right after teardown deleted it.
+	export UNPACK=1
+fi
+: "${COMPOSE_PROJECT_NAME:=tfe-smoke}"
+export COMPOSE_PROJECT_NAME
 # On by default: the successful resend is the half of that route which a cooldown
 # rejection cannot prove, and 65 s per version is a fair price for it.
-: "${BUILD:=0}"
-# An APP_DIR from the caller means "mount this directory as it is". Then there is no
-# package, so the version comparison has nothing to compare and is skipped.
-if [ -n "${APP_DIR:-}" ]; then PACKAGED=0; else PACKAGED=1; fi
 : "${SLOW:=1}"
 : "${KEEP:=0}"
 BASE="http://localhost:$HTTP_PORT"
@@ -49,10 +72,8 @@ skip=0
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-green() { printf '\033[32mpass\033[0m'; }
-red() { printf '\033[31mFAIL\033[0m'; }
-ok() { printf '  %s %s\n' "$(green)" "$1"; pass=$((pass + 1)); }
-bad() { printf '  %s %s\n' "$(red)" "$1"; fail=$((fail + 1)); }
+ok() { printf '  \033[32mpass\033[0m %s\n' "$1"; pass=$((pass + 1)); }
+bad() { printf '  \033[31mFAIL\033[0m %s\n' "$1"; fail=$((fail + 1)); }
 note() { printf '  \033[33mskip\033[0m %s\n' "$1"; skip=$((skip + 1)); }
 is() { [ "$2" = "$3" ] && ok "$1 ($2)" || bad "$1: got $2, expected $3"; }
 body_has() { grep -q -- "$2" "$TMP/body" && ok "$1" || bad "$1: '$2' not in the response"; }
@@ -86,7 +107,10 @@ post() {
 }
 
 mails() { curl -s "$MAILBOX/api/v1/messages?limit=20"; }
-mail_count() { mails | python3 -c 'import json,sys; print(json.load(sys.stdin).get("messages_count", 0))'; }
+# One key, no fallback: a rename must fail loudly rather than read as "no mail was sent",
+# and the image is pinned by digest so a rename cannot arrive unnoticed. (mailpit's
+# `total` is not a synonym — it counts the whole mailbox, not the current query.)
+mail_count() { mails | python3 -c 'import json,sys; print(json.load(sys.stdin)["messages_count"])'; }
 newest_code() {
 	local id
 	id=$(mails | python3 -c 'import json,sys; m=json.load(sys.stdin)["messages"]; print(m[0]["ID"] if m else "")')
@@ -208,7 +232,6 @@ run_checks() {
 	echo "-- assets"
 	local broken=0 count=0 url code_
 	while read -r url; do
-		[ -n "$url" ] || continue
 		count=$((count + 1))
 		code_=$(curl -s -b "$TMP/jar" -c "$TMP/jar" -o /dev/null -w '%{http_code}' "$BASE$url")
 		[ "$code_" = "200" ] || { bad "asset $url -> $code_"; broken=$((broken + 1)); }
@@ -250,48 +273,65 @@ fi
 # something else" — and that has happened here: a smoke test once passed against a
 # package built before the change it was meant to prove.
 preflight_package() {
-	if [ "$BUILD" = 1 ]; then
-		command -v krankerl >/dev/null || {
-			echo "BUILD=1 needs krankerl in PATH." >&2
-			echo "  APP_DIR=$ROOT $0     # or test the working tree instead" >&2
-			exit 1
-		}
-		( cd "$ROOT" && krankerl package ) || exit 1
+	# Everything the package is made of: the files that are shipped as they are (appinfo,
+	# lib, templates, css, js, l10n, img) and the sources they are built from (src and the
+	# manifests including their lock files — a changed lock file means a changed vendor/
+	# or a changed build). Anything left out here can change without the package looking
+	# stale, and translations change often enough for that to matter.
+	# css and js are deliberately absent: both are gitignored build output with no tracked
+	# files, so git can never report them — listing them would only claim coverage.
+	local paths='lib src templates appinfo l10n img'
+	paths="$paths composer.json composer.lock package.json package-lock.json"
+	# These two decide what the package CONTAINS, so a change to them dates a package
+	# just as much as a change to the code does.
+	paths="$paths krankerl.toml .nextcloudignore"
+
+	# Checked BEFORE building: krankerl packages the committed state, so building now
+	# would spend a minute producing a package that still cannot contain these changes,
+	# only to be rejected afterwards.
+	local dirty
+	# shellcheck disable=SC2086
+	dirty=$(git -C "$ROOT" status --porcelain -- $paths)
+	if [ -n "$dirty" ]; then
+		echo "Uncommitted changes to the app:"
+		printf '%s\n' "$dirty" | sed 's/^/    /'
+		cat <<TXT
+
+krankerl packages the committed state, so the above cannot be in any package. Pick one:
+
+  git commit …
+      commit them, then run again
+  APP_DIR=$ROOT $0
+      test the working tree instead of the package
+TXT
+		exit 1
 	fi
 
-	local paths='lib src templates appinfo css js composer.json package.json'
+
 	if [ ! -f "$APP_TARBALL" ]; then
 		echo "No package at $APP_TARBALL. Pick one:"
 		echo "  krankerl package     — build it, then run again"
-		echo "  BUILD=1 $0"
 		echo "  APP_DIR=$ROOT $0"
 		exit 1
 	fi
 
-	local dirty source_ts package_ts
-	# shellcheck disable=SC2086
-	dirty=$(git -C "$ROOT" status --porcelain -- $paths)
+	local source_ts package_ts
 	# The last commit that touched the app itself — a docs-only commit must not make a
-	# perfectly good package look stale.
+	# perfectly good package look stale. Defaults to 0: an empty result would otherwise
+	# make the comparison below an error, and an erroring check is no check.
 	# shellcheck disable=SC2086
 	source_ts=$(git -C "$ROOT" log -1 --format=%ct -- $paths)
 	package_ts=$(stat -c %Y "$APP_TARBALL")
-	if [ -n "$dirty" ] || [ "$package_ts" -lt "$source_ts" ]; then
-		echo "The package does not match the current state of the app:"
+	if [ "$package_ts" -lt "${source_ts:-0}" ]; then
+		echo "The package is older than the app it should contain:"
 		printf '  package %s\n' "$(date -d "@$package_ts" '+%F %T')"
 		printf '  sources %s (last commit touching the app)\n' "$(date -d "@$source_ts" '+%F %T')"
-		if [ -n "$dirty" ]; then
-			echo "  uncommitted:"
-			printf '%s\n' "$dirty" | sed 's/^/    /'
-		fi
 		cat <<TXT
 
-krankerl packages the committed state, so the above is not in the package. Pick one:
+Pick one:
 
   krankerl package
       rebuild, then run again
-  BUILD=1 $0
-      build and run in one go
   APP_DIR=$ROOT $0
       test the working tree instead of the package
 TXT
@@ -302,18 +342,19 @@ TXT
 # Never take over an instance that is already up: compose would recreate the container
 # of whoever is using it. This happened — a test run recreated a colleague's manual
 # instance because both used the same project name and ports.
-# Asked via the compose project LABEL, not via `docker compose ps`: the latter has to
-# interpolate compose.yaml first, and compose.yaml requires APP_DIR — so without it the
-# command fails, the error goes to /dev/null and the count silently becomes zero. A
-# check that cannot fail loudly is not a check.
-project=${COMPOSE_PROJECT_NAME:-$(basename "$PWD")}
-running=$(docker ps --quiet --filter "label=com.docker.compose.project=$project" | wc -l)
+# Filtered by the project label, which is authoritative because COMPOSE_PROJECT_NAME is
+# set above rather than derived from the directory name — compose lowercases and strips
+# characters, so a guessed name silently stops matching.
+running=$(docker ps --quiet --filter "label=com.docker.compose.project=$COMPOSE_PROJECT_NAME" | wc -l)
 if [ "$running" != 0 ]; then
 	cat >&2 <<TXT
 An instance of this project is already running ($running container(s)).
 Starting now would recreate it and pull it away from whoever is using it.
 
-  docker compose down -v                       stop and remove it, then run again
+  COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME docker compose down -v
+                                               stop and remove it, then run again
+                                               (the project is named explicitly so this
+                                               cannot hit a different instance)
   COMPOSE_PROJECT_NAME=tfe-2 HTTP_PORT=8081 MAIL_PORT=8026 $0
                                                run a second, independent instance
 TXT
@@ -332,10 +373,29 @@ echo "servers: ${TAGS[*]}"
 # otherwise `docker compose exec` fails, every occ call comes back empty and the run
 # reports a dozen misleading failures instead of one clear one.
 export APP_TARBALL HTTP_PORT MAIL_PORT ROOT
-# In packaged mode APP_DIR must stay UNSET here: setup.sh unpacks the tarball and sets
-# it. Exporting it beforehand made setup.sh take the "mount a directory" branch and
-# hand compose a path that did not exist yet, so the container never started.
-if [ "$PACKAGED" = 1 ]; then unset APP_DIR; else export APP_DIR; fi
+# In directory mode the caller's APP_DIR is what compose mounts, for every version. In
+# packaged mode it must stay UNSET while setup.sh runs: setup.sh unpacks the tarball and
+# sets it itself. Handing it a value beforehand made it take the "mount a directory"
+# branch and gave compose a path that did not exist yet, so the container never started.
+if [ "$PACKAGED" = 0 ]; then export APP_DIR; fi
+
+# A failed teardown leaves the containers and the data volume behind, so the next version
+# installs into a foreign data directory. That must be loud, not swallowed.
+teardown() {
+	local out
+	# Nothing of this project around? Then there is nothing to tear down, and calling
+	# compose would only fail: on a fresh checkout .env does not exist yet, so a setup
+	# that died before writing it would produce a bogus failure here.
+	if [ -z "$(docker ps -aq --filter "label=com.docker.compose.project=$COMPOSE_PROJECT_NAME")" ]; then
+		rm -rf app
+		return 0
+	fi
+	if ! out=$(docker compose down -v 2>&1); then
+		bad "teardown failed — remove it by hand: docker compose down -v"
+		printf '%s\n' "$out" | tail -5 | sed 's/^/       /'
+	fi
+	rm -rf app
+}
 
 for tag in "${TAGS[@]}"; do
 	echo
@@ -345,12 +405,9 @@ for tag in "${TAGS[@]}"; do
 		echo "  setup failed:"
 		tail -15 "$TMP/setup.log" | sed 's/^/    /'
 		fail=$((fail + 1))
-		docker compose down -v >/dev/null 2>&1
-		rm -rf app
+		teardown
 		continue
 	fi
-	# setup.sh unpacked it; our own compose calls need the same value.
-	[ "$PACKAGED" = 1 ] && export APP_DIR="$PWD/app/twofactor_email"
 	grep -E 'versionstring|twofactor_email' "$TMP/setup.log" | sed 's/^/  /'
 
 	# Fail fast and loudly: if occ does not answer, every following check would fail
@@ -359,8 +416,7 @@ for tag in "${TAGS[@]}"; do
 		echo "  occ does not answer on this instance — skipping the checks:"
 		occ status 2>&1 | head -5 | sed 's/^/    /'
 		fail=$((fail + 1))
-		docker compose down -v >/dev/null 2>&1
-		rm -rf app
+		teardown
 		continue
 	fi
 
@@ -377,10 +433,14 @@ for tag in "${TAGS[@]}"; do
 	fi
 	if [ "$KEEP" = 1 ]; then
 		echo "  instance left running: $BASE (admin/$PW) · $MAILBOX"
+		# Only one instance can be kept, so the run stops here. Say so, otherwise the
+		# summary below looks like a full pass over the whole version range.
+		if [ "$tag" != "${TAGS[$((${#TAGS[@]} - 1))]}" ]; then
+			note "the remaining server version(s) were not tested (KEEP=1 stops after the first)"
+		fi
 		break
 	fi
-	docker compose down -v >/dev/null 2>&1
-	rm -rf app
+	teardown
 done
 
 echo
