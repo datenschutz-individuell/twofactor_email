@@ -44,9 +44,24 @@ document.addEventListener('DOMContentLoaded', () => {
 		return t('twofactor_email', 'You can request a new code in <1 minute.', {}, { sanitize: false })
 	}
 
+	// Nextcloud keeps transient confirmations on screen for seven seconds
+	// (TOAST_DEFAULT_TIMEOUT in @nextcloud/dialogs). The countdown must not push the
+	// confirmation away before that: it used to replace it on the very next tick, so
+	// "a new code was sent" was readable for exactly one second.
+	const CONFIRMATION_DWELL_SECONDS = 7
+
+	// The countdown re-renders every second, but its text only changes once a minute.
+	// Writing the same string again would touch the aria-live region for nothing, and
+	// whether assistive technology then repeats it is up to the implementation.
+	const setStatus = (text) => {
+		if (status.textContent !== text) {
+			status.textContent = text
+		}
+	}
+
 	const offerResend = () => {
 		clearTimer()
-		status.textContent = ''
+		setStatus('')
 		link.hidden = false
 	}
 
@@ -56,14 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		clearTimer()
 		link.hidden = true
 		let remaining = Math.max(0, Math.floor(seconds))
-		let message = firstMessage
+		let dwell = firstMessage ? CONFIRMATION_DWELL_SECONDS : 0
 		const render = () => {
 			if (remaining <= 0) {
 				offerResend()
 				return
 			}
-			status.textContent = message || remainingText(remaining)
-			message = null
+			if (dwell > 0) {
+				setStatus(firstMessage)
+				dwell -= 1
+			} else {
+				setStatus(remainingText(remaining))
+			}
 			remaining -= 1
 		}
 		render()
@@ -89,10 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				// The cooldown has not elapsed. retryAfter (seconds) comes from our controller.
 				startCountdown((data && data.retryAfter) || cooldown)
 			} else if (data && data.error === 'no-email') {
-				status.textContent = t('twofactor_email', 'No email address available, please contact your administrator.')
+				setStatus(t('twofactor_email', 'No email address available, please contact your administrator.'))
 			} else {
 				Logger.error('failed to resend two-factor email code', error)
-				status.textContent = t('twofactor_email', 'The code could not be sent. Please try again later.')
+				setStatus(t('twofactor_email', 'The code could not be sent. Please try again later.'))
 				link.hidden = false
 			}
 		}
