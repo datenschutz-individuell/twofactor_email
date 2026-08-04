@@ -12,12 +12,20 @@ true for anyone publishing a Nextcloud app, and most of it was learned the hard 
 
 ## Before building
 
-**Raise the version in every place that carries it.** For this app that is
-`appinfo/info.xml`, `package.json`, and **both** version fields in
-`package-lock.json` (the top-level one and `packages[""]`). Missing the lock file is
-easy and stays invisible until someone compares the shipped package with the tag.
-Change the value in place — do not let a tool re-resolve the dependency tree during a
-release.
+**Raise the version in every place that carries it.** Let npm do the JavaScript side:
+
+```
+npm version <version> --no-git-tag-version
+```
+
+That updates `package.json` and **both** version fields in `package-lock.json` (the
+top-level one and `packages[""]`) and touches nothing else — verified on a release bump:
+two changed lines in the lock file, all 855 dependency entries byte-identical, integrity
+hashes included. Do not re-resolve the tree during a release, and do not hand-edit the
+lock file either: the second version field is easy to miss, and editing by hand is how
+you end up with a lock whose checksums no longer match what it describes.
+
+`appinfo/info.xml` and the `CHANGELOG.md` section stay manual.
 
 **Add the changelog section for exactly that version** before building. Release notes
 are generated from it, so a missing section means empty notes.
