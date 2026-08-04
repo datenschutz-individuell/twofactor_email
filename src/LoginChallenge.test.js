@@ -122,6 +122,27 @@ describe('LoginChallenge resend', () => {
 		expect(status.textContent).toContain('contact your administrator')
 	})
 
+	it('shows a repeated failure again, so a second click is visibly answered', async () => {
+		Axios.post.mockRejectedValue(new Error('boom'))
+		const { link, status } = render({ availableIn: 0 })
+
+		link.click()
+		await vi.advanceTimersByTimeAsync(0)
+		expect(status.textContent).toContain('could not be sent')
+
+		// The second click produces the same text. It must still be written, otherwise
+		// nothing changes in the DOM: no visual refresh and no re-announcement in the
+		// live region, so the user cannot tell the click did anything.
+		const changes = []
+		const observer = new MutationObserver(() => changes.push(status.textContent))
+		observer.observe(status, { characterData: true, childList: true, subtree: true })
+		link.click()
+		await vi.advanceTimersByTimeAsync(0)
+		observer.disconnect()
+
+		expect(changes.length).toBeGreaterThan(0)
+	})
+
 	it('reports a generic failure and offers the link again', async () => {
 		Axios.post.mockRejectedValue(new Error('boom'))
 		const { link, status } = render({ availableIn: 0 })

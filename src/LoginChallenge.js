@@ -50,10 +50,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	// "a new code was sent" was readable for exactly one second.
 	const CONFIRMATION_DWELL_SECONDS = 7
 
-	// The countdown re-renders every second, but its text only changes once a minute.
-	// Writing the same string again would touch the aria-live region for nothing, and
-	// whether assistive technology then repeats it is up to the implementation.
 	const setStatus = (text) => {
+		status.textContent = text
+	}
+
+	// Only for the countdown: it re-renders every second while its text changes once a
+	// minute, so writing the same string again would touch the aria-live region for
+	// nothing. One-shot messages must NOT go through this — a failure repeated after a
+	// second click has identical text, and skipping the write would leave the user
+	// without any sign that the click did something.
+	const setCountdownStatus = (text) => {
 		if (status.textContent !== text) {
 			status.textContent = text
 		}
@@ -70,6 +76,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	const startCountdown = (seconds, firstMessage) => {
 		clearTimer()
 		link.hidden = true
+		// Both counters tick with the interval, not with the clock. A tab that is hidden
+		// long enough for the browser to throttle timers, or a suspended machine, therefore
+		// stretches the dwell and the countdown past their nominal seconds — the link then
+		// stays hidden after the server-side cooldown has passed, and reloading is the way
+		// out. Deriving both from a Date.now() deadline would fix that; it is a separate
+		// change from this one.
 		let remaining = Math.max(0, Math.floor(seconds))
 		let dwell = firstMessage ? CONFIRMATION_DWELL_SECONDS : 0
 		const render = () => {
@@ -78,10 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				return
 			}
 			if (dwell > 0) {
-				setStatus(firstMessage)
+				setCountdownStatus(firstMessage)
 				dwell -= 1
 			} else {
-				setStatus(remainingText(remaining))
+				setCountdownStatus(remainingText(remaining))
 			}
 			remaining -= 1
 		}
