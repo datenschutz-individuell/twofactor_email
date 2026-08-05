@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Requesting a new code works again on Nextcloud 32 and 33
+- Requesting a new code did nothing on Nextcloud 32 and 33
 
-### Changed
+### Security
 
-- Updated dependencies
+- Update dependencies to fix the fast-uri, postcss and brace-expansion advisories
 
 ## 3.3.0 (2026-07-20)
 

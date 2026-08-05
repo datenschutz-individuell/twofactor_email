@@ -49,9 +49,9 @@ at the bottom of "Personal Settings/Security").]]></description>
     </author>
     <namespace>TwoFactorEMail</namespace>
     <documentation>
-        <user>https://github.com/datenschutz-individuell/twofactor_email/wiki/User-manual</user>
-        <admin>https://github.com/datenschutz-individuell/twofactor_email/wiki/Admin-manual</admin>
-        <developer>https://github.com/datenschutz-individuell/twofactor_email/wiki/Developer-notes</developer>
+        <user>https://github.com/datenschutz-individuell/twofactor_email/blob/main/doc/users.md</user>
+        <admin>https://github.com/datenschutz-individuell/twofactor_email/blob/main/doc/admins.md</admin>
+        <developer>https://github.com/datenschutz-individuell/twofactor_email/blob/main/doc/developers.md</developer>
     </documentation>
     <category>security</category>
 
@@ -59,8 +59,8 @@ at the bottom of "Personal Settings/Security").]]></description>
     <bugs>https://github.com/datenschutz-individuell/twofactor_email/issues</bugs>
     <repository>https://github.com/datenschutz-individuell/twofactor_email.git</repository>
     <screenshot
-            small-thumbnail="https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/screenshots/select-auth_thumb.webp">
-        https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/screenshots/challenge.webp
+            small-thumbnail="https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/3.3.1/screenshots/select-auth_thumb.webp">
+        https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/3.3.1/screenshots/challenge.webp
     </screenshot>
     <dependencies>
         <php min-version="8.1" max-version="8.5"/>

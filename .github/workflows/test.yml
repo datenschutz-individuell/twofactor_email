@@ -11,6 +11,10 @@ on:
   pull_request:
     branches:
       - main
+      # Maintenance lines need the same gate. Without this, a pull request into
+      # release/3.3 gets the lint jobs but neither the PHP suite nor any of the
+      # install-and-run jobs for the declared Nextcloud versions.
+      - 'release/**'
 
 jobs:
   versions:

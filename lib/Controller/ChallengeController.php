@@ -49,12 +49,14 @@ final class ChallengeController extends ALoginSetupController {
 	 * minimum allowed resend cooldown (currently 1 minute), so it never rejects a
 	 * legitimately allowed resend.
 	 *
-	 * The annotation duplicates the attribute below on purpose. Nextcloud 33
-	 * exempts a route from the two-factor gate through the docblock only — its
-	 * TwoFactorMiddleware asks hasAnnotation('NoTwoFactorRequired') — while the
-	 * attribute exists from Nextcloud 34 on. With the attribute alone, a resend on
-	 * Nextcloud 33 gets a redirect to the provider selection instead of a new code.
-	 * Drop the annotation once the app requires Nextcloud 34.
+	 * The annotation below duplicates the #[NoTwoFactorRequired] attribute on purpose.
+	 * Nextcloud 32 and 33 read the exemption from the docblock only. Their
+	 * TwoFactorMiddleware calls hasAnnotation('NoTwoFactorRequired'). The attribute
+	 * was added in Nextcloud 34. With the attribute alone, a resend on 32 or 33 is
+	 * answered with a redirect to the provider selection, so no new code is sent.
+	 *
+	 * Do not remove the annotation on this branch. The 3.3 line exists to serve
+	 * Nextcloud 32, so its lowest supported server will never be 34.
 	 *
 	 * @NoTwoFactorRequired
 	 */
