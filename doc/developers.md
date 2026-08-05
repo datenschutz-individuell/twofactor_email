@@ -20,10 +20,11 @@ Contributions are welcome — see [CONTRIBUTORS](../CONTRIBUTORS.md).
    composer test:unit:dev && composer psalm && composer cs:check
    npm run lint && npm run stylelint && npm test && npm run build
    ```
-   `composer cs:fix` applies the style fixes automatically. Some of the tools cap
-   the PHP version they accept — Psalm in particular — so if your distribution
-   ships a newer default PHP you need an older interpreter for them (on Arch
-   Linux, for example, `php-legacy vendor/bin/psalm.phar`).
+   `composer cs:fix` applies the style fixes automatically. Note that Psalm
+   *analyses* against the minimum PHP version the app supports, set as `phpVersion`
+   in `psalm.xml`; that is not a limit on the interpreter it runs on. Should a tool
+   ever refuse your default PHP, it says so, and an older interpreter next to it
+   helps (on Arch Linux, for example, `php-legacy vendor/bin/psalm.phar`).
 4. **Add SPDX headers to new files.** The project is [REUSE](https://reuse.software/) compliant and CI enforces it; files that cannot carry a header (images, generated files) are annotated centrally in `REUSE.toml`.
 5. **Describe *why* in the commit message**, not *what* — the diff already shows what changed.
 6. **CI is the gate.** All checks have to pass; a red run will not be merged.

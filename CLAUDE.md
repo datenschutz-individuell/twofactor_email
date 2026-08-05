@@ -51,8 +51,11 @@ npm run lint && npm run stylelint && npm test && npm run build
 krankerl package                  # release package
 ```
 
-Psalm runs on the app's **minimum** PHP version and does not support newer runtimes;
-if your default PHP is newer, invoke it with the older one.
+Psalm **analyses** against the app's minimum PHP version — `phpVersion` in `psalm.xml`,
+and the CI checks that the two agree. That is independent of the interpreter it **runs**
+on: Psalm 6.16.1 runs fine on PHP 8.5, verified on 8.5.9 for both the normal and the
+taint pass. If a future version does cap the runtime, the error says so; do not reach
+for an older interpreter without one.
 
 Run the checks that match your diff **before** opening a pull request. CI is the gate,
 but finding it locally is cheaper for everyone.
