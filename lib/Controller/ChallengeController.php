@@ -43,11 +43,20 @@ final class ChallengeController extends ALoginSetupController {
 		parent::__construct($appName, $request);
 	}
 
-	/*
+	/**
 	 * The service cooldown is the configurable source of truth. The rate limit
 	 * is an atomic backstop against concurrent bursts: period 60s matches the
 	 * minimum allowed resend cooldown (currently 1 minute), so it never rejects a
 	 * legitimately allowed resend.
+	 *
+	 * The annotation duplicates the attribute below on purpose. Nextcloud 33
+	 * exempts a route from the two-factor gate through the docblock only — its
+	 * TwoFactorMiddleware asks hasAnnotation('NoTwoFactorRequired') — while the
+	 * attribute exists from Nextcloud 34 on. With the attribute alone, a resend on
+	 * Nextcloud 33 gets a redirect to the provider selection instead of a new code.
+	 * Drop the annotation once the app requires Nextcloud 34.
+	 *
+	 * @NoTwoFactorRequired
 	 */
 	#[NoAdminRequired]
 	#[NoTwoFactorRequired]
