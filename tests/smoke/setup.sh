@@ -87,16 +87,76 @@ for _ in $(seq 1 60); do
 done
 occ status | sed 's/^/  /'
 
-# Point Nextcloud at the mail catcher and give the admin an address: without one the
-# provider cannot be switched on.
-occ config:system:set mail_smtpmode --value=smtp >/dev/null
-occ config:system:set mail_smtphost --value=mailpit >/dev/null
-occ config:system:set mail_smtpport --value=1025 >/dev/null
-occ config:system:set mail_from_address --value=nextcloud >/dev/null
-occ config:system:set mail_domain --value=example.org >/dev/null
-occ user:setting admin settings email admin@example.org
+# The mail settings are declared in compose.yaml; the image turns them into config by
+# itself. Check that they arrived, because the file doing it (config/smtp.config.php)
+# belongs to the image, not to us: if a future version drops or renames it, the only
+# symptom would be a challenge email that never arrives — which reads like a bug in
+# the app.
+# The port is checked as well as the host. Host, sender and domain are that file's own
+# precondition, so losing one of them fails the host check anyway. The port is not: it
+# falls back to 25 when SMTP_PORT is missing, which leaves the host right and the mail
+# catcher silent.
+# The two expected values repeat what compose.yaml declares. Keep the pair in step —
+# changing the port there without changing it here aborts every run.
+expected_host=mailpit
+expected_port=1025
+# `|| true` because a key that is not set makes occ exit 1, which pipefail would turn
+# into a silent abort of this script. An empty value is a result here, not a crash.
+setting() { occ config:system:get "$1" | tail -n 1 | tr -d '\r' || true; }
+host=$(setting mail_smtphost)
+port=$(setting mail_smtpport)
+if [ "$host" != "$expected_host" ] || [ "$port" != "$expected_port" ]; then
+	echo "The mail settings from compose.yaml did not arrive:" >&2
+	echo "  mail_smtphost: '$host' (expected '$expected_host')" >&2
+	echo "  mail_smtpport: '$port' (expected '$expected_port')" >&2
+	echo "Both empty means occ could not answer at all — see 'docker compose logs" >&2
+	echo "nextcloud'. Otherwise check whether nextcloud:$NC_TAG still ships" >&2
+	echo "config/smtp.config.php, which is where these values come from." >&2
+	echo "The instance is up; remove it with 'docker compose down -v'." >&2
+	exit 1
+fi
 
-occ app:enable twofactor_email | sed 's/^/  /'
+# Right after the installation a write can fail with "database is locked": the
+# installer's own background work still holds the SQLite file, and `occ status`
+# reporting "installed" does not mean it has let go. Retry instead of hoping.
+# This used to be hidden: the five occ calls that configured the mail settings stood
+# here and took about a second each, which was enough for the lock to clear. Moving
+# them into compose.yaml removed that accidental delay and turned the race into a
+# failing CI run — on one of the two servers only, as races go.
+# Only writes need this. `config:system:get` above reads config.php, not the database.
+# Retrying is announced, because a run that needed nine attempts otherwise looks exactly
+# like a clean one — and then nobody notices that the budget below is getting tight.
+occ_write() {
+	local out attempt=1
+	while :; do
+		if out=$(occ "$@" 2>&1); then
+			[ -n "$out" ] && echo "$out" | sed 's/^/  /'
+			return 0
+		fi
+		# Only the lock is worth waiting for. A command that is broken for another
+		# reason — bad info.xml, a dependency the server does not have — has to say so
+		# now instead of after ten sleeps.
+		case $out in
+		*"database is locked"*) ;;
+		*)
+			echo "$out" >&2
+			return 1
+			;;
+		esac
+		if [ "$attempt" -ge 10 ]; then
+			echo "Still locked after $attempt attempts:" >&2
+			echo "$out" >&2
+			return 1
+		fi
+		echo "  database locked, retrying ($attempt)"
+		attempt=$((attempt + 1))
+		sleep 3
+	done
+}
+
+# Without an address on the account the provider cannot be switched on.
+occ_write user:setting admin settings email admin@example.org
+occ_write app:enable twofactor_email
 
 cat <<TXT
 
