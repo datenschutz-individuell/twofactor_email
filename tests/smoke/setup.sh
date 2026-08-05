@@ -92,7 +92,12 @@ occ status | sed 's/^/  /'
 # belongs to the image, not to us: if a future version drops or renames it, the only
 # symptom would be a challenge email that never arrives — which reads like a bug in
 # the app.
-if [ "$(occ config:system:get mail_smtphost | tail -n 1 | tr -d '\r')" != mailpit ]; then
+# The port is checked separately on purpose. Host, sender and domain are the file's own
+# precondition, so losing one of them fails the host check anyway. The port is not: it
+# falls back to 25 when SMTP_PORT is missing, which leaves the host correct and the
+# mail catcher silent.
+setting() { occ config:system:get "$1" | tail -n 1 | tr -d '\r'; }
+if [ "$(setting mail_smtphost)" != mailpit ] || [ "$(setting mail_smtpport)" != 1025 ]; then
 	echo "The image did not apply the mail settings from compose.yaml." >&2
 	echo "Check whether nextcloud:$NC_TAG still ships config/smtp.config.php." >&2
 	exit 1
