@@ -75,7 +75,7 @@ official image — SQLite plus a mail catcher, because without SMTP the challeng
 never arrives and the login flow cannot be tested at all.
 
 ```bash
-krankerl package                  # both start from the built package
+krankerl package                  # in the repository root; both start from the package
 cd tests/smoke
 
 ./smoke.sh                        # either: the checks, oldest and newest server
@@ -85,7 +85,16 @@ NC_TAG=33-apache ./setup.sh       # or:     one instance, left up to click aroun
 The last two are alternatives, not a sequence: `smoke.sh` refuses to run while an
 instance is up rather than pulling it away from whoever is using it. `setup.sh` prints
 the URLs and how to switch the provider on for the user; `docker compose down -v`
-removes everything again. The options, what the checks cover,
+removes everything again.
+
+While you still have uncommitted work, there is no package to test — `krankerl` packages
+the committed state, and `smoke.sh` stops rather than prove the wrong thing. Mount the
+working tree instead:
+
+```bash
+composer install -o && npm ci && npm run build
+APP_DIR="$(git rev-parse --show-toplevel)" ./smoke.sh
+``` The options, what the checks cover,
 and a list of things that behave surprisingly are in
 [tests/smoke/README.md](../tests/smoke/README.md).
 

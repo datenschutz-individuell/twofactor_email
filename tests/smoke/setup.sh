@@ -92,14 +92,27 @@ occ status | sed 's/^/  /'
 # belongs to the image, not to us: if a future version drops or renames it, the only
 # symptom would be a challenge email that never arrives — which reads like a bug in
 # the app.
-# The port is checked separately on purpose. Host, sender and domain are the file's own
+# The port is checked as well as the host. Host, sender and domain are that file's own
 # precondition, so losing one of them fails the host check anyway. The port is not: it
-# falls back to 25 when SMTP_PORT is missing, which leaves the host correct and the
-# mail catcher silent.
-setting() { occ config:system:get "$1" | tail -n 1 | tr -d '\r'; }
-if [ "$(setting mail_smtphost)" != mailpit ] || [ "$(setting mail_smtpport)" != 1025 ]; then
-	echo "The image did not apply the mail settings from compose.yaml." >&2
-	echo "Check whether nextcloud:$NC_TAG still ships config/smtp.config.php." >&2
+# falls back to 25 when SMTP_PORT is missing, which leaves the host right and the mail
+# catcher silent.
+# The two expected values repeat what compose.yaml declares. Keep the pair in step —
+# changing the port there without changing it here aborts every run.
+expected_host=mailpit
+expected_port=1025
+# `|| true` because a key that is not set makes occ exit 1, which pipefail would turn
+# into a silent abort of this script. An empty value is a result here, not a crash.
+setting() { occ config:system:get "$1" | tail -n 1 | tr -d '\r' || true; }
+host=$(setting mail_smtphost)
+port=$(setting mail_smtpport)
+if [ "$host" != "$expected_host" ] || [ "$port" != "$expected_port" ]; then
+	echo "The mail settings from compose.yaml did not arrive:" >&2
+	echo "  mail_smtphost: '$host' (expected '$expected_host')" >&2
+	echo "  mail_smtpport: '$port' (expected '$expected_port')" >&2
+	echo "Both empty means occ could not answer at all — see 'docker compose logs" >&2
+	echo "nextcloud'. Otherwise check whether nextcloud:$NC_TAG still ships" >&2
+	echo "config/smtp.config.php, which is where these values come from." >&2
+	echo "The instance is up; remove it with 'docker compose down -v'." >&2
 	exit 1
 fi
 
@@ -111,17 +124,34 @@ fi
 # them into compose.yaml removed that accidental delay and turned the race into a
 # failing CI run — on one of the two servers only, as races go.
 # Only writes need this. `config:system:get` above reads config.php, not the database.
+# Retrying is announced, because a run that needed nine attempts otherwise looks exactly
+# like a clean one — and then nobody notices that the budget below is getting tight.
 occ_write() {
-	local out
-	for _ in $(seq 1 10); do
+	local out attempt=1
+	while :; do
 		if out=$(occ "$@" 2>&1); then
 			[ -n "$out" ] && echo "$out" | sed 's/^/  /'
 			return 0
 		fi
+		# Only the lock is worth waiting for. A command that is broken for another
+		# reason — bad info.xml, a dependency the server does not have — has to say so
+		# now instead of after ten sleeps.
+		case $out in
+		*"database is locked"*) ;;
+		*)
+			echo "$out" >&2
+			return 1
+			;;
+		esac
+		if [ "$attempt" -ge 10 ]; then
+			echo "Still locked after $attempt attempts:" >&2
+			echo "$out" >&2
+			return 1
+		fi
+		echo "  database locked, retrying ($attempt)"
+		attempt=$((attempt + 1))
 		sleep 3
 	done
-	echo "$out" >&2
-	return 1
 }
 
 # Without an address on the account the provider cannot be switched on.
