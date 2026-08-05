@@ -1,7 +1,7 @@
 {
   "name": "twofactor_email",
   "description": "Two-Factor Email Provider",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "type": "module",
   "author": {
     "name": "Christoph Wurst",
@@ -68,8 +68,7 @@
     "npm": "^11.0.0"
   },
   "overrides": {
-    "esbuild": "^0.28.1",
-    "fast-xml-parser": "^5.7.0"
+    "esbuild": "^0.28.1"
   },
   "devDependencies": {
     "@mdi/js": "^7.4.47",
