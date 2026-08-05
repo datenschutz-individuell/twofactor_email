@@ -103,10 +103,30 @@ if [ "$(setting mail_smtphost)" != mailpit ] || [ "$(setting mail_smtpport)" != 
 	exit 1
 fi
 
-# Without an address on the account the provider cannot be switched on.
-occ user:setting admin settings email admin@example.org
+# Right after the installation a write can fail with "database is locked": the
+# installer's own background work still holds the SQLite file, and `occ status`
+# reporting "installed" does not mean it has let go. Retry instead of hoping.
+# This used to be hidden: the five occ calls that configured the mail settings stood
+# here and took about a second each, which was enough for the lock to clear. Moving
+# them into compose.yaml removed that accidental delay and turned the race into a
+# failing CI run — on one of the two servers only, as races go.
+# Only writes need this. `config:system:get` above reads config.php, not the database.
+occ_write() {
+	local out
+	for _ in $(seq 1 10); do
+		if out=$(occ "$@" 2>&1); then
+			[ -n "$out" ] && echo "$out" | sed 's/^/  /'
+			return 0
+		fi
+		sleep 3
+	done
+	echo "$out" >&2
+	return 1
+}
 
-occ app:enable twofactor_email | sed 's/^/  /'
+# Without an address on the account the provider cannot be switched on.
+occ_write user:setting admin settings email admin@example.org
+occ_write app:enable twofactor_email
 
 cat <<TXT
 
