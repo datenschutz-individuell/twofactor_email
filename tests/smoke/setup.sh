@@ -87,13 +87,18 @@ for _ in $(seq 1 60); do
 done
 occ status | sed 's/^/  /'
 
-# Point Nextcloud at the mail catcher and give the admin an address: without one the
-# provider cannot be switched on.
-occ config:system:set mail_smtpmode --value=smtp >/dev/null
-occ config:system:set mail_smtphost --value=mailpit >/dev/null
-occ config:system:set mail_smtpport --value=1025 >/dev/null
-occ config:system:set mail_from_address --value=nextcloud >/dev/null
-occ config:system:set mail_domain --value=example.org >/dev/null
+# The mail settings are declared in compose.yaml; the image turns them into config by
+# itself. Check that they arrived, because the file doing it (config/smtp.config.php)
+# belongs to the image, not to us: if a future version drops or renames it, the only
+# symptom would be a challenge email that never arrives — which reads like a bug in
+# the app.
+if [ "$(occ config:system:get mail_smtphost | tail -n 1 | tr -d '\r')" != mailpit ]; then
+	echo "The image did not apply the mail settings from compose.yaml." >&2
+	echo "Check whether nextcloud:$NC_TAG still ships config/smtp.config.php." >&2
+	exit 1
+fi
+
+# Without an address on the account the provider cannot be switched on.
 occ user:setting admin settings email admin@example.org
 
 occ app:enable twofactor_email | sed 's/^/  /'
