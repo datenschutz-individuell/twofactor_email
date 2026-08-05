@@ -56,6 +56,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: nextcloud/apps/twofactor_email
+          persist-credentials: false
 
       - name: Install dependencies
         working-directory: nextcloud/apps/twofactor_email

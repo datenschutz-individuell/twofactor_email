@@ -120,6 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
 				// The cooldown has not elapsed. retryAfter (seconds) comes from our controller.
 				startCountdown((data && data.retryAfter) || cooldown)
 			} else if (data && data.error === 'no-email') {
+				// The link stays hidden on purpose. Without an address the next attempt
+				// fails the same way, so offering the button again only invites a click
+				// that cannot work. The user has to ask an administrator first.
 				setStatus(t('twofactor_email', 'No email address available, please contact your administrator.'))
 			} else {
 				Logger.error('failed to resend two-factor email code', error)
