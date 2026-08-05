@@ -44,9 +44,30 @@ document.addEventListener('DOMContentLoaded', () => {
 		return t('twofactor_email', 'You can request a new code in <1 minute.', {}, { sanitize: false })
 	}
 
+	// Nextcloud keeps transient confirmations on screen for seven seconds
+	// (TOAST_DEFAULT_TIMEOUT in @nextcloud/dialogs). The countdown must not push the
+	// confirmation away before that: it used to replace it on the very next tick, so
+	// "a new code was sent" was readable for exactly one second.
+	const CONFIRMATION_DWELL_SECONDS = 7
+
+	const setStatus = (text) => {
+		status.textContent = text
+	}
+
+	// Only for the countdown: it re-renders every second while its text changes once a
+	// minute, so writing the same string again would touch the aria-live region for
+	// nothing. One-shot messages must NOT go through this — a failure repeated after a
+	// second click has identical text, and skipping the write would leave the user
+	// without any sign that the click did something.
+	const setCountdownStatus = (text) => {
+		if (status.textContent !== text) {
+			status.textContent = text
+		}
+	}
+
 	const offerResend = () => {
 		clearTimer()
-		status.textContent = ''
+		setStatus('')
 		link.hidden = false
 	}
 
@@ -55,15 +76,25 @@ document.addEventListener('DOMContentLoaded', () => {
 	const startCountdown = (seconds, firstMessage) => {
 		clearTimer()
 		link.hidden = true
+		// Both counters tick with the interval, not with the clock. A tab that is hidden
+		// long enough for the browser to throttle timers, or a suspended machine, therefore
+		// stretches the dwell and the countdown past their nominal seconds — the link then
+		// stays hidden after the server-side cooldown has passed, and reloading is the way
+		// out. Deriving both from a Date.now() deadline would fix that; it is a separate
+		// change from this one.
 		let remaining = Math.max(0, Math.floor(seconds))
-		let message = firstMessage
+		let dwell = firstMessage ? CONFIRMATION_DWELL_SECONDS : 0
 		const render = () => {
 			if (remaining <= 0) {
 				offerResend()
 				return
 			}
-			status.textContent = message || remainingText(remaining)
-			message = null
+			if (dwell > 0) {
+				setCountdownStatus(firstMessage)
+				dwell -= 1
+			} else {
+				setCountdownStatus(remainingText(remaining))
+			}
 			remaining -= 1
 		}
 		render()
@@ -92,10 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				// The link stays hidden on purpose. Without an address the next attempt
 				// fails the same way, so offering the button again only invites a click
 				// that cannot work. The user has to ask an administrator first.
-				status.textContent = t('twofactor_email', 'No email address available, please contact your administrator.')
+				setStatus(t('twofactor_email', 'No email address available, please contact your administrator.'))
 			} else {
 				Logger.error('failed to resend two-factor email code', error)
-				status.textContent = t('twofactor_email', 'The code could not be sent. Please try again later.')
+				setStatus(t('twofactor_email', 'The code could not be sent. Please try again later.'))
 				link.hidden = false
 			}
 		}

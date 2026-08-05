@@ -72,6 +72,35 @@ describe('LoginChallenge resend', () => {
 		expect(status.textContent).toContain('new code was sent')
 	})
 
+	it('keeps the confirmation readable before the countdown takes over', async () => {
+		Axios.post.mockResolvedValue({})
+		const { link, status } = render({ availableIn: 0 })
+
+		link.click()
+		await vi.advanceTimersByTimeAsync(0)
+		expect(status.textContent).toContain('new code was sent')
+
+		// Six seconds in it must still be there — one second was the old behaviour.
+		await vi.advanceTimersByTimeAsync(6000)
+		expect(status.textContent).toContain('new code was sent')
+
+		// After the dwell of seven seconds the countdown takes the line over.
+		await vi.advanceTimersByTimeAsync(2000)
+		expect(status.textContent).toContain('1 minute')
+	})
+
+	it('leaves the live region untouched while the countdown text is unchanged', async () => {
+		const { status } = render({ availableIn: 120 })
+		const changes = []
+		const observer = new MutationObserver(() => changes.push(status.textContent))
+		observer.observe(status, { characterData: true, childList: true, subtree: true })
+
+		await vi.advanceTimersByTimeAsync(5000)
+		observer.disconnect()
+
+		expect(changes).toEqual([])
+	})
+
 	it('shows a countdown when the server reports the cooldown (429)', async () => {
 		Axios.post.mockRejectedValue({ response: { status: 429, data: { retryAfter: 30 } } })
 		const { link, status } = render({ availableIn: 0 })
@@ -94,6 +123,27 @@ describe('LoginChallenge resend', () => {
 		// Deliberate, and the one error path that does not offer the link again: until
 		// an administrator sets an address, another attempt fails the same way.
 		expect(link.hidden).toBe(true)
+	})
+
+	it('shows a repeated failure again, so a second click is visibly answered', async () => {
+		Axios.post.mockRejectedValue(new Error('boom'))
+		const { link, status } = render({ availableIn: 0 })
+
+		link.click()
+		await vi.advanceTimersByTimeAsync(0)
+		expect(status.textContent).toContain('could not be sent')
+
+		// The second click produces the same text. It must still be written, otherwise
+		// nothing changes in the DOM: no visual refresh and no re-announcement in the
+		// live region, so the user cannot tell the click did anything.
+		const changes = []
+		const observer = new MutationObserver(() => changes.push(status.textContent))
+		observer.observe(status, { characterData: true, childList: true, subtree: true })
+		link.click()
+		await vi.advanceTimersByTimeAsync(0)
+		observer.disconnect()
+
+		expect(changes.length).toBeGreaterThan(0)
 	})
 
 	it('reports a generic failure and offers the link again', async () => {
