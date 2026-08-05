@@ -158,6 +158,60 @@ occ_write() {
 occ_write user:setting admin settings email admin@example.org
 occ_write app:enable twofactor_email
 
+# Wait for HTTP too, not only for occ. `occ status` goes through docker exec, so it
+# reports "installed" while Apache may still be unable to serve a request. Whoever runs
+# next then talks to a server that is not there yet, and the first failure reads
+# "no request token on /login" followed by empty responses — which looks like the login
+# page changed rather than like a race. That is what happened to the CI on 2026-08-05:
+# the same commit passed in one run and failed in the next, on one server version only.
+# The budget is a deadline, not a number of attempts: a single attempt has to be allowed
+# to take long enough for the FIRST render of a fresh instance, which builds the asset
+# caches, while the total still cannot run away. A connection refusal — the case this
+# waits for — comes back instantly, so the per-attempt limit only ever applies to a
+# response that is already being generated. Aborting those would be actively harmful:
+# PHP's ignore_user_abort defaults to 0, so each abandoned probe kills a render halfway
+# through, and the caches it was building are what the asset checks read later.
+# `--noproxy` because an http_proxy in the environment would otherwise be asked to
+# resolve localhost.
+printf 'waiting for the server to answer '
+ready=0
+code=none
+deadline=$((SECONDS + 120))
+while [ "$SECONDS" -lt "$deadline" ]; do
+	code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 --noproxy localhost \
+		"http://localhost:$HTTP_PORT/login" || true)
+	case $code in
+	200 | 303)
+		ready=1
+		break
+		;;
+	4??)
+		# Answered, and not with something that becomes 200 by waiting: an untrusted
+		# domain is 400, a missing rewrite 404. Report it now instead of after the
+		# full budget.
+		echo ''
+		echo "The server answers on http://localhost:$HTTP_PORT/login with $code." >&2
+		echo "That will not change by waiting. 400 usually means the domain is not" >&2
+		echo "trusted; 404 means the request never reached Nextcloud." >&2
+		echo "Remove the instance with 'docker compose down -v'." >&2
+		exit 1
+		;;
+	esac
+	printf '.'
+	sleep 2
+done
+if [ "$ready" = 1 ]; then
+	echo ' done'
+else
+	echo ''
+	echo "The server does not answer on http://localhost:$HTTP_PORT (last status: $code)." >&2
+	echo "The instance is up, so look at 'docker compose logs nextcloud'." >&2
+	echo "If your docker daemon is not local (DOCKER_HOST), the published port is not" >&2
+	echo "on localhost and this check cannot work — that is a limitation, not a fault." >&2
+	echo "Remove the instance with 'docker compose down -v'." >&2
+	exit 1
+fi
+
 cat <<TXT
 
 Nextcloud   http://localhost:$HTTP_PORT   (admin / admin)

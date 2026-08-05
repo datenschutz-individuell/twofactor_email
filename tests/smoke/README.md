@@ -124,6 +124,12 @@ That still needs a person with a browser — `KEEP=1` leaves an instance running
 
 ## Things that cost hours, written down so they cost you none
 
+- **"No request token on `/login`" means the server is not answering yet**, not that the
+  login page changed. `occ status` reporting `installed: true` goes through
+  `docker compose exec` and says nothing about Apache. The CI hit this on a loaded
+  runner: the same commit passed in one run and failed in the next, on one server
+  version only, with everything after the first check reporting 401 or an empty
+  response. `setup.sh` now waits for `/login` to answer before it returns.
 - **The request token goes in a header, not in a form field.** It is base64 and often
   contains a `+`, which PHP turns into a space while decoding a form body. As a form
   field the same request therefore works about one time in three, which looks like a
