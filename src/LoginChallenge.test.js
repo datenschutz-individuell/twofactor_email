@@ -83,14 +83,17 @@ describe('LoginChallenge resend', () => {
 		expect(status.textContent).toContain('1 minute')
 	})
 
-	it('reports a missing email address', async () => {
+	it('reports a missing email address and keeps the link hidden', async () => {
 		Axios.post.mockRejectedValue({ response: { status: 400, data: { error: 'no-email' } } })
-		const { status } = render({ availableIn: 0 })
+		const { link, status } = render({ availableIn: 0 })
 
-		document.querySelector('.twofactor_email-resend').click()
+		link.click()
 		await vi.advanceTimersByTimeAsync(0)
 
 		expect(status.textContent).toContain('contact your administrator')
+		// Deliberate, and the one error path that does not offer the link again: until
+		// an administrator sets an address, another attempt fails the same way.
+		expect(link.hidden).toBe(true)
 	})
 
 	it('reports a generic failure and offers the link again', async () => {
