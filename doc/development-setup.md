@@ -94,13 +94,14 @@ working tree instead:
 ```bash
 composer install -o && npm ci && npm run build
 APP_DIR="$(git rev-parse --show-toplevel)" ./smoke.sh
-``` The options, what the checks cover,
-and a list of things that behave surprisingly are in
-[tests/smoke/README.md](../tests/smoke/README.md).
+```
 
-Testing the **built package** rather than the working tree is deliberate: it is what
-users get, and it catches what a checkout hides — `krankerl` packages the committed
-state, so an uncommitted fix is simply not in it.
+Prefer the packaged run before a release, though: it is what users get, and it catches
+what a checkout hides — a file missing from the release because of `.nextcloudignore`
+cannot show up when the working tree is mounted.
+
+The options, what the checks cover, and a list of things that behave surprisingly are
+in [tests/smoke/README.md](../tests/smoke/README.md).
 
 If the Docker daemon refuses to start with `error initializing graphdriver: driver not
 supported`, the kernel was updated without a reboot since — the modules of the running
