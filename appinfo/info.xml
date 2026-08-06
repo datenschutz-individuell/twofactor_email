@@ -72,6 +72,7 @@ at the bottom of "Personal Settings/Security").]]></description>
     <repair-steps>
         <post-migration>
             <step>OCA\TwoFactorEMail\Migration\RemovePersistedDefaultTemplate</step>
+            <step>OCA\TwoFactorEMail\Migration\RepairEmailTexts</step>
         </post-migration>
     </repair-steps>
     <two-factor-providers>
