@@ -12,15 +12,17 @@ namespace OCA\TwoFactorEMail\Service;
 use OCA\TwoFactorEMail\AppInfo\Application;
 use OCP\IAppConfig;
 use OCP\IL10N;
+use Psr\Log\LoggerInterface;
 
-final readonly class AppSettings implements IAppSettings {
+final class AppSettings implements IAppSettings {
 
-	// Config keys used to store the settings in the app config
-	private const KEY_CODE_LENGTH = 'code_length';
-	private const KEY_CODE_VALID_MINUTES = 'code_valid_minutes';
-	private const KEY_RESEND_MIN_MINUTES = 'resend_min_minutes';
-	private const KEY_EMAIL_SUBJECT = 'email_subject';
-	private const KEY_EMAIL_TEMPLATE = 'email_template';
+	// Config keys used to store the settings in the app config. Public so the repair
+	// step can read the raw values, which the getters here correct or hide.
+	public const KEY_CODE_LENGTH = 'code_length';
+	public const KEY_CODE_VALID_MINUTES = 'code_valid_minutes';
+	public const KEY_RESEND_MIN_MINUTES = 'resend_min_minutes';
+	public const KEY_EMAIL_SUBJECT = 'email_subject';
+	public const KEY_EMAIL_TEMPLATE = 'email_template';
 
 	// Default values — used when no value has been stored in the app config.
 	// For the email template parts an empty string means: use the localized
@@ -32,22 +34,91 @@ final readonly class AppSettings implements IAppSettings {
 	private const DEFAULT_EMAIL_SUBJECT = '';
 	private const DEFAULT_EMAIL_TEMPLATE = '';
 
+	/** @var array<string, true> conditions already reported for this instance */
+	private array $reported = [];
+
 	public function __construct(
-		private IAppConfig $appConfig,
-		private IL10N $l10n,
+		private readonly IAppConfig $appConfig,
+		private readonly IL10N $l10n,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 
+	/**
+	 * A stored value is read many times per request — the code validity alone once
+	 * per rendered mail part. The condition is the same every time, so say it once.
+	 */
+	private function reportOnce(string $condition, string $message): void {
+		if (isset($this->reported[$condition])) {
+			return;
+		}
+		$this->reported[$condition] = true;
+		$this->logger->warning($message);
+	}
+
+	/**
+	 * Text that is not valid UTF-8 counts as unset, so the localized default applies.
+	 * Such a text cannot be written through this app — SettingsValidator refuses it —
+	 * so it comes from `occ config:app:set` or a restored database, and it would go
+	 * out as broken characters in a mail nobody can read. This is the read-side bound
+	 * of the numeric settings applied to the texts.
+	 */
+	private function usableText(string $value, string $setting): string {
+		if ($value === '' || mb_check_encoding($value, 'UTF-8')) {
+			return $value;
+		}
+		$this->reportOnce(
+			$setting,
+			'The stored ' . $setting . ' is not valid UTF-8 and is ignored; the default text is used. '
+			. 'Set it again with occ twofactor_email:settings.',
+		);
+		return '';
+	}
+
+	/**
+	 * Clamped on READ: SettingsValidator cannot reach `occ config:app:set` or a
+	 * database restored from a release with different bounds, and the value decides
+	 * how strong the second factor is. At length 1 it has ten possible values.
+	 */
 	public function getCodeLength(): int {
-		return $this->appConfig->getValueInt(Application::APP_ID, self::KEY_CODE_LENGTH, self::DEFAULT_CODE_LENGTH);
+		return $this->clamp(
+			$this->appConfig->getValueInt(Application::APP_ID, self::KEY_CODE_LENGTH, self::DEFAULT_CODE_LENGTH),
+			SettingsValidator::MIN_CODE_LENGTH,
+			SettingsValidator::MAX_CODE_LENGTH,
+			'code length',
+		);
 	}
 
 	public function getCodeValidMinutes(): int {
-		return $this->appConfig->getValueInt(Application::APP_ID, self::KEY_CODE_VALID_MINUTES, self::DEFAULT_CODE_VALID_MINUTES);
+		return $this->clamp(
+			$this->appConfig->getValueInt(Application::APP_ID, self::KEY_CODE_VALID_MINUTES, self::DEFAULT_CODE_VALID_MINUTES),
+			SettingsValidator::MIN_CODE_VALID_MINUTES,
+			SettingsValidator::MAX_CODE_VALID_MINUTES,
+			'code validity',
+		);
 	}
 
 	public function getResendMinMinutes(): int {
-		return $this->appConfig->getValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, self::DEFAULT_RESEND_MIN_MINUTES);
+		return $this->clamp(
+			$this->appConfig->getValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, self::DEFAULT_RESEND_MIN_MINUTES),
+			SettingsValidator::MIN_RESEND_MINUTES,
+			SettingsValidator::MAX_RESEND_MINUTES,
+			'resend cooldown',
+		);
+	}
+
+	private function clamp(int $value, int $min, int $max, string $name): int {
+		$clamped = max($min, min($max, $value));
+		if ($clamped !== $value) {
+			// Without this line, a value written past the validator is invisible:
+			// every read, including occ twofactor_email:settings, shows the clamped one.
+			$this->reportOnce(
+				$name,
+				'The stored ' . $name . ' (' . $value . ') is outside the allowed range; ' . $clamped
+				. ' is used instead. Set it again with occ twofactor_email:settings.',
+			);
+		}
+		return $clamped;
 	}
 
 	public function getResendCooldownSeconds(): int {
@@ -55,11 +126,17 @@ final readonly class AppSettings implements IAppSettings {
 	}
 
 	public function getEMailSubject(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, self::KEY_EMAIL_SUBJECT, self::DEFAULT_EMAIL_SUBJECT);
+		return $this->usableText(
+			$this->appConfig->getValueString(Application::APP_ID, self::KEY_EMAIL_SUBJECT, self::DEFAULT_EMAIL_SUBJECT),
+			'email subject',
+		);
 	}
 
 	public function getEMailTemplate(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, self::KEY_EMAIL_TEMPLATE, self::DEFAULT_EMAIL_TEMPLATE);
+		return $this->usableText(
+			$this->appConfig->getValueString(Application::APP_ID, self::KEY_EMAIL_TEMPLATE, self::DEFAULT_EMAIL_TEMPLATE),
+			'email body',
+		);
 	}
 
 	public function getDefaultEMailSubject(): string {
