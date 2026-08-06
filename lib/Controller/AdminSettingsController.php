@@ -50,7 +50,15 @@ final class AdminSettingsController extends Controller {
 		string $eMailSubject,
 		int $resendMinutes,
 	): JSONResponse {
-		$errors = $this->validator->validate($codeLength, $codeValidMinutes, $resendMinutes, $eMailSubject, $eMailTemplate);
+		$errors = $this->validator->validate(
+			$codeLength,
+			$codeValidMinutes,
+			$resendMinutes,
+			$eMailSubject,
+			$eMailTemplate,
+			$this->appSettings->getEMailSubject(),
+			$this->appSettings->getEMailTemplate(),
+		);
 		if (!empty($errors)) {
 			return new JSONResponse(['errors' => $errors], Http::STATUS_BAD_REQUEST);
 		}

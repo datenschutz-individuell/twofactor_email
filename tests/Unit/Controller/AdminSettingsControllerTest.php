@@ -72,6 +72,18 @@ final class AdminSettingsControllerTest extends TestCase {
 		$this->assertEquals(Http::STATUS_OK, $response->getStatus());
 	}
 
+	/** Passes the stored texts as the baseline; SettingsValidatorTest owns the rule. */
+	public function testSaveAcceptsAnUnchangedStoredTextThatIsInvalid(): void {
+		$stored = 'Your code {code}: https://cloud.example/?u={user}';
+		$this->appSettings->method('getEMailTemplate')->willReturn($stored);
+		$this->appSettings->expects($this->once())->method('setCodeLength')->with(8);
+
+		$response = $this->controller->save(8, 10, $stored, '', 30);
+
+		$this->assertEquals(Http::STATUS_OK, $response->getStatus());
+	}
+
+	/** Only the placeholder-in-url case is exempt: a body without {code} still blocks. */
 	public function testSaveRejectsCustomBodyWithoutCode(): void {
 		$this->appSettings->expects($this->never())->method('setEMailTemplate');
 
