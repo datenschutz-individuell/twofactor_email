@@ -47,6 +47,10 @@ export function useAdminSettings(store, fieldKeys, debounceMs = 1500, successMs 
 		'email-subject-must-be-single-line': t('twofactor_email', 'The subject must be a single line.'),
 		'email-template-too-long': t('twofactor_email', 'The body must not exceed {max} characters.', { max: limits.eMailTemplate?.max }),
 		'email-code-placeholder-missing': t('twofactor_email', 'The body must contain the {code} placeholder.'),
+		'email-subject-not-valid-text': t('twofactor_email', 'The text must be valid UTF-8.'),
+		'email-template-not-valid-text': t('twofactor_email', 'The text must be valid UTF-8.'),
+		'email-subject-placeholder-in-url': t('twofactor_email', 'A placeholder must not be part of a web address: the value would be sent to whoever the address belongs to.'),
+		'email-template-placeholder-in-url': t('twofactor_email', 'A placeholder must not be part of a web address: the value would be sent to whoever the address belongs to.'),
 	}
 
 	/**

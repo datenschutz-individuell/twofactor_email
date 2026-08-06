@@ -65,6 +65,49 @@ class SettingsTest extends TestCase {
 		$this->assertSame(Command::SUCCESS, $exitCode);
 	}
 
+	/**
+	 * A stored body can be invalid without anyone having typed it here — the repair
+	 * step keeps such a text on purpose. That must not block the other settings.
+	 *
+	 * @throws Exception
+	 */
+	public function testSetsASettingEvenWhileAnotherStoredTextIsInvalid(): void {
+		$appSettings = $this->createMock(IAppSettings::class);
+		$appSettings->method('getCodeLength')->willReturn(6);
+		$appSettings->method('getCodeValidMinutes')->willReturn(10);
+		$appSettings->method('getResendMinMinutes')->willReturn(1);
+		$appSettings->method('getEMailSubject')->willReturn('');
+		$appSettings->method('getEMailTemplate')->willReturn('Your code {code}: https://cloud.example/?u={user}');
+		$appSettings->expects($this->once())->method('setCodeLength')->with(8);
+		$tester = new CommandTester(new Settings($appSettings, new SettingsValidator()));
+
+		$exitCode = $tester->execute(['key' => 'code_length', 'value' => '8']);
+
+		$this->assertSame(Command::SUCCESS, $exitCode);
+	}
+
+	/**
+	 * Re-setting the same faulty stored text is refused: only leaving the text
+	 * alone is exempt, or tooling would confirm a value the app forbids.
+	 *
+	 * @throws Exception
+	 */
+	public function testRefusesReSettingTheSameFaultyStoredText(): void {
+		$faulty = 'Your code {code}: https://cloud.example/?u={user}';
+		$appSettings = $this->createMock(IAppSettings::class);
+		$appSettings->method('getCodeLength')->willReturn(6);
+		$appSettings->method('getCodeValidMinutes')->willReturn(10);
+		$appSettings->method('getResendMinMinutes')->willReturn(1);
+		$appSettings->method('getEMailSubject')->willReturn('');
+		$appSettings->method('getEMailTemplate')->willReturn($faulty);
+		$appSettings->expects($this->never())->method('setEMailTemplate');
+		$tester = new CommandTester(new Settings($appSettings, new SettingsValidator()));
+
+		$exitCode = $tester->execute(['key' => 'email_template', 'value' => $faulty]);
+
+		$this->assertSame(Command::INVALID, $exitCode);
+	}
+
 	public function testSetsValidTemplate(): void {
 		$this->appSettings->expects($this->once())->method('setEMailTemplate')->with('Use {code} now');
 

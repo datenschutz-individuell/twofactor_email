@@ -29,6 +29,7 @@ class EMailSenderTest extends TestCase {
 	private IURLGenerator&MockObject $urlGenerator;
 	private IAppSettings&MockObject $appSettings;
 	private IEMailTemplate&MockObject $template;
+	private LoggerInterface&MockObject $logger;
 
 	private EMailSender $sender;
 
@@ -50,8 +51,9 @@ class EMailSenderTest extends TestCase {
 		// TemplateRenderer is final — use the real class so these tests cover
 		// the full rendering pipeline. The localized default texts come from
 		// the mocked IAppSettings (their real content is tested in AppSettingsTest).
+		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->sender = new EMailSender(
-			$this->createMock(LoggerInterface::class),
+			$this->logger,
 			$this->mailer,
 			$this->appSettings,
 			new TemplateRenderer($this->defaults, $this->urlGenerator, $this->appSettings),
@@ -143,10 +145,79 @@ class EMailSenderTest extends TestCase {
 	}
 
 	/**
-	 * @throws SendEMailFailed
+	 * A display name can build an address around the code, which no check on the
+	 * template can see. The mail then goes out with the default text.
+	 *
 	 * @throws Exception
+	 * @throws SendEMailFailed
 	 * @throws EMailNotSet
 	 */
+	public function testFallsBackToTheDefaultWhenAValueBuildsAnAddressAroundTheCode(): void {
+		$this->appSettings->method('getEMailSubject')->willReturn('Code for {user}{code}');
+		$this->appSettings->method('getEMailTemplate')->willReturn('Your code is {code}.');
+		$this->appSettings->method('getDefaultEMailSubject')->willReturn('Login attempt for {user}');
+		$this->appSettings->method('getDefaultEMailBody')->willReturn("Your code is:\n\n{code}");
+		$this->logger->expects($this->once())->method('warning');
+
+		$user = $this->createMock(IUser::class);
+		$user->method('getEMailAddress')->willReturn('jane@example.com');
+		$user->method('getDisplayName')->willReturn('https://evil.example/?c=');
+
+		$this->expectMailWithTemplate();
+		$this->template->expects($this->once())
+			->method('setSubject')
+			->with('Login attempt for https://evil.example/?c=');
+
+		$this->sender->sendChallengeEMail($user, '123456');
+	}
+
+	/**
+	 * If even the default is unsafe, no text can repair it. Not sending keeps the
+	 * user out; sending would hand the code away.
+	 *
+	 * @throws Exception
+	 */
+	public function testSendsNothingWhenEvenTheDefaultWouldCarryTheCodeInAnAddress(): void {
+		$this->appSettings->method('getEMailSubject')->willReturn('');
+		$this->appSettings->method('getEMailTemplate')->willReturn('');
+		$this->appSettings->method('getDefaultEMailSubject')->willReturn('Code {user}{code}');
+		$this->appSettings->method('getDefaultEMailBody')->willReturn('{code}');
+		$this->logger->expects($this->once())->method('error');
+		$this->mailer->expects($this->never())->method('send');
+
+		$user = $this->createMock(IUser::class);
+		$user->method('getEMailAddress')->willReturn('jane@example.com');
+		$user->method('getDisplayName')->willReturn('https://evil.example/?c=');
+
+		$this->expectException(SendEMailFailed::class);
+		$this->sender->sendChallengeEMail($user, '123456');
+	}
+
+	/**
+	 * A code line directly above an address line: the line break separates them for
+	 * every reader, so this template must be sent as written.
+	 *
+	 * @throws Exception
+	 * @throws SendEMailFailed
+	 * @throws EMailNotSet
+	 */
+	public function testKeepsATemplateWhoseCodeAndAddressAreOnlySeparatedByALineBreak(): void {
+		$this->appSettings->method('getEMailSubject')->willReturn('');
+		$this->appSettings->method('getEMailTemplate')
+			->willReturn("{user}, your code is {code}.\nhttps://example.com/");
+		$this->appSettings->method('getDefaultEMailSubject')->willReturn('Login attempt');
+		$this->appSettings->expects($this->never())->method('getDefaultEMailBody');
+		$this->logger->expects($this->never())->method('warning');
+
+		$this->expectMailWithTemplate();
+		$bodyTexts = [];
+		$this->collectBodyTexts($bodyTexts);
+
+		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
+
+		$this->assertStringContainsString('Jane Doe, your code is >>> 123456 <<<', $bodyTexts[1][1]);
+	}
+
 	public function testUsesCustomTemplatesAndReplacesAllPlaceholders(): void {
 		$this->appSettings->method('getEMailSubject')->willReturn('Code {code} for {user}');
 		$this->appSettings->method('getEMailTemplate')->willReturn('Use {code} on {cloud} within {validity} minutes.');
