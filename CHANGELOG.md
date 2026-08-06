@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Require the second factor for the admin settings routes while an admin is still being set up
+- Check the finished email and fall back to the default text if the one-time code ended up in a web address
+- Reject an email subject or body that puts a placeholder inside a web address
+- Report email texts that no longer work as intended, and reset one that is not valid text, on upgrade
+
+### Changed
+
+- Bound the code length, validity and resend cooldown when they are read, not only when they are set
+- Drop {logo} from the email subject instead of leaving it literal
+- A stored text that puts a placeholder inside a web address no longer blocks saving the other settings
+- Count the subject and body length limits in characters, not bytes
 
 ### Fixed
 
