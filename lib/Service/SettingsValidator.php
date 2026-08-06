@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Service;
 
+use OCA\TwoFactorEMail\Mail\TemplateRenderer;
+
 /**
  * Validates the admin settings. Used by the admin settings web UI and the
  * occ command, so both enforce the same limits.
@@ -52,8 +54,14 @@ final class SettingsValidator {
 	 * Returns a map of field name to error code, or an empty array if all
 	 * values are valid. The field names match the settings keys used by the
 	 * web UI, so callers can flag the offending field without knowing which
-	 * code belongs to which field. A field that trips more than one check
-	 * keeps its last error.
+	 * code belongs to which field. A field that trips more than one check keeps
+	 * its FIRST error, so the checks are ordered by what the admin has to fix
+	 * first — a new one belongs where it ranks, not at the end.
+	 *
+	 * The stored texts are the baseline. A text that is unchanged may keep a
+	 * placeholder inside a web address, because an instance can carry one without
+	 * anyone having typed it here and it must not block the other settings. Every
+	 * other error still blocks, and so does a changed text.
 	 *
 	 * @return array<string, string>
 	 */
@@ -63,6 +71,8 @@ final class SettingsValidator {
 		int $resendMinutes,
 		string $eMailSubject,
 		string $eMailTemplate,
+		string $storedSubject = '',
+		string $storedTemplate = '',
 	): array {
 		$errors = [];
 		if ($codeLength < self::MIN_CODE_LENGTH || $codeLength > self::MAX_CODE_LENGTH) {
@@ -74,21 +84,55 @@ final class SettingsValidator {
 		if ($resendMinutes < self::MIN_RESEND_MINUTES || $resendMinutes > self::MAX_RESEND_MINUTES) {
 			$errors['codeResendMinutes'] = 'resend-minutes-out-of-range';
 		}
-		if (strlen($eMailSubject) > self::MAX_EMAIL_SUBJECT_LENGTH) {
+		// AppSettings discards such a text on every read, so accepting it here would
+		// report a setting that never takes effect.
+		if (!mb_check_encoding($eMailSubject, 'UTF-8')) {
+			$errors['eMailSubject'] = 'email-subject-not-valid-text';
+		}
+		if (!mb_check_encoding($eMailTemplate, 'UTF-8')) {
+			$errors['eMailTemplate'] = 'email-template-not-valid-text';
+		}
+		if (!isset($errors['eMailSubject']) && mb_strlen($eMailSubject) > self::MAX_EMAIL_SUBJECT_LENGTH) {
 			$errors['eMailSubject'] = 'email-subject-too-long';
 		}
 		// Guard against header injection — the subject must stay a single line
-		if (preg_match('/[\r\n]/', $eMailSubject) === 1) {
+		if (!isset($errors['eMailSubject']) && preg_match('/[\r\n]/', $eMailSubject) === 1) {
 			$errors['eMailSubject'] = 'email-subject-must-be-single-line';
 		}
-		if (strlen($eMailTemplate) > self::MAX_EMAIL_TEMPLATE_LENGTH) {
+		// Only when nothing worse was found: a line break in a header outranks this,
+		// and overwriting it would hide it until the admin has fixed the URL.
+		// Unchanged: an instance can carry such a text without anyone having typed it
+		// here, and it must not block the other settings.
+		if (!isset($errors['eMailSubject'])
+			&& TemplateRenderer::hasPlaceholderInUrl($eMailSubject)
+			&& !self::unchanged($eMailSubject, $storedSubject)) {
+			$errors['eMailSubject'] = 'email-subject-placeholder-in-url';
+		}
+		if (!isset($errors['eMailTemplate']) && mb_strlen($eMailTemplate) > self::MAX_EMAIL_TEMPLATE_LENGTH) {
 			$errors['eMailTemplate'] = 'email-template-too-long';
 		}
 		// The code must reach the user: an empty body falls back to the default
 		// which contains {code}, so only a customized body can lose it.
-		if ($eMailTemplate !== '' && !str_contains($eMailTemplate, '{code}')) {
+		if (!isset($errors['eMailTemplate']) && $eMailTemplate !== '' && !str_contains($eMailTemplate, '{code}')) {
 			$errors['eMailTemplate'] = 'email-code-placeholder-missing';
 		}
+		// Where {code} occurs decides whether it stays in the message: inside a URL it
+		// would be substituted into a link that scanners fetch unattended. Again only
+		// when nothing worse was found — a body without {code} delivers nothing.
+		if (!isset($errors['eMailTemplate'])
+			&& TemplateRenderer::hasPlaceholderInUrl($eMailTemplate)
+			&& !self::unchanged($eMailTemplate, $storedTemplate)) {
+			$errors['eMailTemplate'] = 'email-template-placeholder-in-url';
+		}
 		return $errors;
+	}
+
+	/**
+	 * Browsers normalize line endings in a text area, so a text sent back with LF
+	 * still counts as the stored CRLF text.
+	 */
+	private static function unchanged(string $submitted, string $stored): bool {
+		$toLf = static fn (string $text): string => str_replace(["\r\n", "\r"], "\n", $text);
+		return $toLf($submitted) === $toLf($stored);
 	}
 }
