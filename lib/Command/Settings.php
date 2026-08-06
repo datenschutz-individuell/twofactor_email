@@ -121,8 +121,10 @@ final class Settings extends Command {
 		$codeLength = $this->appSettings->getCodeLength();
 		$codeValidMinutes = $this->appSettings->getCodeValidMinutes();
 		$resendMinutes = $this->appSettings->getResendMinMinutes();
-		$eMailSubject = $this->appSettings->getEMailSubject();
-		$eMailTemplate = $this->appSettings->getEMailTemplate();
+		$storedSubject = $this->appSettings->getEMailSubject();
+		$storedTemplate = $this->appSettings->getEMailTemplate();
+		$eMailSubject = $storedSubject;
+		$eMailTemplate = $storedTemplate;
 		match ($key) {
 			'code_length' => $codeLength = (int)$value,
 			'code_valid_minutes' => $codeValidMinutes = (int)$value,
@@ -131,7 +133,17 @@ final class Settings extends Command {
 			'email_template' => $eMailTemplate = $value,
 		};
 
-		$errors = $this->validator->validate($codeLength, $codeValidMinutes, $resendMinutes, $eMailSubject, $eMailTemplate);
+		// The key being set gets no baseline: re-setting the same faulty text
+		// must fail, not pass as "unchanged".
+		$errors = $this->validator->validate(
+			$codeLength,
+			$codeValidMinutes,
+			$resendMinutes,
+			$eMailSubject,
+			$eMailTemplate,
+			$key === 'email_subject' ? '' : $storedSubject,
+			$key === 'email_template' ? '' : $storedTemplate,
+		);
 		if (!empty($errors)) {
 			foreach ($errors as $error) {
 				$io->error($this->errorMessage($error));
@@ -162,6 +174,10 @@ final class Settings extends Command {
 			'email-subject-must-be-single-line' => 'email_subject must be a single line.',
 			'email-template-too-long' => sprintf('email_template must not exceed %d characters.', SettingsValidator::MAX_EMAIL_TEMPLATE_LENGTH),
 			'email-code-placeholder-missing' => 'email_template must contain the {code} placeholder.',
+			'email-subject-not-valid-text' => 'email_subject must be valid UTF-8 text.',
+			'email-template-not-valid-text' => 'email_template must be valid UTF-8 text.',
+			'email-subject-placeholder-in-url' => 'email_subject must not put a placeholder inside a web address: the value would be sent to whoever the address belongs to.',
+			'email-template-placeholder-in-url' => 'email_template must not put a placeholder inside a web address: the value would be sent to whoever the address belongs to.',
 			default => $errorKey,
 		};
 	}
