@@ -21,7 +21,15 @@ jobs:
   static-analysis:
     runs-on: ubuntu-latest
 
-    name: static-psalm-analysis
+    strategy:
+      fail-fast: false
+      matrix:
+        # Both ends of the supported range. Against the newest OCP this finds an
+        # API that Nextcloud has removed; against the oldest it finds one that
+        # does not exist there yet. Only checking the newest sees half of that.
+        ocp: [min, max]
+
+    name: static-psalm-analysis (ocp ${{ matrix.ocp }})
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -51,7 +59,7 @@ jobs:
           composer i
 
       - name: Install nextcloud/ocp
-        run: composer require --dev nextcloud/ocp:dev-${{ steps.versions.outputs.branches-max }} --ignore-platform-reqs --with-dependencies
+        run: composer require --dev nextcloud/ocp:dev-${{ matrix.ocp == 'min' && steps.versions.outputs.branches-min || steps.versions.outputs.branches-max }} --ignore-platform-reqs --with-dependencies
 
       - name: Run coding standards check
         run: composer run psalm -- --threads=1 --monochrome --no-progress --output-format=github
