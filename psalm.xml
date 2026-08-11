@@ -4,6 +4,7 @@
         phpVersion="8.2"
         findUnusedCode="false"
         ensureOverrideAttribute="false"
+        findUnusedIssueHandlerSuppression="false"
         autoloader="tests/bootstrap.php"
 >
     <projectFiles>
@@ -16,4 +17,16 @@
             <directory name="vendor/phpunit/php-code-coverage"/>
         </ignoreFiles>
     </extraFiles>
+	<issueHandlers>
+		<!-- One attribute, not one method: #[NoTwoFactorRequired] is @since 34 and the
+		     analysis also runs against the OCP of the oldest supported server, where it
+		     does not exist. A suppression in the docblock would have silenced every
+		     undefined attribute on that method, including a typo. Goes when min-version
+		     reaches 34, together with the docblock annotation beside it. -->
+		<UndefinedAttributeClass>
+			<errorLevel type="suppress">
+				<referencedClass name="OCP\AppFramework\Http\Attribute\NoTwoFactorRequired"/>
+			</errorLevel>
+		</UndefinedAttributeClass>
+	</issueHandlers>
 </psalm>
