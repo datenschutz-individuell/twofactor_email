@@ -1,0 +1,106 @@
+# SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
+# SPDX-License-Identifier: MIT
+
+# Early warning against the Nextcloud release that is not out yet.
+#
+# The supported range in appinfo/info.xml drives every other workflow, and it
+# must not name a version that cannot be built against: nextcloud-deps/ocp only
+# grows a stableNN branch around that version's release candidate, so until then
+# `dev-stableNN` does not resolve. The next release lives on master.
+#
+# This job therefore builds against master instead of the declared range, and it
+# never blocks: it answers "would we still work on the next server", not "may
+# this merge".
+#
+# It needs no maintenance when a version ships. master is always the next
+# release, so once 35 is declared in info.xml, this keeps watching 36, then 37.
+# The one time it may be worth switching off is the weeks right after a release,
+# when master has just opened and churns; disable it in the Actions tab rather
+# than deleting it, so it is there for the next round.
+
+name: Nextcloud next
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Weekly, so upstream breakage surfaces even in a week without a pull request
+    - cron: '19 6 * * 1'
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    name: Unit tests against Nextcloud master
+
+    steps:
+      # 8.5 like the ordinary unit tests: the highest version this app declares,
+      # which is also what Nextcloud 35 recommends. The low end is covered better
+      # elsewhere — php-lint runs every declared version, psalm runs the floor.
+      - name: Set up php8.5
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.5'
+          extensions: ctype,curl,dom,gd,iconv,intl,json,mbstring,openssl,posix,sqlite,xml,zip
+          coverage: none
+
+      - name: Checkout Nextcloud
+        run: git clone https://github.com/nextcloud/server.git --recursive --depth 1 -b master nextcloud
+
+      - name: Install Nextcloud
+        run: php -f nextcloud/occ maintenance:install --database-host 127.0.0.1 --database-name nextcloud --database-user nextcloud --database-pass nextcloud --admin-user admin --admin-pass admin --database sqlite
+
+      - name: Checkout app
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: nextcloud/apps/twofactor_email
+          persist-credentials: false
+
+      - name: Install dependencies
+        working-directory: nextcloud/apps/twofactor_email
+        run: composer install
+
+      - name: Run tests
+        working-directory: nextcloud/apps/twofactor_email
+        run: composer run test:unit:dev
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    name: Psalm against the OCP of Nextcloud master
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # 8.2 like the ordinary psalm job, so this differs from it in exactly one
+      # thing: the OCP it analyses against. psalm.xml targets 8.2 either way.
+      - name: Set up php8.2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.2'
+          extensions: ctype,curl,dom,gd,iconv,intl,json,mbstring,openssl,posix,sqlite,xml,zip
+          coverage: none
+          ini-file: development
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: |
+          composer remove nextcloud/ocp --dev --no-scripts
+          composer i
+
+      - name: Install the OCP of Nextcloud master
+        run: composer require --dev nextcloud/ocp:dev-master --ignore-platform-reqs --with-dependencies
+
+      - name: Run static analysis
+        run: composer run psalm -- --threads=1 --monochrome --no-progress --output-format=github
+
+      - name: Run taint analysis
+        run: composer run psalm:taint -- --threads=1 --monochrome --no-progress --output-format=github
