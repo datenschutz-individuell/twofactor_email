@@ -33,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tags: ${{ steps.read.outputs.tags }}
+      next-tag: ${{ steps.read.outputs.next-tag }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -45,16 +46,35 @@ jobs:
           min=$(printf '%s' "$spec" | grep -oP 'min-version="\K[0-9]+')
           max=$(printf '%s' "$spec" | grep -oP 'max-version="\K[0-9]+')
           if [ "$min" = "$max" ]; then
-            tags="[\"$min-apache\"]"
+            tags="\"$min-apache\""
           else
-            tags="[\"$min-apache\", \"$max-apache\"]"
+            tags="\"$min-apache\", \"$max-apache\""
           fi
-          echo "tags=$tags" >> "$GITHUB_OUTPUT"
-          echo "testing against: $tags"
+
+          # The server after the declared range, if the official image already has
+          # it. Nextcloud publishes a tag when a version is released, so this stays
+          # empty for most of a cycle and starts testing the moment it is not — no
+          # edit needed here when 35, then 36, then 37 appears. Nothing depends on
+          # it: the run is allowed to fail, see continue-on-error below.
+          next=$((max + 1))
+          if curl -sf "https://hub.docker.com/v2/repositories/library/nextcloud/tags/$next-apache" > /dev/null; then
+            echo "next-tag=$next-apache" >> "$GITHUB_OUTPUT"
+            tags="$tags, \"$next-apache\""
+            echo "the next server already has an image: $next-apache"
+          else
+            echo "next-tag=" >> "$GITHUB_OUTPUT"
+            echo "no image for Nextcloud $next yet"
+          fi
+
+          echo "tags=[$tags]" >> "$GITHUB_OUTPUT"
+          echo "testing against: [$tags]"
 
   smoke:
     needs: versions
     runs-on: ubuntu-latest
+    # The declared versions are a gate. The one after them is an early warning and
+    # must never block a merge — the app does not claim to support it yet.
+    continue-on-error: ${{ matrix.tag == needs.versions.outputs.next-tag }}
     strategy:
       fail-fast: false
       matrix:
