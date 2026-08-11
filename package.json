@@ -82,7 +82,7 @@
     "@vue/test-utils": "^2.4.11",
     "eslint": "^10.8.0",
     "happy-dom": "^20.11.1",
-    "vite": "^8.1.5",
+    "vite": "^8.2.0",
     "vitest": "^4.1.10"
   },
   "allowScripts": {
