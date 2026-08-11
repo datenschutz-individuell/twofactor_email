@@ -53,7 +53,10 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
 
 - **The duplicated `NoTwoFactorRequired`** in `ChallengeController::resend()`: the
   docblock annotation serves Nextcloud 33, the attribute serves 34 and is `@since 34`.
-  Both are needed until `min-version` reaches 34. The docblock explains it.
+  Both are needed until `min-version` reaches 34. The docblock explains it, and so
+  does the `@psalm-suppress UndefinedAttributeClass` beside it — the attribute does
+  not exist in the oldest supported server's OCP, which the analysis now checks
+  against. All three go together when `min-version` reaches 34.
 - **`symfony/console` at `^6.4.42`**: Nextcloud bundles Symfony 6.4 and `occ` commands
   must match its major. This one has no expiry — it moves when Nextcloud moves.
 - **`@nextcloud/vite-config` pinned to a pre-release**: it is the only version that
