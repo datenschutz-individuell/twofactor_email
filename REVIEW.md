@@ -53,7 +53,15 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
 
 - **The duplicated `NoTwoFactorRequired`** in `ChallengeController::resend()`: the
   docblock annotation serves Nextcloud 33, the attribute serves 34 and is `@since 34`.
-  Both are needed until `min-version` reaches 34. The docblock explains it.
+  Both are needed until `min-version` reaches 34. The docblock explains it, and so
+  does the `UndefinedAttributeClass` handler in `psalm.xml` — the attribute does not
+  exist in the oldest supported server's OCP, which the analysis now checks against.
+  That handler names the **one** class on purpose; a suppression in the method's
+  docblock silenced every undefined attribute on the route that skips the second
+  factor, including a typo. `findUnusedIssueHandlerSuppression="false"` belongs to
+  it, because the same handler is necessarily unused against the newest OCP. All of
+  it goes together when `min-version` reaches 34 — and `CompatibilityShimsTest`
+  fails until it does, so this is enforced rather than remembered.
 - **`symfony/console` at `^6.4.42`**: Nextcloud bundles Symfony 6.4 and `occ` commands
   must match its major. This one has no expiry — it moves when Nextcloud moves.
 - **`@nextcloud/vite-config` pinned to a pre-release**: it is the only version that

@@ -12,11 +12,19 @@ on:
     branches:
       - main
 
+concurrency:
+  group: test-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   versions:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.versions.outputs.matrix }}
+      # full-matrix, not matrix: the latter gives one PHP per server, which was
+      # always the highest. The range in info.xml promises every version in it,
+      # and only running the tests proves the promise — php-lint merely parses
+      # and psalm never executes. Eight jobs of about a minute, run in parallel.
+      matrix: ${{ steps.versions.outputs.full-matrix }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

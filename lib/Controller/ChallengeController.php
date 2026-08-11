@@ -56,6 +56,12 @@ final class ChallengeController extends ALoginSetupController {
 	 * Nextcloud 33 gets a redirect to the provider selection instead of a new code.
 	 * Drop the annotation once the app requires Nextcloud 34.
 	 *
+	 * The attribute is the other half of the same shim, and it is why psalm.xml
+	 * suppresses UndefinedAttributeClass for this one class: analysed against the OCP
+	 * of the oldest supported server it does not exist yet. PHP resolves an attribute
+	 * class only when something reflects on it, so Nextcloud 33 never asks and never
+	 * fails. That suppression goes when this annotation does.
+	 *
 	 * @NoTwoFactorRequired
 	 */
 	#[FrontpageRoute(verb: 'POST', url: '/challenge/resend')]
