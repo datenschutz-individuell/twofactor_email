@@ -33,6 +33,20 @@ NC_TAG=34-apache ./setup.sh   # just an instance, no checks
 COMPOSE_PROJECT_NAME=tfe-2 HTTP_PORT=8081 MAIL_PORT=8026 ./smoke.sh   # a second instance
 ```
 
+### The server that is not out yet
+
+`NC_TAG` takes any tag of the official `nextcloud` image, and that is the limit: there
+is **no image for an unreleased version**. Nextcloud published `NN-beta` and `NN-rc`
+tags up to version 18 and stopped; today a tag appears when the version is released.
+So `NC_TAG=master` or `NC_TAG=35-apache` simply will not pull while 35 is in beta.
+
+Two things cover that gap instead. The `Nextcloud next` workflow runs the unit tests
+and Psalm against the server's `master` branch, which needs no image. And this smoke
+test picks the next version up **by itself**: its workflow asks the registry whether
+an image for the version after the declared range exists, and adds it to the run as
+soon as one does — as a warning, never as a gate. Nothing has to be edited for 35,
+then 36, then 37.
+
 `setup.sh` writes `tests/smoke/.env` (gitignored) with the values compose needs, which is
 why a later `docker compose down -v`, `logs` or `exec` works in that directory without
 setting anything. It records the **last** setup run, so with two instances around name the
