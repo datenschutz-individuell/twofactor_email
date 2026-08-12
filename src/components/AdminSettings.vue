@@ -77,6 +77,9 @@
 				</template>
 				{{ t('twofactor_email', 'Reset all Two-Factor email app-wide admin settings to their defaults') }}
 			</NcButton>
+			<span v-if="resetFailed" class="error">
+				{{ t('twofactor_email', 'Could not reset the settings. Reload the page to see their current state.') }}
+			</span>
 		</NcSettingsSection>
 	</div>
 </template>
@@ -95,6 +98,7 @@ import Logger from '../Logger.js'
 import { useAdminSettingsStore } from '../Store.js'
 
 const resetting = ref(false)
+const resetFailed = ref(false)
 
 const fieldKeys = ['codeLength', 'codeValidMinutes', 'codeResendMinutes', 'eMailSubject', 'eMailTemplate']
 
@@ -127,14 +131,19 @@ const bodyHelperText = [
 
 async function onReset() {
 	resetting.value = true
+	resetFailed.value = false
 	try {
 		const result = await store.reset()
-		if (typeof result?.error !== 'string') {
+		if (typeof result?.error === 'string') {
+			resetFailed.value = true
+			Logger.error('reset failed:', result.error)
+		} else {
 			for (const key of fieldKeys) {
 				inputValues[key] = store[key]
 			}
 		}
 	} catch (e) {
+		resetFailed.value = true
 		Logger.error('reset failed:', e)
 	} finally {
 		resetting.value = false

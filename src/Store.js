@@ -86,16 +86,18 @@ export const useAdminSettingsStore = defineStore('adminSettings', {
 		},
 		async reset() {
 			const result = await resetAdminSettings()
-			if (typeof result.error !== 'string') {
-				this.$patch({
-					codeLength: result.codeLength,
-					codeValidMinutes: result.codeValidMinutes,
-					codeResendMinutes: result.codeResendMinutes,
-					eMailSubject: result.eMailSubject,
-					eMailTemplate: result.eMailTemplate,
-					error: null,
-				})
+			if (typeof result.error === 'string') {
+				this.$patch({ error: result.error })
+				return result
 			}
+			this.$patch({
+				codeLength: result.codeLength,
+				codeValidMinutes: result.codeValidMinutes,
+				codeResendMinutes: result.codeResendMinutes,
+				eMailSubject: result.eMailSubject,
+				eMailTemplate: result.eMailTemplate,
+				error: null,
+			})
 			return result
 		},
 	},

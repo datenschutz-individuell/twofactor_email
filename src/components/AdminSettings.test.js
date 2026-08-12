@@ -81,6 +81,36 @@ describe('AdminSettings', () => {
 		expect(inputValues).toEqual(before)
 	})
 
+	it('says so when the reset failed, instead of only stopping the spinner', async () => {
+		store.reset.mockResolvedValue({ error: 'reset-failed' })
+		const wrapper = mount(AdminSettings)
+		expect(wrapper.find('.error').exists()).toBe(false)
+
+		await clickReset(wrapper)
+
+		expect(wrapper.find('.error').exists()).toBe(true)
+	})
+
+	it('says so when the reset threw', async () => {
+		store.reset.mockRejectedValue(new Error('network'))
+		const wrapper = mount(AdminSettings)
+		await clickReset(wrapper)
+
+		expect(wrapper.find('.error').exists()).toBe(true)
+	})
+
+	it('clears an earlier message when the next reset succeeds', async () => {
+		store.reset.mockResolvedValue({ error: 'reset-failed' })
+		const wrapper = mount(AdminSettings)
+		await clickReset(wrapper)
+		expect(wrapper.find('.error').exists()).toBe(true)
+
+		store.reset.mockResolvedValue({})
+		await clickReset(wrapper)
+
+		expect(wrapper.find('.error').exists()).toBe(false)
+	})
+
 	it('logs and recovers when reset throws', async () => {
 		store.reset.mockRejectedValue(new Error('network'))
 		const wrapper = mount(AdminSettings)

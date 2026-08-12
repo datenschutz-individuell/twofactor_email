@@ -78,7 +78,7 @@ describe('useAdminSettingsStore.reset', () => {
 		expect(store.codeLength).toBe(6)
 	})
 
-	it('does not touch the state on error', async () => {
+	it('does not touch the settings on error, but records the error', async () => {
 		resetAdminSettings.mockResolvedValue({ error: 'reset-failed' })
 		const store = useAdminSettingsStore()
 		store.codeLength = 8
@@ -86,6 +86,7 @@ describe('useAdminSettingsStore.reset', () => {
 		const result = await store.reset()
 
 		expect(store.codeLength).toBe(8)
+		expect(store.error).toBe('reset-failed')
 		expect(result.error).toBe('reset-failed')
 	})
 })
