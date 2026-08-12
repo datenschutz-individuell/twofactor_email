@@ -26,6 +26,7 @@ final readonly class EMailSender implements IEMailSender {
 	) {
 	}
 
+	#[\Override]
 	public function sendChallengeEMail(IUser $user, string $code): void {
 		$email = $user->getEMailAddress();
 		if ($email === null) {

@@ -80,6 +80,7 @@ final class AppSettings implements IAppSettings {
 	 * database restored from a release with different bounds, and the value decides
 	 * how strong the second factor is. At length 1 it has ten possible values.
 	 */
+	#[\Override]
 	public function getCodeLength(): int {
 		return $this->clamp(
 			$this->appConfig->getValueInt(Application::APP_ID, self::KEY_CODE_LENGTH, self::DEFAULT_CODE_LENGTH),
@@ -89,6 +90,7 @@ final class AppSettings implements IAppSettings {
 		);
 	}
 
+	#[\Override]
 	public function getCodeValidMinutes(): int {
 		return $this->clamp(
 			$this->appConfig->getValueInt(Application::APP_ID, self::KEY_CODE_VALID_MINUTES, self::DEFAULT_CODE_VALID_MINUTES),
@@ -98,6 +100,7 @@ final class AppSettings implements IAppSettings {
 		);
 	}
 
+	#[\Override]
 	public function getResendMinMinutes(): int {
 		return $this->clamp(
 			$this->appConfig->getValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, self::DEFAULT_RESEND_MIN_MINUTES),
@@ -121,10 +124,12 @@ final class AppSettings implements IAppSettings {
 		return $clamped;
 	}
 
+	#[\Override]
 	public function getResendCooldownSeconds(): int {
 		return $this->getResendMinMinutes() * 60;
 	}
 
+	#[\Override]
 	public function getEMailSubject(): string {
 		return $this->usableText(
 			$this->appConfig->getValueString(Application::APP_ID, self::KEY_EMAIL_SUBJECT, self::DEFAULT_EMAIL_SUBJECT),
@@ -132,6 +137,7 @@ final class AppSettings implements IAppSettings {
 		);
 	}
 
+	#[\Override]
 	public function getEMailTemplate(): string {
 		return $this->usableText(
 			$this->appConfig->getValueString(Application::APP_ID, self::KEY_EMAIL_TEMPLATE, self::DEFAULT_EMAIL_TEMPLATE),
@@ -139,10 +145,12 @@ final class AppSettings implements IAppSettings {
 		);
 	}
 
+	#[\Override]
 	public function getDefaultEMailSubject(): string {
 		return $this->l10n->t('Login attempt for %s', ['{user} @ {cloud}']);
 	}
 
+	#[\Override]
 	public function getDefaultEMailBody(): string {
 		// The {logo} and {code} structure is kept outside of the translatable
 		// strings so translations cannot break it; every chunk is a complete
@@ -155,26 +163,32 @@ final class AppSettings implements IAppSettings {
 			. $this->l10n->t('If you did not try to log in, somebody else knows your username and your password — change your password and inform your administrator.');
 	}
 
+	#[\Override]
 	public function setCodeLength(int $codeLength): void {
 		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_CODE_LENGTH, $codeLength);
 	}
 
+	#[\Override]
 	public function setCodeValidMinutes(int $codeValidMinutes): void {
 		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_CODE_VALID_MINUTES, $codeValidMinutes);
 	}
 
+	#[\Override]
 	public function setResendMinMinutes(int $resendMinutes): void {
 		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, $resendMinutes);
 	}
 
+	#[\Override]
 	public function setEMailSubject(string $subject): void {
 		$this->appConfig->setValueString(Application::APP_ID, self::KEY_EMAIL_SUBJECT, $subject);
 	}
 
+	#[\Override]
 	public function setEMailTemplate(string $body): void {
 		$this->appConfig->setValueString(Application::APP_ID, self::KEY_EMAIL_TEMPLATE, $body);
 	}
 
+	#[\Override]
 	public function resetToDefaults(): void {
 		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_CODE_LENGTH);
 		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_CODE_VALID_MINUTES);

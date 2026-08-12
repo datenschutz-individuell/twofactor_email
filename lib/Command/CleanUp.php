@@ -23,12 +23,14 @@ final class CleanUp extends Command {
 		parent::__construct();
 	}
 
+	#[\Override]
 	protected function configure(): void {
 		$this
 			->setName('twofactor_email:cleanup')
 			->setDescription('Remove expired two-factor email codes.');
 	}
 
+	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$io = new SymfonyStyle($input, $output);
 		$io->title('Removing expired two-factor email codes');

@@ -38,10 +38,12 @@ final readonly class RemovePersistedDefaultTemplate implements IRepairStep {
 	) {
 	}
 
+	#[\Override]
 	public function getName(): string {
 		return 'Remove the email template that 3.1.x persisted without customization';
 	}
 
+	#[\Override]
 	public function run(IOutput $output): void {
 		if ($this->appSettings->getEMailTemplate() !== self::OLD_DEFAULT_TEMPLATE) {
 			return;

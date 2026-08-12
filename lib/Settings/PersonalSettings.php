@@ -23,6 +23,7 @@ final readonly class PersonalSettings implements IPersonalProviderSettings {
 	) {
 	}
 
+	#[\Override]
 	public function getBody(): ITemplate {
 		try {
 			return $this->templateManager->getTemplate(Application::APP_ID, 'PersonalSettings');

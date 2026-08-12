@@ -35,6 +35,7 @@ final class Settings extends Command {
 		parent::__construct();
 	}
 
+	#[\Override]
 	protected function configure(): void {
 		$settings = implode(', ', [...self::INT_SETTINGS, ...self::STRING_SETTINGS]);
 		$this
@@ -45,6 +46,7 @@ final class Settings extends Command {
 			->addOption('reset', null, InputOption::VALUE_NONE, 'Reset all settings to their defaults');
 	}
 
+	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$io = new SymfonyStyle($input, $output);
 		$key = $input->getArgument('key');

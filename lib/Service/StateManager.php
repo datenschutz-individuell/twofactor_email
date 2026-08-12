@@ -30,18 +30,22 @@ final readonly class StateManager implements IStateManager {
 	) {
 	}
 
+	#[\Override]
 	public function enable(IUser $user, StateChangeActor $actor = StateChangeActor::USER): void {
 		$this->eventDispatcher->dispatchTyped(new StateChanged($user, true, $actor));
 	}
 
+	#[\Override]
 	public function disable(IUser $user, StateChangeActor $actor = StateChangeActor::USER): void {
 		$this->eventDispatcher->dispatchTyped(new StateChanged($user, false, $actor));
 	}
 
+	#[\Override]
 	public function isEnabled(IUser $user): bool {
 		return $this->registry->getProviderStates($user)[self::PROVIDER_ID] ?? false;
 	}
 
+	#[\Override]
 	public function hasOtherActiveProvider(IUser $user): bool {
 		foreach ($this->registry->getProviderStates($user) as $providerId => $enabled) {
 			if ($enabled && $providerId !== self::PROVIDER_ID) {
