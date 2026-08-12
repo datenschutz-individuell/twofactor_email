@@ -23,7 +23,7 @@
     "nextcloud/ocp": "^33 || ^34",
     "psalm/phar": "^6.16.1",
     "roave/security-advisories": "dev-latest",
-    "symfony/console": "^6.4.42"
+    "symfony/console": "^6.4.43"
   },
   "scripts": {
     "lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
