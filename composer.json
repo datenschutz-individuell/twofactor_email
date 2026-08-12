@@ -40,6 +40,9 @@
     "bin": "echo 'bin not installed'",
     "post-install-cmd": [
       "@composer bin all install --ansi"
+    ],
+    "post-update-cmd": [
+      "@composer bin all install --ansi"
     ]
   },
   "config": {
@@ -56,7 +59,7 @@
   "extra": {
     "bamarni-bin": {
       "bin-links": true,
-      "forward-command": true
+      "forward-command": false
     }
   }
 }
