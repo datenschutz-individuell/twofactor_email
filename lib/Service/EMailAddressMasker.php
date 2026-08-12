@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Service;
 
 final class EMailAddressMasker implements IEMailAddressMasker {
+	#[\Override]
 	public function maskForUI(string $emailAddress): string {
 		if (!preg_match('/^([^@\s]+)@([^@\s]+)$/', $emailAddress, $m)) {
 			return $emailAddress;

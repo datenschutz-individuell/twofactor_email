@@ -20,30 +20,37 @@ final readonly class Setting implements ISetting {
 	) {
 	}
 
+	#[\Override]
 	public function canChangeMail(): bool {
 		return false;
 	}
 
+	#[\Override]
 	public function canChangeStream(): bool {
 		return false;
 	}
 
+	#[\Override]
 	public function getIdentifier(): string {
 		return Application::APP_ID;
 	}
 
+	#[\Override]
 	public function getName(): string {
 		return $this->l10n->t('Email');
 	}
 
+	#[\Override]
 	public function getPriority(): int {
 		return 10;
 	}
 
+	#[\Override]
 	public function isDefaultEnabledMail(): bool {
 		return true;
 	}
 
+	#[\Override]
 	public function isDefaultEnabledStream(): bool {
 		return true;
 	}

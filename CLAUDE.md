@@ -77,6 +77,11 @@ treating them as background noise, and re-check whether the existing pins and
   are globbed, so a new root file has to be added there by hand.
 - **GitHub Actions are pinned to a commit SHA** with a version comment, and every
   checkout sets `persist-credentials: false`. Follow the existing workflows.
+- **A method that overrides or implements anything carries `#[\Override]`** — an
+  interface, an abstract class, a parent method, whether from OCP, Symfony or this app.
+  Psalm requires it (`ensureOverrideAttribute`) and names every method missing one. It
+  is what turns a method Nextcloud has renamed into an analysis error instead of code
+  that is quietly never called again.
 - **A version bump touches four places:** `appinfo/info.xml`, `package.json`, and
   **both** version fields in `package-lock.json` — plus a `CHANGELOG.md` section with
   the release date. Change the values in place; do not re-resolve the lock file during

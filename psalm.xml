@@ -3,7 +3,7 @@
         errorLevel="3"
         phpVersion="8.2"
         findUnusedCode="false"
-        ensureOverrideAttribute="false"
+        ensureOverrideAttribute="true"
         findUnusedIssueHandlerSuppression="false"
         autoloader="tests/bootstrap.php"
 >

@@ -216,6 +216,18 @@ run_checks() {
 	is "admin/reset" "$status" "200"
 	body_has "reset restores the defaults" '"codeLength":6'
 
+	# The admin settings are an IDelegatedSettings. No HTTP route reaches that
+	# side of the class: the server builds the delegation list on its own and
+	# asks each setting for its name and priority. If it ever expected a method
+	# the class does not have, this is where it would show.
+	# The needle is the JSON key, not just the class name: a PHP error names the
+	# class too, so grepping for the name alone would pass on the very failure
+	# this check exists to catch.
+	echo "-- delegated admin settings"
+	is "the settings class is offered for delegation" \
+		"$(occ admin-delegation:show --output=json \
+			| grep -cF '"className":"OCA\\TwoFactorEMail\\Settings\\AdminSettings"')" "1"
+
 	echo "-- state/save"
 	# No 403 to expect here: Nextcloud counts the login that just happened as the
 	# password confirmation for 30 minutes. A 403 would only show up on an older

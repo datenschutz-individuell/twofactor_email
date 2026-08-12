@@ -31,6 +31,7 @@ final class CleanUpExpiredCodes extends TimedJob {
 		$this->setTimeSensitivity(IJob::TIME_INSENSITIVE);
 	}
 
+	#[\Override]
 	protected function run(mixed $argument): void {
 		$this->codeStorage->deleteExpired();
 	}

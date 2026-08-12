@@ -18,6 +18,7 @@ final readonly class NumericalCodeGenerator implements ICodeGenerator {
 	) {
 	}
 
+	#[\Override]
 	public function generateChallengeCode(): string {
 		return $this->secureRandom->generate(
 			$this->settings->getCodeLength(),

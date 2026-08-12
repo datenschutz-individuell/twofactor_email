@@ -25,6 +25,7 @@ final readonly class AdminSettings implements IDelegatedSettings {
 	) {
 	}
 
+	#[\Override]
 	public function getForm(): TemplateResponse {
 		$this->initialState->provideInitialState('codeLength', $this->appSettings->getCodeLength());
 		$this->initialState->provideInitialState('codeValidMinutes', $this->appSettings->getCodeValidMinutes());
@@ -40,24 +41,22 @@ final readonly class AdminSettings implements IDelegatedSettings {
 		return new TemplateResponse(Application::APP_ID, 'AdminSettings', renderAs: TemplateResponse::RENDER_AS_BLANK);
 	}
 
+	#[\Override]
 	public function getSection(): string {
 		return 'security';
 	}
 
+	#[\Override]
 	public function getPriority(): int {
 		return 30;
 	}
 
+	#[\Override]
 	public function getName(): ?string {
 		return $this->l10n->t('Email');
 	}
 
-	// Both required by Nextcloud at runtime via IDelegatedSettings
-	/** @noinspection PhpUnused */
-	public function getAuthorizedGroupIds(): array {
-		return []; // real admins only
-	}
-
+	#[\Override]
 	public function getAuthorizedAppConfig(): array {
 		return []; // no app config keys delegated to non-admins
 	}

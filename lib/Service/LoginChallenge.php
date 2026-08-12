@@ -31,6 +31,7 @@ final readonly class LoginChallenge implements ILoginChallenge {
 	 * @throws SendEMailFailed
 	 * @throws EMailNotSet
 	 */
+	#[\Override]
 	public function sendChallenge(IUser $user): bool {
 		/**
 		 * The code is stored hashed, so it stays secret and resistant to timing
@@ -61,6 +62,7 @@ final readonly class LoginChallenge implements ILoginChallenge {
 	 * @throws EMailNotSet
 	 * @throws SendEMailFailed
 	 */
+	#[\Override]
 	public function resendChallenge(IUser $user): void {
 		$elapsed = $this->codeStorage->secondsSinceLastCode($user->getUID());
 		$cooldown = $this->settings->getResendCooldownSeconds();
@@ -71,6 +73,7 @@ final readonly class LoginChallenge implements ILoginChallenge {
 		$this->issueCode($user);
 	}
 
+	#[\Override]
 	public function secondsUntilResendAllowed(IUser $user): int {
 		$elapsed = $this->codeStorage->secondsSinceLastCode($user->getUID());
 		if ($elapsed === null) {
@@ -83,6 +86,7 @@ final readonly class LoginChallenge implements ILoginChallenge {
 		return max(0, $cooldown - $elapsed);
 	}
 
+	#[\Override]
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {
 		$submittedCode = trim($submittedCode);
 		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
