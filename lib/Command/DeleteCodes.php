@@ -32,6 +32,7 @@ final class DeleteCodes extends Command {
 		parent::__construct();
 	}
 
+	#[\Override]
 	protected function configure(): void {
 		$this
 			->setName('twofactor_email:delete-codes')
@@ -40,6 +41,7 @@ final class DeleteCodes extends Command {
 			->addOption('all', null, InputOption::VALUE_NONE, 'Delete the codes of all users');
 	}
 
+	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$io = new SymfonyStyle($input, $output);
 		$uid = $input->getArgument('uid');

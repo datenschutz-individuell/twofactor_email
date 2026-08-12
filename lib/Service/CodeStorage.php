@@ -21,6 +21,7 @@ final readonly class CodeStorage implements ICodeStorage {
 	) {
 	}
 
+	#[\Override]
 	public function readCode(string $userId): ?string {
 		$expiresBefore = time() - $this->settings->getCodeValidMinutes() * 60;
 		$createdAt = $this->config->getValueInt($userId, Application::APP_ID, self::KEY_CREATED_AT);
@@ -37,6 +38,7 @@ final readonly class CodeStorage implements ICodeStorage {
 		return $code;
 	}
 
+	#[\Override]
 	public function secondsSinceLastCode(string $userId): ?int {
 		// Only a still-valid code counts: an expired one is treated as "none"
 		// so the user may request a fresh code without waiting.
@@ -47,6 +49,7 @@ final readonly class CodeStorage implements ICodeStorage {
 		return max(0, time() - $createdAt);
 	}
 
+	#[\Override]
 	public function deleteCode(string $userId): bool {
 		$existed = $this->config->getValueString($userId, Application::APP_ID, self::KEY_CODE) !== '';
 		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CODE);
@@ -54,6 +57,7 @@ final readonly class CodeStorage implements ICodeStorage {
 		return $existed;
 	}
 
+	#[\Override]
 	public function writeCode(string $userId, string $code, ?int $createdAt = null): void {
 		$createdAt ??= time();
 		// The stored value is a hash, but flag it sensitive so it is masked in
@@ -62,6 +66,7 @@ final readonly class CodeStorage implements ICodeStorage {
 		$this->config->setValueInt($userId, Application::APP_ID, self::KEY_CREATED_AT, $createdAt);
 	}
 
+	#[\Override]
 	public function deleteAllCodes(): int {
 		$count = count($this->config->getValuesByUsers(Application::APP_ID, self::KEY_CREATED_AT, ValueType::INT));
 		$this->config->deleteKey(Application::APP_ID, self::KEY_CODE);
@@ -69,6 +74,7 @@ final readonly class CodeStorage implements ICodeStorage {
 		return $count;
 	}
 
+	#[\Override]
 	public function deleteExpired(): int {
 		$expiresBefore = time() - $this->settings->getCodeValidMinutes() * 60;
 		$creationTime = $this->config->getValuesByUsers(Application::APP_ID, self::KEY_CREATED_AT, ValueType::INT);

@@ -25,6 +25,7 @@ final readonly class LoginSetup implements ILoginSetupProvider {
 	) {
 	}
 
+	#[\Override]
 	public function getBody(): ITemplate {
 		try {
 			$template = $this->templateManager->getTemplate(Application::APP_ID, 'LoginSetup');

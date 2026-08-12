@@ -47,6 +47,7 @@ final class Version03000400Date20250829000000 extends SimpleMigrationStep {
 	) {
 	}
 
+	#[\Override]
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
 		// Count all users that have a v2 authentication code stored
 		try {

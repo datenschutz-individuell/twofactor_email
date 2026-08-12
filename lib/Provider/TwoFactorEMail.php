@@ -57,14 +57,17 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	) {
 	}
 
+	#[\Override]
 	public function getId(): string {
 		return 'email';
 	}
 
+	#[\Override]
 	public function getDisplayName(): string {
 		return 'Email';
 	}
 
+	#[\Override]
 	public function getDescription(): string {
 		return $this->l10n->t('Authenticate by email');
 	}
@@ -75,6 +78,7 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	 * It sends a challenge code by email, unless a still-valid code exists —
 	 * so reloading the page does not send another email.
 	 */
+	#[\Override]
 	public function getTemplate(IUser $user): ITemplate {
 		try {
 			$template = $this->templateManager->getTemplate(Application::APP_ID, 'LoginChallenge');
@@ -102,6 +106,7 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 		return $template;
 	}
 
+	#[\Override]
 	public function verifyChallenge(IUser $user, string $challenge): bool {
 		return $this->challengeService->verifyChallenge($user, $challenge);
 	}
@@ -113,18 +118,22 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	 * If no entry exists for the provider "email" and the given user, this method is called during the login flow.
 	 * Nextcloud then saves the current state.
 	 */
+	#[\Override]
 	public function isTwoFactorAuthEnabledForUser(IUser $user): bool {
 		return $this->stateManager->isEnabled($user);
 	}
 
+	#[\Override]
 	public function getLightIcon(): string {
 		return $this->urlGenerator->imagePath(Application::APP_ID, 'app.svg');
 	}
 
+	#[\Override]
 	public function getDarkIcon(): string {
 		return $this->urlGenerator->imagePath(Application::APP_ID, 'app-dark.svg');
 	}
 
+	#[\Override]
 	public function getPersonalSettings(IUser $user): IPersonalProviderSettings {
 		$email = $user->getEMailAddress() ?? '';
 		$this->initialStateService->provideInitialState('enabled', $this->stateManager->isEnabled($user));
@@ -135,10 +144,12 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 		);
 	}
 
+	#[\Override]
 	public function disableFor(IUser $user): void {
 		$this->stateManager->disable($user, StateChangeActor::ADMIN);
 	}
 
+	#[\Override]
 	public function enableFor(IUser $user): void {
 		$this->stateManager->enable($user, StateChangeActor::ADMIN);
 	}
@@ -147,6 +158,7 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	 * @throws NotFoundExceptionInterface
 	 * @throws ContainerExceptionInterface
 	 */
+	#[\Override]
 	public function getLoginSetup(IUser $user): ILoginSetupProvider {
 		$maskedEmail = $this->emailAddressMasker->maskForUI($user->getEMailAddress() ?? '');
 		$this->initialStateService->provideInitialState('maskedEmail', $maskedEmail);
