@@ -101,7 +101,10 @@ treating them as background noise, and re-check whether the existing pins and
 - **`ChallengeController::resend()` carries both `#[NoTwoFactorRequired]` and a
   `@NoTwoFactorRequired` docblock annotation.** Nextcloud 33 reads the exemption from
   the docblock only; the attribute is `@since 34`. Removing either one breaks a
-  supported server. The annotation goes when `min-version` reaches 34.
+  supported server. Nextcloud 35 still reads both, so this is never urgent —
+  `CompatibilityShimsTest` fails as soon as `min-version` reaches 34 and names the
+  three pieces that go together: the annotation, the `UndefinedAttributeClass`
+  handler in `psalm.xml`, and the `findUnusedIssueHandlerSuppression` beside it.
 - **`symfony/console` is held at `^6.4.42`.** Nextcloud bundles Symfony 6.4, and `occ`
   commands must build against the same major.
 - **`allowScripts` in `package.json` lists `fsevents`, which is never installed here.**
