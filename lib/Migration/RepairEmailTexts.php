@@ -41,10 +41,12 @@ final readonly class RepairEmailTexts implements IRepairStep {
 	) {
 	}
 
+	#[\Override]
 	public function getName(): string {
 		return 'Check the configured two-factor email texts';
 	}
 
+	#[\Override]
 	public function run(IOutput $output): void {
 		$this->checkText($output, AppSettings::KEY_EMAIL_SUBJECT, 'subject', false);
 		$this->checkText($output, AppSettings::KEY_EMAIL_TEMPLATE, 'body', true);
