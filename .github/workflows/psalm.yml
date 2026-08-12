@@ -56,10 +56,10 @@ jobs:
       - name: Install dependencies
         run: |
           composer remove nextcloud/ocp --dev --no-scripts
-          composer i
+          composer i --no-scripts
 
       - name: Install nextcloud/ocp
-        run: composer require --dev nextcloud/ocp:dev-${{ matrix.ocp == 'min' && steps.versions.outputs.branches-min || steps.versions.outputs.branches-max }} --ignore-platform-reqs --with-dependencies
+        run: composer require --dev nextcloud/ocp:dev-${{ matrix.ocp == 'min' && steps.versions.outputs.branches-min || steps.versions.outputs.branches-max }} --ignore-platform-reqs --with-dependencies --no-scripts
 
       - name: Run coding standards check
         run: composer run psalm -- --threads=1 --monochrome --no-progress --output-format=github
