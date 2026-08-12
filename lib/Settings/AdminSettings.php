@@ -56,12 +56,6 @@ final readonly class AdminSettings implements IDelegatedSettings {
 		return $this->l10n->t('Email');
 	}
 
-	// Both required by Nextcloud at runtime via IDelegatedSettings
-	/** @noinspection PhpUnused */
-	public function getAuthorizedGroupIds(): array {
-		return []; // real admins only
-	}
-
 	#[\Override]
 	public function getAuthorizedAppConfig(): array {
 		return []; // no app config keys delegated to non-admins
