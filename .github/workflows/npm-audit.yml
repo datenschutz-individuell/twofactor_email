@@ -1,0 +1,59 @@
+# SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
+# SPDX-License-Identifier: MIT
+
+# Dependabot is configured for the default branch only, so release/3.3 has no
+# dependency watching. This reports rather than repairs: a failing workflow
+# reaches the maintainer by mail and needs no token with write access.
+#
+# Threshold `moderate`: both branches carry low findings from elliptic beneath
+# the Vite config's polyfill plugin, accepted in REVIEW.md.
+
+name: npm audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Mondays, early. An off-minute on purpose, see the other schedules.
+    - cron: '41 5 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        branch:
+          - main
+          - release/3.3
+
+    name: npm audit (${{ matrix.branch }})
+
+    steps:
+      - name: Checkout ${{ matrix.branch }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ matrix.branch }}
+          persist-credentials: false
+
+      - name: Read node and npm versions from package.json
+        uses: skjnldsv/read-package-engines-version-actions@06d6baf7d8f41934ab630e97d9e6c0bc9c9ac5e4 # v3
+        id: versions
+        with:
+          fallbackNode: '^24'
+          fallbackNpm: '^11'
+
+      - name: Set up node ${{ steps.versions.outputs.nodeVersion }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ steps.versions.outputs.nodeVersion }}
+
+      - name: Set up npm ${{ steps.versions.outputs.npmVersion }}
+        run: npm i -g 'npm@${{ steps.versions.outputs.npmVersion }}'
+
+      # The lock file is what a release ships, and needs no install to be judged.
+      - name: Audit
+        run: npm audit --package-lock-only --audit-level=moderate

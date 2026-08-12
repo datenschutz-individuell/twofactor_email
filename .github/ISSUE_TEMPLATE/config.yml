@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+blank_issues_enabled: false
+contact_links:
+  - name: 🤔 Question, discussion or an idea
+    url: https://github.com/datenschutz-individuell/twofactor_email/issues/8
+    about: Ask here rather than opening a bug — ideas are collected in this thread.
+  - name: 🔒 Security issue
+    url: https://github.com/datenschutz-individuell/twofactor_email/blob/main/SECURITY.md
+    about: Please report privately, not as a public issue.

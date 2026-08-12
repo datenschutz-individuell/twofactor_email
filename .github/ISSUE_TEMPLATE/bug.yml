@@ -1,0 +1,61 @@
+# SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name: 🐛 Bug
+description: Something in this app does not work as it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Only what is needed to reproduce it. Operating system, web server, database,
+        PHP version and logs will be asked for if they turn out to matter.
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+    validations:
+      required: true
+
+  - type: input
+    id: app-version
+    attributes:
+      label: Version of this app
+      description: Settings → Apps, or `occ app:list | grep twofactor_email`
+    validations:
+      required: true
+
+  - type: input
+    id: server-version
+    attributes:
+      label: Nextcloud version
+      description: Settings → Overview, or `occ status`
+    validations:
+      required: true
+
+  - type: textarea
+    id: anything-else
+    attributes:
+      label: Anything else worth knowing
+      description: |
+        Log lines, a screenshot, whether it started after an update. Remove passwords,
+        tokens and email addresses before pasting.
