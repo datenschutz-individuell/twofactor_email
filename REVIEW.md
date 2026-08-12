@@ -37,7 +37,8 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   decision about `.nextcloudignore` for anything new at the root, GitHub Actions pinned
   to a commit SHA with a version comment, `persist-credentials: false` on checkouts,
   and `-f` on any `curl` that **downloads a tool or artefact** (not on the test
-  requests in `tests/smoke/`, where the status code is the assertion).
+  requests in `tests/smoke/`, where the status code is the assertion). Psalm enforces
+  `#[\Override]` on every override, so that one reports itself.
 - **Texts that will not survive translation.** User-facing strings, comments and
   docblocks should be plain, short English. Idioms, nested clauses and German sentence
   structure in English words all make translation worse.
