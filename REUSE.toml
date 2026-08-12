@@ -9,7 +9,7 @@ SPDX-PackageDownloadLocation = "https://github.com/datenschutz-individuell/twofa
 path = ["CHANGELOG.md", "CLAUDE.md", "CONTRIBUTORS.md", "README.md", "REVIEW.md",
     "SECURITY.md", "doc/**",
     "composer.json", "composer.lock", "package.json", "package-lock.json",
-    "vendor-bin/cs-fixer/composer.json", "vendor-bin/cs-fixer/composer.lock",
+    "vendor-bin/*/composer.json", "vendor-bin/*/composer.lock",
     "psalm.xml"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2024 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>"
@@ -19,6 +19,13 @@ SPDX-License-Identifier = "AGPL-3.0-or-later"
 path = [".tx/config", "l10n/**.js", "l10n/**.json", "l10n/**.php"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Translators <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+# Screenshots are binary and cannot carry a header; this covers new ones too.
+path = ["screenshots/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025-2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
