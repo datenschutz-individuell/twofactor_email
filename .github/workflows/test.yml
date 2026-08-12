@@ -74,11 +74,16 @@ jobs:
         working-directory: nextcloud/apps/twofactor_email
         run: composer run test:unit
 
+      # Coverage is a report, not a gate: a failed upload says something about
+      # codecov or the runner's location, never about the code under test. It used
+      # to fail the whole matrix job — once for a documentation-only pull request,
+      # when codecov's storage refused the upload from that runner. A pull request
+      # from a fork has no token and would fail the same way.
       - name: Report coverage
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./nextcloud/apps/twofactor_email/tests/clover.xml
           flags: unittests
-          fail_ci_if_error: true
+          fail_ci_if_error: false
