@@ -19,7 +19,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class NotifierTest extends TestCase {
+final class NotifierTest extends TestCase {
 	private Notifier $notifier;
 
 	/**

@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  * loud instead — it fails as soon as the supported range moves past the version a
  * shim exists for, and names everything that has to go together.
  */
-class CompatibilityShimsTest extends TestCase {
+final class CompatibilityShimsTest extends TestCase {
 	private const ROOT = __DIR__ . '/../..';
 
 	private function minimumNextcloudVersion(): int {

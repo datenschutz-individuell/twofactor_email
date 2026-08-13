@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -11,7 +13,7 @@ use OCA\TwoFactorEMail\Activity\Notification;
 use OCA\TwoFactorEMail\Event\StateChangeActor;
 use PHPUnit\Framework\TestCase;
 
-class NotificationTest extends TestCase {
+final class NotificationTest extends TestCase {
 	public function testUserEnableMapsToEnabledByUser(): void {
 		$this->assertSame(Notification::ENABLED_BY_USER, Notification::fromStateChange(StateChangeActor::USER, true));
 	}
