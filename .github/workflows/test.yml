@@ -8,9 +8,9 @@ permissions:
   pull-requests: write
 
 on:
+  # No branch filter: a pull request against release/3.3, or against another
+  # pull request's branch, is a change that has to be tested just the same.
   pull_request:
-    branches:
-      - main
 
 concurrency:
   group: test-${{ github.head_ref || github.run_id }}
