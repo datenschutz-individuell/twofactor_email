@@ -22,7 +22,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class StateChangeNotificationTest extends TestCase {
+final class StateChangeNotificationTest extends TestCase {
 	private IManager&MockObject $notificationManager;
 
 	private StateChangeNotification $listener;

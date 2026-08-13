@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -22,7 +24,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ChallengeControllerTest extends TestCase {
+final class ChallengeControllerTest extends TestCase {
 	private IUserSession&MockObject $userSession;
 	private ILoginChallenge&MockObject $challenge;
 	private IStateManager&MockObject $stateManager;

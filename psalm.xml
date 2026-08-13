@@ -18,13 +18,38 @@
         </ignoreFiles>
     </extraFiles>
     <issueHandlers>
+        <!-- Nextcloud deprecates an interface long before it removes it, and errorLevel 3
+             files that warning as information nobody reads. Raised to errors, it becomes
+             visible in the run against the server's master branch — which is the Nextcloud
+             next workflow, and non-blocking on purpose. So this is a warning that arrives
+             early, not a gate; the gate follows when the version enters info.xml and the
+             ordinary psalm jobs analyse against it. -->
+        <DeprecatedClass errorLevel="error"/>
+        <DeprecatedConstant errorLevel="error"/>
+        <DeprecatedInterface errorLevel="error"/>
+        <!-- Nextcloud 35 deprecates ISecureRandom::generate in favour of PHP's
+             Randomizer::getBytesFromString, which needs PHP 8.3. The app's floor is 8.2,
+             because Nextcloud 33 allows it, so the replacement is out of reach and the
+             deprecated call is the only way to generate the code. One method, named on
+             purpose: any other deprecated call still has to be an error.
+             CompatibilityShimsTest fails as soon as the floor reaches 8.3. -->
+        <DeprecatedMethod errorLevel="error">
+            <errorLevel type="suppress">
+                <referencedMethod name="OCP\Security\ISecureRandom::generate"/>
+            </errorLevel>
+        </DeprecatedMethod>
+        <DeprecatedProperty errorLevel="error"/>
+        <DeprecatedTrait errorLevel="error"/>
+        <DeprecatedFunction errorLevel="error"/>
+
         <!-- One attribute, not one method: #[NoTwoFactorRequired] is @since 34 and the
              analysis also runs against the OCP of the oldest supported server, where it
              does not exist. A suppression in the docblock would have silenced every
-             undefined attribute on that method, including a typo. This handler and the
-             findUnusedIssueHandlerSuppression attribute above are one unit and go
-             together when min-version reaches 34 — CompatibilityShimsTest fails until
-             they do. -->
+             undefined attribute on that method, including a typo. It goes when
+             min-version reaches 34 — CompatibilityShimsTest fails until it does.
+             The findUnusedIssueHandlerSuppression attribute above is not part of that
+             pair: it belongs to every suppression in this file, and goes with the last
+             of them. -->
         <UndefinedAttributeClass>
             <errorLevel type="suppress">
                 <referencedClass name="OCP\AppFramework\Http\Attribute\NoTwoFactorRequired"/>

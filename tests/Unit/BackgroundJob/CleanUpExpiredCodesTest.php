@@ -16,7 +16,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
-class CleanUpExpiredCodesTest extends TestCase {
+final class CleanUpExpiredCodesTest extends TestCase {
 	/**
 	 * @throws Exception
 	 */

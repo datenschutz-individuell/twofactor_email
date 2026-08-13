@@ -17,7 +17,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class StateManagerTest extends TestCase {
+final class StateManagerTest extends TestCase {
 	private IRegistry&MockObject $registry;
 
 	private StateManager $stateManager;

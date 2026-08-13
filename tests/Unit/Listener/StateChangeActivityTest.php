@@ -21,7 +21,7 @@ use OCP\IUserSession;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class StateChangeActivityTest extends TestCase {
+final class StateChangeActivityTest extends TestCase {
 
 	private StateChangeActivity $listener;
 

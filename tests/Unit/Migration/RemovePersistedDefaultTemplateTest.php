@@ -16,7 +16,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class RemovePersistedDefaultTemplateTest extends TestCase {
+final class RemovePersistedDefaultTemplateTest extends TestCase {
 	private const OLD_DEFAULT_TEMPLATE
 		= "Your two-factor authentication code is: {code}\n\n"
 		. 'If you tried to login, please enter that code on {cloud}. '
