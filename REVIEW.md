@@ -83,6 +83,11 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
 - **Formatting.** `php-cs-fixer` with `nextcloud/coding-standard` owns it, ESLint and
   Stylelint own the frontend. Tabs, brace placement and import order are not review
   material.
+- **There is no Rector configuration, on purpose.** Its Nextcloud sets for 33, 34 and
+  35 are the same file, and running them against `lib/` changes nothing. Keeping the
+  tool would add a dependency project that only earns its keep when a future server
+  renames an API. Run it from a throwaway checkout when the supported range moves —
+  `doc/development-setup.md` says how — rather than carrying it here.
 - **`package-lock.json` churn** in a dependency update, and generated translation
   files.
 - **Test doubles that look over-specific.** Assertions on exact mock calls are
