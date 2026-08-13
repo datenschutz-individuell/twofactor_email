@@ -42,10 +42,11 @@
         <!-- One attribute, not one method: #[NoTwoFactorRequired] is @since 34 and the
              analysis also runs against the OCP of the oldest supported server, where it
              does not exist. A suppression in the docblock would have silenced every
-             undefined attribute on that method, including a typo. This handler and the
-             findUnusedIssueHandlerSuppression attribute above are one unit and go
-             together when min-version reaches 34 — CompatibilityShimsTest fails until
-             they do. -->
+             undefined attribute on that method, including a typo. It goes when
+             min-version reaches 34 — CompatibilityShimsTest fails until it does.
+             The findUnusedIssueHandlerSuppression attribute above is not part of that
+             pair: it belongs to every suppression in this file, and goes with the last
+             of them. -->
         <UndefinedAttributeClass>
             <errorLevel type="suppress">
                 <referencedClass name="OCP\AppFramework\Http\Attribute\NoTwoFactorRequired"/>
