@@ -59,18 +59,28 @@ final class AdminSettingsControllerTest extends TestCase {
 		$this->assertEquals(Http::STATUS_OK, $response->getStatus());
 	}
 
-	/** Passes the stored texts as the baseline; SettingsValidatorTest owns the rule. */
-	public function testSaveAcceptsAnUnchangedStoredTextThatIsInvalid(): void {
+	/**
+	 * The form shows every field and sends every field, so an unchanged faulty text is
+	 * still a text the admin submitted while looking at it. Accepting it answered with
+	 * a success on the very field that will never be used — the mail falls back to the
+	 * default text. Refusing says so, and it also makes this route agree with occ,
+	 * which already refuses to set such a text again.
+	 */
+	public function testSaveRejectsAnUnchangedStoredTextThatIsInvalid(): void {
 		$stored = 'Your code {code}: https://cloud.example/?u={user}';
 		$this->appSettings->method('getEMailTemplate')->willReturn($stored);
-		$this->appSettings->expects($this->once())->method('setCodeLength')->with(8);
+		$this->appSettings->expects($this->never())->method('setCodeLength');
 
 		$response = $this->controller->save(8, 10, $stored, '', 30);
 
-		$this->assertEquals(Http::STATUS_OK, $response->getStatus());
+		$this->assertEquals(Http::STATUS_BAD_REQUEST, $response->getStatus());
+		$this->assertEquals(
+			['errors' => ['eMailTemplate' => 'email-template-placeholder-in-url']],
+			$response->getData(),
+		);
 	}
 
-	/** Only the placeholder-in-url case is exempt: a body without {code} still blocks. */
+	/** A body without {code} blocks as well, and names its own error. */
 	public function testSaveRejectsCustomBodyWithoutCode(): void {
 		$this->appSettings->expects($this->never())->method('setEMailTemplate');
 
