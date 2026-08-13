@@ -24,9 +24,9 @@ permissions:
   contents: read
 
 on:
+  # No branch filter: a pull request against release/3.3, or against another
+  # pull request's branch, is a change that has to be tested just the same.
   pull_request:
-    branches:
-      - main
   schedule:
     # Weekly, so upstream breakage surfaces even in a week without a pull request
     - cron: '19 6 * * 1'
