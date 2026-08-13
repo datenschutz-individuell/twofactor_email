@@ -101,8 +101,8 @@ final class SettingsValidator {
 		}
 		// Only when nothing worse was found: a line break in a header outranks this,
 		// and overwriting it would hide it until the admin has fixed the URL.
-		// Unchanged: an instance can carry such a text without anyone having typed it
-		// here, and it must not block the other settings.
+		// The baseline serves the occ command, which sets one key at a time and must
+		// not refuse an unrelated key because a stored text is faulty.
 		if (!isset($errors['eMailSubject'])
 			&& LinkScanner::hasPlaceholderInUrl($eMailSubject)
 			&& !self::unchanged($eMailSubject, $storedSubject)) {

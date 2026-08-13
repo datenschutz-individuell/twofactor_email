@@ -50,14 +50,15 @@ final class AdminSettingsController extends Controller {
 		string $eMailSubject,
 		int $resendMinutes,
 	): JSONResponse {
+		// No baseline: the form shows every field and sends every field, so a text that
+		// arrives here was submitted by the admin looking at it, whether they typed it
+		// or not. The occ command sets one key at a time and can tell the difference.
 		$errors = $this->validator->validate(
 			$codeLength,
 			$codeValidMinutes,
 			$resendMinutes,
 			$eMailSubject,
 			$eMailTemplate,
-			$this->appSettings->getEMailSubject(),
-			$this->appSettings->getEMailTemplate(),
 		);
 		if (!empty($errors)) {
 			return new JSONResponse(['errors' => $errors], Http::STATUS_BAD_REQUEST);
