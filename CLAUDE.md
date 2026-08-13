@@ -63,6 +63,12 @@ but finding it locally is cheaper for everyone.
 **`composer outdated` in the root does not see `vendor-bin/*`.** The bamarni plugin
 gives those their own projects — use `composer bin all outdated`.
 
+**A root `composer install` also installs `vendor-bin/*`**, through a hook that exists
+so working in the repo takes one command instead of two. CI and the package build do
+not need the tooling and pass `--no-scripts`; the only job that keeps it is the one
+running `cs:check`. A new workflow that installs dependencies should pass
+`--no-scripts` too.
+
 **Query npm with `--all`.** `npm ls <package>` and friends traverse shallowly without
 it and silently miss deeper paths, which is how a dependency once looked dev-only when
 it was not. After an update, read the warnings and remove their cause rather than
@@ -107,9 +113,12 @@ treating them as background noise, and re-check whether the existing pins and
   `@NoTwoFactorRequired` docblock annotation.** Nextcloud 33 reads the exemption from
   the docblock only; the attribute is `@since 34`. Removing either one breaks a
   supported server. Nextcloud 35 still reads both, so this is never urgent —
-  `CompatibilityShimsTest` fails as soon as `min-version` reaches 34 and names the
-  three pieces that go together: the annotation, the `UndefinedAttributeClass`
-  handler in `psalm.xml`, and the `findUnusedIssueHandlerSuppression` beside it.
+  `CompatibilityShimsTest` fails as soon as `min-version` reaches 34 and names the two
+  pieces that go together: the annotation and the `UndefinedAttributeClass` handler in
+  `psalm.xml`. **That test is the register of every such carve-out**, each with the
+  condition that ends it. A new workaround the app carries only because it spans
+  several server or PHP versions belongs there, so that dropping a version is a sweep
+  and not a search.
 - **`symfony/console` is held at `^6.4.42`.** Nextcloud bundles Symfony 6.4, and `occ`
   commands must build against the same major.
 - **`allowScripts` in `package.json` lists `fsevents`, which is never installed here.**

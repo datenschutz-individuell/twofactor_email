@@ -68,7 +68,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: nextcloud/apps/twofactor_email
-        run: composer install
+        run: composer install --no-scripts
 
       - name: Run tests
         working-directory: nextcloud/apps/twofactor_email

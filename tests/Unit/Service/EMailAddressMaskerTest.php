@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -10,7 +12,7 @@ namespace OCA\TwoFactorEMail\Test\Unit\Service;
 use OCA\TwoFactorEMail\Service\EMailAddressMasker;
 use PHPUnit\Framework\TestCase;
 
-class EMailAddressMaskerTest extends TestCase {
+final class EMailAddressMaskerTest extends TestCase {
 	private EMailAddressMasker $masker;
 
 	protected function setUp(): void {

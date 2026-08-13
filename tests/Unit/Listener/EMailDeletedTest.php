@@ -20,7 +20,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class EMailDeletedTest extends TestCase {
+final class EMailDeletedTest extends TestCase {
 	private IStateManager&MockObject $stateManager;
 
 	private EMailDeleted $listener;

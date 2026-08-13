@@ -106,3 +106,46 @@ in [tests/smoke/README.md](../tests/smoke/README.md).
 If the Docker daemon refuses to start with `error initializing graphdriver: driver not
 supported`, the kernel was updated without a reboot since — the modules of the running
 kernel are gone, so overlayfs cannot be loaded. Rebooting fixes it.
+
+## Rector, when the Nextcloud range moves
+
+Rector can rewrite calls that a new server renamed, but it is not part of this project:
+its Nextcloud sets for 33, 34 and 35 are the same file, and over `lib/` they propose
+nothing at all. Run it from a throwaway directory when the supported range moves, then
+throw the directory away:
+
+```bash
+mkdir -p /tmp/rector && cd /tmp/rector
+composer require --dev rector/rector nextcloud/rector
+cat > rector.php <<'PHP'
+<?php
+use Nextcloud\Rector\Set\NextcloudSets;
+use Rector\Config\RectorConfig;
+return RectorConfig::configure()
+	->withPaths([
+		'/path/to/twofactor_email/lib',
+		'/path/to/twofactor_email/tests',
+	])
+	->withAutoloadPaths([
+		'/path/to/twofactor_email/vendor/autoload.php',
+		'/path/to/twofactor_email/tests/bootstrap.php',
+	])
+	->withSets([NextcloudSets::NEXTCLOUD_35]);
+PHP
+vendor/bin/rector process --dry-run
+```
+
+`--dry-run` prints the changes without writing them; read them before applying anything
+by hand.
+
+**Both autoload paths are required.** Without the app's own dependencies, Rector cannot
+see the classes the code inherits from, and a rule that needs that information proposes
+the wrong change with the same confidence as a right one — in one run it wanted to delete
+every `parent::setUp()` in the test suite. `nextcloud/ocp` ships no autoload section of
+its own, which is why `tests/bootstrap.php` belongs in the list: it registers the
+autoloader for `OCP\` and `NCU\` that nothing else provides.
+
+Read each proposal on its merits rather than applying the run wholesale, and expect to
+reject some. Adding the PHPUnit code-quality set produced four rules over `tests/`, of
+which two were worth taking: `parent::setUp()` is kept here deliberately, and a
+`(string)` cast it suggests is already guaranteed by the declared types.
