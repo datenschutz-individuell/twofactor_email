@@ -63,6 +63,12 @@ but finding it locally is cheaper for everyone.
 **`composer outdated` in the root does not see `vendor-bin/*`.** The bamarni plugin
 gives those their own projects — use `composer bin all outdated`.
 
+**A root `composer install` also installs `vendor-bin/*`**, through a hook that exists
+so working in the repo takes one command instead of two. CI and the package build do
+not need the tooling and pass `--no-scripts`; the only job that keeps it is the one
+running `cs:check`. A new workflow that installs dependencies should pass
+`--no-scripts` too.
+
 **Query npm with `--all`.** `npm ls <package>` and friends traverse shallowly without
 it and silently miss deeper paths, which is how a dependency once looked dev-only when
 it was not. After an update, read the warnings and remove their cause rather than
