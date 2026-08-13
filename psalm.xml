@@ -18,6 +18,26 @@
         </ignoreFiles>
     </extraFiles>
     <issueHandlers>
+        <!-- OCP's Controller builds a JSONResponse from a DataResponse's data, which
+             is wider than what JSONResponse accepts. It surfaces only once something
+             extends Controller directly instead of through one of OCP's abstract
+             controllers, which AdminSettingsController does on purpose.
+             The file is the same in both supported OCP versions, the complaint is not:
+             stable33 declares DataResponse's data as a union and reports the coercion,
+             stable34 declares it as mixed and reports the template parameter. Hence two
+             handlers, both for that one file. The same issues in our own code stay
+             errors. -->
+        <InvalidTemplateParam>
+            <errorLevel type="suppress">
+                <file name="vendor/nextcloud/ocp/OCP/AppFramework/Controller.php"/>
+            </errorLevel>
+        </InvalidTemplateParam>
+        <ArgumentTypeCoercion>
+            <errorLevel type="suppress">
+                <file name="vendor/nextcloud/ocp/OCP/AppFramework/Controller.php"/>
+            </errorLevel>
+        </ArgumentTypeCoercion>
+
         <!-- Nextcloud deprecates an interface long before it removes it, and errorLevel 3
              files that warning as information nobody reads. Raised to errors, it becomes
              visible in the run against the server's master branch — which is the Nextcloud

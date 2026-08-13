@@ -14,6 +14,7 @@ use OCA\TwoFactorEMail\Controller\AdminSettingsController;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Service\SettingsValidator;
 use OCP\AppFramework\Http;
+use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
 use OCP\IRequest;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -38,6 +39,18 @@ final class AdminSettingsControllerTest extends TestCase {
 			$this->appSettings,
 			new SettingsValidator(),
 		);
+	}
+
+	/**
+	 * ALoginSetupController is an empty marker class, and Nextcloud's TwoFactorMiddleware
+	 * skips the two-factor gate for it while a user who needs a second factor has no
+	 * provider to complete it with (stable33 line 67, stable34 line 72). The enrolment
+	 * step needs that; these routes never do. Extending it would let the password of an
+	 * admin — or of a member of a group the settings are delegated to — change them for
+	 * the whole instance while that admin is still being set up.
+	 */
+	public function testIsNotExemptedFromTheTwoFactorGate(): void {
+		$this->assertNotInstanceOf(ALoginSetupController::class, $this->controller);
 	}
 
 	public function testSavePersistsAllSettings(): void {
