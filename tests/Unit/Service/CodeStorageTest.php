@@ -74,6 +74,15 @@ final class CodeStorageTest extends TestCase {
 		$this->assertSame(1, $this->storage->deleteExpired());
 	}
 
+	public function testDeleteExpiredAcceptsAUserIdOfDigitsOnly(): void {
+		// Nextcloud allows such an id, and PHP hands it back as an int because it
+		// is an array key. Passing it on unchanged is a TypeError.
+		$this->config->method('getValuesByUsers')->willReturn(['12345' => 0]);
+		$this->config->method('getValueString')->willReturn('hashed-code');
+
+		$this->assertSame(1, $this->storage->deleteExpired());
+	}
+
 	public function testSecondsSinceLastCodeForFreshCode(): void {
 		$this->config->method('getValueInt')->willReturn(time());
 		$this->config->method('getValueString')->willReturn('hashed-code');

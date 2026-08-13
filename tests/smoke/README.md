@@ -125,6 +125,11 @@ then the right code, `admin/save` with its validation path, `admin/reset`,
 `state/save` in both directions with the registry state, every asset the challenge
 page pulls, and the server log.
 
+It also covers what no HTTP route reaches: `admin-delegation:show`, which is where the
+server asks the settings class for its name and priority, and the `twofactor_email:cleanup`
+and `twofactor_email:delete-codes` commands. Those run against a user whose id is digits
+only, because Nextcloud allows such an id and PHP then hands it back as an int.
+
 **Why both server versions by default:** in 3.4.0 the resend endpoint was dead on
 Nextcloud 33 while working on 34. The exemption from the two-factor gate is read from
 the docblock on 33 and from the attribute on 34, and the attribute is `@since 34`. The
