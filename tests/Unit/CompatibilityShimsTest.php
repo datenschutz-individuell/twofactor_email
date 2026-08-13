@@ -16,6 +16,12 @@ use PHPUnit\Framework\TestCase;
  * the version it served is dropped, it just sits there. This test makes the moment
  * loud instead — it fails as soon as the supported range moves past the version a
  * shim exists for, and names everything that has to go together.
+ *
+ * This class is the register of those workarounds, and it is meant to be complete.
+ * Anything the app only does because it spans several server or PHP versions belongs
+ * here with the condition that ends it: supporting one version per release removes
+ * all of them at once, and only a complete list makes that a sweep instead of a
+ * search.
  */
 final class CompatibilityShimsTest extends TestCase {
 	private const ROOT = __DIR__ . '/../..';

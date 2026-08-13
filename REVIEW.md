@@ -31,7 +31,10 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   `set -u` aborts there.
 - **Version-range shims that outlived their reason.** When the supported Nextcloud
   range changes, workarounds for the dropped version become dead weight around
-  security-relevant code. Flag them.
+  security-relevant code. Flag them. Flag a **new** one too if it is not registered in
+  `CompatibilityShimsTest`: that class is meant to list every workaround the app carries
+  only because it spans several versions, so that dropping a version is a sweep rather
+  than a search.
 - **Repository conventions**, because they exist for a reason and are easy to miss when
   adding a file of a kind that already exists: SPDX/REUSE coverage for new files, a
   decision about `.nextcloudignore` for anything new at the root, GitHub Actions pinned
