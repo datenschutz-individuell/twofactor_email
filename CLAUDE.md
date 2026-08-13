@@ -83,6 +83,9 @@ treating them as background noise, and re-check whether the existing pins and
   are globbed, so a new root file has to be added there by hand.
 - **GitHub Actions are pinned to a commit SHA** with a version comment, and every
   checkout sets `persist-credentials: false`. Follow the existing workflows.
+- **A `pull_request` trigger carries no branch filter.** A pull request based on
+  another pull request's branch is still a change that has to be tested, and it is the
+  one where a missing check goes unnoticed.
 - **A method that overrides or implements anything carries `#[\Override]`** — an
   interface, an abstract class, a parent method, whether from OCP, Symfony or this app.
   Psalm requires it (`ensureOverrideAttribute`) and names every method missing one. It
