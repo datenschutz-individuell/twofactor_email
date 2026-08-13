@@ -63,6 +63,11 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   it, because the same handler is necessarily unused against the newest OCP. All of
   it goes together when `min-version` reaches 34 — and `CompatibilityShimsTest`
   fails until it does, so this is enforced rather than remembered.
+- **`ISecureRandom::generate` is deprecated in Nextcloud 35 and still used.** Its
+  replacement, `Random\Randomizer::getBytesFromString()`, needs PHP 8.3, and the app's
+  floor is 8.2 because Nextcloud 33 allows it. Psalm is told to accept that one method
+  by name, so every other deprecated call stays an error, and
+  `CompatibilityShimsTest` fails as soon as the floor reaches 8.3.
 - **`symfony/console` at `^6.4.42`**: Nextcloud bundles Symfony 6.4 and `occ` commands
   must match its major. This one has no expiry — it moves when Nextcloud moves.
 - **`@nextcloud/vite-config` pinned to a pre-release**: it is the only version that

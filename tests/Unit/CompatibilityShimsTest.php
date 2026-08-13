@@ -20,6 +20,38 @@ use PHPUnit\Framework\TestCase;
 final class CompatibilityShimsTest extends TestCase {
 	private const ROOT = __DIR__ . '/../..';
 
+	private function minimumPhpVersion(): string {
+		$info = file_get_contents(self::ROOT . '/appinfo/info.xml');
+		self::assertIsString($info, 'appinfo/info.xml is not readable');
+		self::assertSame(1, preg_match('/<php[^>]*min-version="([0-9.]+)"/', $info, $m));
+		return $m[1];
+	}
+
+	/**
+	 * Nextcloud 35 deprecates ISecureRandom::generate in favour of PHP's
+	 * Randomizer::getBytesFromString, which needs PHP 8.3. While the app supports
+	 * PHP 8.2 the replacement is out of reach, so psalm is told to accept that one
+	 * call. The moment the floor moves, the suppression hides a call that should
+	 * have changed — and nothing else would say so.
+	 */
+	public function testTheSecureRandomSuppressionGoesWhenPhp82Does(): void {
+		$psalm = file_get_contents(self::ROOT . '/psalm.xml');
+		self::assertIsString($psalm);
+
+		if (version_compare($this->minimumPhpVersion(), '8.3', '>=')) {
+			$this->assertStringNotContainsString(
+				'ISecureRandom::generate',
+				$psalm,
+				'PHP 8.2 is no longer supported: generate the code with '
+				. 'Random\Randomizer::getBytesFromString() and remove the suppression '
+				. 'for ISecureRandom::generate from psalm.xml.',
+			);
+			return;
+		}
+
+		$this->assertStringContainsString('ISecureRandom::generate', $psalm);
+	}
+
 	private function minimumNextcloudVersion(): int {
 		$info = file_get_contents(self::ROOT . '/appinfo/info.xml');
 		self::assertIsString($info, 'appinfo/info.xml is not readable');
