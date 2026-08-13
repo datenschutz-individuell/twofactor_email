@@ -36,7 +36,10 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   `set -u` aborts there.
 - **Version-range shims that outlived their reason.** When the supported Nextcloud
   range changes, workarounds for the dropped version become dead weight around
-  security-relevant code. Flag them.
+  security-relevant code. Flag them. Flag a **new** one too if it is not registered in
+  `CompatibilityShimsTest`: that class is meant to list every workaround the app carries
+  only because it spans several versions, so that dropping a version is a sweep rather
+  than a search.
 - **Repository conventions**, because they exist for a reason and are easy to miss when
   adding a file of a kind that already exists: SPDX/REUSE coverage for new files, a
   decision about `.nextcloudignore` for anything new at the root, GitHub Actions pinned
@@ -64,10 +67,19 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   exist in the oldest supported server's OCP, which the analysis now checks against.
   That handler names the **one** class on purpose; a suppression in the method's
   docblock silenced every undefined attribute on the route that skips the second
-  factor, including a typo. `findUnusedIssueHandlerSuppression="false"` belongs to
-  it, because the same handler is necessarily unused against the newest OCP. All of
-  it goes together when `min-version` reaches 34 — and `CompatibilityShimsTest`
-  fails until it does, so this is enforced rather than remembered.
+  factor, including a typo. Both go when `min-version` reaches 34 — and
+  `CompatibilityShimsTest` fails until they do, so this is enforced rather than
+  remembered.
+- **`findUnusedIssueHandlerSuppression="false"` outlives that pair.** A suppression in
+  `psalm.xml` exists because the app spans several versions, so in any single analysis
+  run it may simply not be triggered — and psalm would then report it as unused. The
+  flag belongs to all of them and goes with the last one, which is a check of its own,
+  not to the handler it was first added for.
+- **`ISecureRandom::generate` is deprecated in Nextcloud 35 and still used.** Its
+  replacement, `Random\Randomizer::getBytesFromString()`, needs PHP 8.3, and the app's
+  floor is 8.2 because Nextcloud 33 allows it. Psalm is told to accept that one method
+  by name, so every other deprecated call stays an error, and
+  `CompatibilityShimsTest` fails as soon as the floor reaches 8.3.
 - **`symfony/console` at `^6.4.42`**: Nextcloud bundles Symfony 6.4 and `occ` commands
   must match its major. This one has no expiry — it moves when Nextcloud moves.
 - **`@nextcloud/vite-config` pinned to a pre-release**: it is the only version that
@@ -88,6 +100,11 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
 - **Formatting.** `php-cs-fixer` with `nextcloud/coding-standard` owns it, ESLint and
   Stylelint own the frontend. Tabs, brace placement and import order are not review
   material.
+- **There is no Rector configuration, on purpose.** Its Nextcloud sets for 33, 34 and
+  35 are the same file, and running them against `lib/` changes nothing. Keeping the
+  tool would add a dependency project that only earns its keep when a future server
+  renames an API. Run it from a throwaway checkout when the supported range moves —
+  `doc/development-setup.md` says how — rather than carrying it here.
 - **`package-lock.json` churn** in a dependency update, and generated translation
   files.
 - **Test doubles that look over-specific.** Assertions on exact mock calls are

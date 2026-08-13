@@ -14,7 +14,7 @@ use OCA\TwoFactorEMail\Event\StateChanged;
 use OCP\IUser;
 use PHPUnit\Framework\MockObject\Exception;
 
-class StateChangedTest extends TestCase {
+final class StateChangedTest extends TestCase {
 	/**
 	 * @throws Exception
 	 */

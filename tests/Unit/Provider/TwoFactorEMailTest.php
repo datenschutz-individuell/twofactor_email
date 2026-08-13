@@ -30,7 +30,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
 
-class TwoFactorEMailTest extends TestCase {
+final class TwoFactorEMailTest extends TestCase {
 	private ITemplateManager&MockObject $templateManager;
 	private IL10N&MockObject $l10n;
 	private IInitialState&MockObject $initialState;

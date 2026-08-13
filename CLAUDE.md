@@ -113,9 +113,12 @@ treating them as background noise, and re-check whether the existing pins and
   `@NoTwoFactorRequired` docblock annotation.** Nextcloud 33 reads the exemption from
   the docblock only; the attribute is `@since 34`. Removing either one breaks a
   supported server. Nextcloud 35 still reads both, so this is never urgent —
-  `CompatibilityShimsTest` fails as soon as `min-version` reaches 34 and names the
-  three pieces that go together: the annotation, the `UndefinedAttributeClass`
-  handler in `psalm.xml`, and the `findUnusedIssueHandlerSuppression` beside it.
+  `CompatibilityShimsTest` fails as soon as `min-version` reaches 34 and names the two
+  pieces that go together: the annotation and the `UndefinedAttributeClass` handler in
+  `psalm.xml`. **That test is the register of every such carve-out**, each with the
+  condition that ends it. A new workaround the app carries only because it spans
+  several server or PHP versions belongs there, so that dropping a version is a sweep
+  and not a search.
 - **`symfony/console` is held at `^6.4.42`.** Nextcloud bundles Symfony 6.4, and `occ`
   commands must build against the same major.
 - **`allowScripts` in `package.json` lists `fsevents`, which is never installed here.**
