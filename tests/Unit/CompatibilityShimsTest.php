@@ -55,8 +55,13 @@ final class CompatibilityShimsTest extends TestCase {
 		// Both sides, like the Nextcloud 33 pair below. A suppression that outlives the
 		// call it was written for is not reported by psalm either, because the unused
 		// check is off — so it would sit here widening what is accepted, unseen.
+		//
+		// The interface and the call, not the property name: renaming the property is a
+		// refactor that says nothing about the deprecation, and it must not read as
+		// "this carve-out can go".
+		self::assertStringContainsString('ISecureRandom', $generator);
 		$this->assertStringContainsString(
-			'secureRandom->generate(',
+			'->generate(',
 			$generator,
 			'Nothing calls ISecureRandom::generate any more: remove its suppression from '
 			. 'psalm.xml and this test with it.',
@@ -127,21 +132,27 @@ final class CompatibilityShimsTest extends TestCase {
 	}
 
 	/**
-	 * Every suppression here exists for one end of a version range, and is therefore
-	 * unused at the other end — the analysis runs against the oldest and the newest
-	 * OCP. So the unused-suppression check has to stay off while any suppression is
-	 * left, and has to come back once none is. Tying it to one particular suppression
-	 * would be wrong the moment a second one exists, which is how this test earned
-	 * its own place.
+	 * A suppression here exists because the app spans several versions, and in any one
+	 * analysis run it may simply not be triggered: the Nextcloud 33 one is idle against
+	 * the newest OCP, the ISecureRandom one against every OCP in the range until 35
+	 * enters it. Psalm would report each such run's idle suppression as unused, so the
+	 * check stays off while any suppression is left and comes back once none is. Tying
+	 * it to one particular suppression was wrong the moment a second one existed, which
+	 * is how this test earned its own place.
 	 */
 	public function testTheUnusedSuppressionCheckFollowsTheSuppressions(): void {
 		$psalm = file_get_contents(self::ROOT . '/psalm.xml');
 		self::assertIsString($psalm);
 
+		// Comments stripped first: this file explains every handler in prose, and an
+		// explanation quoting the syntax would otherwise count as a suppression and keep
+		// the flag alive after the last real one is gone.
+		$handlers = preg_replace('/<!--.*?-->/s', '', $psalm) ?? $psalm;
+
 		// Both forms psalm accepts: the nested element and the attribute on the handler.
 		// Matching only the nested one would call a file "suppressing nothing" while a
 		// suppression written the other way is still in it.
-		$suppresses = preg_match('/(<errorLevel type="suppress">|errorLevel="suppress")/', $psalm) === 1;
+		$suppresses = preg_match('/(<errorLevel type="suppress">|errorLevel="suppress")/', $handlers) === 1;
 
 		if ($suppresses) {
 			$this->assertStringContainsString(

@@ -115,7 +115,7 @@ nothing at all. Run it from a throwaway directory when the supported range moves
 throw the directory away:
 
 ```bash
-mkdir -p /tmp/rector && cd /tmp/rector || exit
+mkdir -p /tmp/rector && cd /tmp/rector
 composer require --dev rector/rector nextcloud/rector
 cat > rector.php <<'PHP'
 <?php
