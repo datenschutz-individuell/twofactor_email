@@ -23,6 +23,11 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
 - **An empty result treated as success.** `for` over nothing, a filter that matches
   nothing, a check whose loop body never runs — if "found nothing to test" can report a
   pass, that is a bug. This has happened here.
+- **An array key used as a value.** PHP converts a key of digits only to `int`, whatever
+  the docblock promises — and OCP promises `array<string, …>` for user ids and provider
+  ids alike. Psalm believes the promise and cannot see this, so a key that reaches a
+  `string` parameter needs a cast. Nextcloud allows an all-digit user id, so this is a
+  real id, not a contrived one. This has happened here too.
 - **Failure paths that cannot work.** Diagnostics after a teardown, a log dump that
   runs when the container is gone, `|| true` swallowing the very error the step exists
   to surface.
