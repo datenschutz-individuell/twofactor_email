@@ -48,7 +48,19 @@ final class CompatibilityShimsTest extends TestCase {
 	 */
 	public function testTheSecureRandomSuppressionGoesWhenPhp82Does(): void {
 		$psalm = file_get_contents(self::ROOT . '/psalm.xml');
+		$generator = file_get_contents(self::ROOT . '/lib/Service/NumericalCodeGenerator.php');
 		self::assertIsString($psalm);
+		self::assertIsString($generator);
+
+		// Both sides, like the Nextcloud 33 pair below. A suppression that outlives the
+		// call it was written for is not reported by psalm either, because the unused
+		// check is off — so it would sit here widening what is accepted, unseen.
+		$this->assertStringContainsString(
+			'secureRandom->generate(',
+			$generator,
+			'Nothing calls ISecureRandom::generate any more: remove its suppression from '
+			. 'psalm.xml and this test with it.',
+		);
 
 		// The handler itself, not the comment beside it: a bare class name would also
 		// match the explanation and stay green after the handler was deleted.
@@ -126,7 +138,12 @@ final class CompatibilityShimsTest extends TestCase {
 		$psalm = file_get_contents(self::ROOT . '/psalm.xml');
 		self::assertIsString($psalm);
 
-		if (str_contains($psalm, '<errorLevel type="suppress">')) {
+		// Both forms psalm accepts: the nested element and the attribute on the handler.
+		// Matching only the nested one would call a file "suppressing nothing" while a
+		// suppression written the other way is still in it.
+		$suppresses = preg_match('/(<errorLevel type="suppress">|errorLevel="suppress")/', $psalm) === 1;
+
+		if ($suppresses) {
 			$this->assertStringContainsString(
 				'findUnusedIssueHandlerSuppression="false"',
 				$psalm,

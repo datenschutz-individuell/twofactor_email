@@ -110,9 +110,9 @@ kernel are gone, so overlayfs cannot be loaded. Rebooting fixes it.
 ## Rector, when the Nextcloud range moves
 
 Rector can rewrite calls that a new server renamed, but it is not part of this project:
-its Nextcloud sets for 33, 34 and 35 are the same file, and they change nothing here.
-Run it from a throwaway directory when the supported range moves, then throw the
-directory away:
+its Nextcloud sets for 33, 34 and 35 are the same file, and over `lib/` they propose
+nothing at all. Run it from a throwaway directory when the supported range moves, then
+throw the directory away:
 
 ```bash
 mkdir -p /tmp/rector && cd /tmp/rector || exit
@@ -122,7 +122,10 @@ cat > rector.php <<'PHP'
 use Nextcloud\Rector\Set\NextcloudSets;
 use Rector\Config\RectorConfig;
 return RectorConfig::configure()
-	->withPaths(['/path/to/twofactor_email/lib'])
+	->withPaths([
+		'/path/to/twofactor_email/lib',
+		'/path/to/twofactor_email/tests',
+	])
 	->withAutoloadPaths([
 		'/path/to/twofactor_email/vendor/autoload.php',
 		'/path/to/twofactor_email/tests/bootstrap.php',
@@ -142,5 +145,7 @@ every `parent::setUp()` in the test suite. `nextcloud/ocp` ships no autoload sec
 its own, which is why `tests/bootstrap.php` belongs in the list: it registers the
 autoloader for `OCP\` and `NCU\` that nothing else provides.
 
-Read each proposal on its merits rather than applying the run wholesale. Of the four
-rules that fired here, two were worth taking and two were not.
+Read each proposal on its merits rather than applying the run wholesale, and expect to
+reject some. Adding the PHPUnit code-quality set produced four rules over `tests/`, of
+which two were worth taking: `parent::setUp()` is kept here deliberately, and a
+`(string)` cast it suggests is already guaranteed by the declared types.

@@ -19,9 +19,11 @@
     </extraFiles>
     <issueHandlers>
         <!-- Nextcloud deprecates an interface long before it removes it, and errorLevel 3
-             files that warning as information nobody reads. Raised to an error, the
-             analysis against the newest OCP says which call has to move while there is
-             still time to move it. -->
+             files that warning as information nobody reads. Raised to errors, it becomes
+             visible in the run against the server's master branch — which is the Nextcloud
+             next workflow, and non-blocking on purpose. So this is a warning that arrives
+             early, not a gate; the gate follows when the version enters info.xml and the
+             ordinary psalm jobs analyse against it. -->
         <DeprecatedClass errorLevel="error"/>
         <DeprecatedConstant errorLevel="error"/>
         <DeprecatedInterface errorLevel="error"/>
@@ -38,6 +40,7 @@
         </DeprecatedMethod>
         <DeprecatedProperty errorLevel="error"/>
         <DeprecatedTrait errorLevel="error"/>
+        <DeprecatedFunction errorLevel="error"/>
 
         <!-- One attribute, not one method: #[NoTwoFactorRequired] is @since 34 and the
              analysis also runs against the OCP of the oldest supported server, where it

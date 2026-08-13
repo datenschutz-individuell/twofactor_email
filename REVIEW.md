@@ -62,10 +62,14 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   exist in the oldest supported server's OCP, which the analysis now checks against.
   That handler names the **one** class on purpose; a suppression in the method's
   docblock silenced every undefined attribute on the route that skips the second
-  factor, including a typo. `findUnusedIssueHandlerSuppression="false"` belongs to
-  it, because the same handler is necessarily unused against the newest OCP. All of
-  it goes together when `min-version` reaches 34 — and `CompatibilityShimsTest`
-  fails until it does, so this is enforced rather than remembered.
+  factor, including a typo. Both go when `min-version` reaches 34 — and
+  `CompatibilityShimsTest` fails until they do, so this is enforced rather than
+  remembered.
+- **`findUnusedIssueHandlerSuppression="false"` outlives that pair.** Every suppression
+  in `psalm.xml` serves one end of the supported range and is therefore unused at the
+  other, where the analysis also runs. The flag belongs to all of them and goes with
+  the last one, which is a check of its own — not to the handler it was first added
+  for.
 - **`ISecureRandom::generate` is deprecated in Nextcloud 35 and still used.** Its
   replacement, `Random\Randomizer::getBytesFromString()`, needs PHP 8.3, and the app's
   floor is 8.2 because Nextcloud 33 allows it. Psalm is told to accept that one method
