@@ -81,7 +81,6 @@ final class AdminSettingsControllerTest extends TestCase {
 	 */
 	public function testSaveRejectsAnUnchangedStoredTextThatIsInvalid(): void {
 		$stored = 'Your code {code}: https://cloud.example/?u={user}';
-		$this->appSettings->method('getEMailTemplate')->willReturn($stored);
 		$this->appSettings->expects($this->never())->method('setCodeLength');
 
 		$response = $this->controller->save(8, 10, $stored, '', 30);

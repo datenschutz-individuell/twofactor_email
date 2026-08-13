@@ -58,10 +58,11 @@ final class SettingsValidator {
 	 * its FIRST error, so the checks are ordered by what the admin has to fix
 	 * first — a new one belongs where it ranks, not at the end.
 	 *
-	 * The stored texts are the baseline. A text that is unchanged may keep a
-	 * placeholder inside a web address, because an instance can carry one without
-	 * anyone having typed it here and it must not block the other settings. Every
-	 * other error still blocks, and so does a changed text.
+	 * The stored texts are the baseline for the occ command, which sets one key at
+	 * a time: a faulty stored text must not stop an admin from changing the code
+	 * length there. The web form passes no baseline, because it shows and submits
+	 * every field at once — a text arriving from it was submitted by an admin
+	 * looking at it. Every other error blocks either way.
 	 *
 	 * @return array<string, string>
 	 */
@@ -105,7 +106,7 @@ final class SettingsValidator {
 		// not refuse an unrelated key because a stored text is faulty.
 		if (!isset($errors['eMailSubject'])
 			&& LinkScanner::hasPlaceholderInUrl($eMailSubject)
-			&& !self::unchanged($eMailSubject, $storedSubject)) {
+			&& $eMailSubject !== $storedSubject) {
 			$errors['eMailSubject'] = 'email-subject-placeholder-in-url';
 		}
 		if (!isset($errors['eMailTemplate']) && mb_strlen($eMailTemplate) > self::MAX_EMAIL_TEMPLATE_LENGTH) {
@@ -121,18 +122,9 @@ final class SettingsValidator {
 		// when nothing worse was found — a body without {code} delivers nothing.
 		if (!isset($errors['eMailTemplate'])
 			&& LinkScanner::hasPlaceholderInUrl($eMailTemplate)
-			&& !self::unchanged($eMailTemplate, $storedTemplate)) {
+			&& $eMailTemplate !== $storedTemplate) {
 			$errors['eMailTemplate'] = 'email-template-placeholder-in-url';
 		}
 		return $errors;
-	}
-
-	/**
-	 * Browsers normalize line endings in a text area, so a text sent back with LF
-	 * still counts as the stored CRLF text.
-	 */
-	private static function unchanged(string $submitted, string $stored): bool {
-		$toLf = static fn (string $text): string => str_replace(["\r\n", "\r"], "\n", $text);
-		return $toLf($submitted) === $toLf($stored);
 	}
 }

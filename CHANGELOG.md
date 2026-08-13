@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Bound the code length, validity and resend cooldown when they are read, not only when they are set
 - Drop {logo} from the email subject instead of leaving it literal
-- A stored text that puts a placeholder inside a web address no longer blocks saving the other settings
+- A stored text that puts a placeholder inside a web address no longer blocks occ from setting an unrelated key
+- The admin settings page refuses to save while a stored text puts a placeholder inside a web address
 - Count the subject and body length limits in characters, not bytes
 
 ### Fixed

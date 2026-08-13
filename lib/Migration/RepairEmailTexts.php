@@ -114,7 +114,8 @@ final readonly class RepairEmailTexts implements IRepairStep {
 		if (LinkScanner::hasPlaceholderInUrl($stored)) {
 			$output->warning(
 				'The email ' . $part . ' puts a placeholder inside a web address. Such a mail would carry the '
-				. 'code in a link, so the default text is sent instead. Fix it with occ twofactor_email:settings.',
+				. 'code in a link, so the default text is sent instead. No settings can be saved in the '
+				. 'web interface until this is fixed. Edit it with occ twofactor_email:settings.',
 			);
 		}
 	}
