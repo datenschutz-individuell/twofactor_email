@@ -18,6 +18,17 @@
         </ignoreFiles>
     </extraFiles>
     <issueHandlers>
+        <!-- OCP's own stub builds a JSONResponse out of a mixed, which breaks the
+             template that class declares. It surfaces only once something extends
+             Controller directly instead of through one of OCP's abstract controllers,
+             which AdminSettingsController does on purpose. One file, named explicitly:
+             the same issue in our own code stays an error. -->
+        <InvalidTemplateParam>
+            <errorLevel type="suppress">
+                <file name="vendor/nextcloud/ocp/OCP/AppFramework/Controller.php"/>
+            </errorLevel>
+        </InvalidTemplateParam>
+
         <!-- Nextcloud deprecates an interface long before it removes it, and errorLevel 3
              files that warning as information nobody reads. Raised to errors, it becomes
              visible in the run against the server's master branch — which is the Nextcloud
