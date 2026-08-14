@@ -123,15 +123,14 @@ class SettingsValidatorTest extends TestCase {
 	}
 
 	/**
-	 * Such a text is only reported, never reset, so an instance can carry one — and
-	 * it must not block the other settings. A browser sends a text area with LF
-	 * whatever was stored, so the comparison ignores the line endings.
+	 * The baseline exists for the occ command, which sets one key at a time: a stored
+	 * text that is faulty must not stop an admin from changing the code length there.
+	 * The web form passes no baseline, because it submits every field at once.
 	 */
 	public function testDropsThePlaceholderInUrlErrorForAnUnchangedText(): void {
 		$stored = "Your code {code}:\r\nhttps://cloud.example/?u={user}";
 
 		$this->assertSame([], $this->validator->validate(6, 10, 1, '', $stored, '', $stored));
-		$this->assertSame([], $this->validator->validate(6, 10, 1, '', str_replace("\r\n", "\n", $stored), '', $stored));
 	}
 
 	/** Every other error blocks even for an unchanged text. */
