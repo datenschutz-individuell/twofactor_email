@@ -28,12 +28,18 @@ use OCP\IUser;
  *   - {logo} inserts the instance logo; it only appears in the HTML variant
  *   - all placeholders ({code}, {user}, {cloud}, {validity}) render bold
  *     and monospace in the HTML variant; in the plain text variant they are
- *     inserted bare, {code} with ">>> <<<" markers; inside URLs and in the
- *     subject all are inserted bare
+ *     inserted bare, {code} with ">>> <<<" markers; in the subject bare
+ *   - inside a URL the placeholders are inserted bare, so no markup can end
+ *     up in an attribute
  * Everything else is HTML-escaped — raw HTML is not possible.
+ *
+ * Nothing here decides whether the one-time code may leave the system. That is
+ * asked once, of the finished text, by EMailSender — see codeCouldBeFetched().
  */
 final readonly class TemplateRenderer {
 
+	// Detection for linking only. Where an address ends is a matter of taste, and
+	// getting it wrong here costs a link, not a code.
 	private const URL_PATTERN = '~https?://[^\s<>"]+~i';
 
 	public function __construct(
@@ -44,6 +50,62 @@ final readonly class TemplateRenderer {
 	}
 
 	/**
+	 * Whether any web address in the text contains a placeholder. Such a text renders
+	 * a value into a link, so the mail would go out with the default text instead —
+	 * SettingsValidator tells the admin before it comes to that.
+	 *
+	 * Reads an address the same way codeCouldBeFetched() does, and must keep doing so:
+	 * anything that check would stop has to be refused when it is written, or the
+	 * admin is told a setting was saved that then never takes effect.
+	 */
+	public static function hasPlaceholderInUrl(string $text): bool {
+		foreach (self::linkableRuns($text) as $run) {
+			foreach (self::VALUE_PLACEHOLDERS as $placeholder) {
+				if (str_contains($run, $placeholder)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * The parts of the text a link scanner would read as one address: separated by
+	 * ASCII whitespace, containing a scheme or a leading "www.". Without the `u` flag,
+	 * so unusual bytes cannot make it fail — and if the split ever did fail, the whole
+	 * text counts as one address, which errs towards reporting.
+	 *
+	 * @return list<string>
+	 */
+	private static function linkableRuns(string $text): array {
+		$runs = preg_split('~[ \t\r\n\x0B\f]+~', $text) ?: [$text];
+		return array_values(array_filter($runs, static fn (string $run): bool => preg_match('~://|www\.~i', $run) === 1));
+	}
+
+	/**
+	 * Whether a link scanner could fetch the code from this text: it sits in a run
+	 * of characters that such a scanner would read as a web address.
+	 *
+	 * This asks about the finished text, not about the template, so it also sees an
+	 * address that an inserted value built around the code. It is deliberately
+	 * cruder than URL_PATTERN: it splits on ASCII whitespace only, treats every
+	 * scheme and a leading "www." as linkable, and uses no `u` flag, so it cannot
+	 * fail on unusual bytes. When in doubt it should say yes: sending the default
+	 * text without need is better than letting one code slip through.
+	 */
+	public static function codeCouldBeFetched(string $text, string $code): bool {
+		if ($code === '') {
+			return false;
+		}
+		foreach (self::linkableRuns($text) as $run) {
+			if (str_contains($run, $code)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * The subject is a single line of plain text — all placeholders are
 	 * inserted bare. Line breaks are replaced after the substitution: the
 	 * admin text is validated single-line, but placeholder values like the
@@ -51,7 +113,8 @@ final readonly class TemplateRenderer {
 	 * reach the mailer (header injection, defense in depth).
 	 */
 	public function renderSubject(string $subject, IUser $user, string $code): string {
-		$rendered = strtr($subject, $this->placeholderValues($user, $code));
+		// {logo} has no text form, so it drops out here, as in the plain text body.
+		$rendered = strtr($subject, ['{logo}' => ''] + $this->placeholderValues($user, $code));
 		return str_replace(["\r\n", "\r", "\n"], ' ', $rendered);
 	}
 
@@ -72,7 +135,7 @@ final readonly class TemplateRenderer {
 		// so an empty paragraph provides the spacing.
 		$rendered = [['&nbsp;', false]];
 		foreach ($this->paragraphs($body) as $paragraph) {
-			$plain = $this->toPlain(str_replace('{logo}', '', $paragraph), $values);
+			$plain = $this->toPlain($paragraph, $values);
 			// An empty plain text (e.g. a logo-only paragraph) must be passed
 			// as false — with '' the server would fall back to escaping the
 			// HTML.
@@ -80,6 +143,21 @@ final readonly class TemplateRenderer {
 		}
 		return $rendered;
 	}
+
+	/**
+	 * The placeholders that insert a value. Only these matter inside a web address:
+	 * {logo} expands to an image tag or to nothing, so it hands no data to anyone.
+	 * A test pins this list against placeholderValues().
+	 */
+	private const VALUE_PLACEHOLDERS = ['{code}', '{user}', '{cloud}', '{validity}'];
+
+	/**
+	 * Every placeholder this class expands. A test pins it against placeholderValues()
+	 * and literal(). The admin settings hint lists them again inside its translated
+	 * sentences, which this constant cannot fill in without hurting the translation —
+	 * so a new placeholder has to be added there by hand.
+	 */
+	public const PLACEHOLDERS = [...self::VALUE_PLACEHOLDERS, '{logo}'];
 
 	/**
 	 * @return array<string, string> placeholder => replacement value
@@ -97,7 +175,7 @@ final readonly class TemplateRenderer {
 	 * @return string[] non-empty paragraphs, split on blank lines
 	 */
 	private function paragraphs(string $text): array {
-		$split = preg_split('/\R\s*\R/u', $text) ?: [];
+		$split = preg_split('/\R\s*\R/u', $text) ?: [$text];
 		return array_values(array_filter(array_map(trim(...), $split), static fn (string $p): bool => $p !== ''));
 	}
 
@@ -122,18 +200,16 @@ final readonly class TemplateRenderer {
 			$offset = $position + strlen($url);
 		}
 		$result .= $this->literal(substr($paragraph, $offset), $values);
-		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $result);
+		return str_replace(["\r\n", "\n", "\r"], '<br>', $result);
 	}
 
 	/**
 	 * @param array<string, string> $values placeholder => replacement value
 	 */
 	private function toPlain(string $paragraph, array $values): string {
-		// No styling in plain text — bare values, the code with markers.
-		// strtr() replaces in a single pass, so placeholder-like fragments in
-		// the inserted values (e.g. a display name containing "{code}") stay
-		// as-is.
-		return strtr($paragraph, ['{code}' => '>>> ' . $values['{code}'] . ' <<<'] + $values);
+		// Single pass, so a "{code}" inside an inserted display name stays as-is.
+		// {logo} has no text form and drops out here.
+		return strtr($paragraph, ['{code}' => '>>> ' . $values['{code}'] . ' <<<', '{logo}' => ''] + $values);
 	}
 
 	/**
@@ -141,23 +217,21 @@ final readonly class TemplateRenderer {
 	 */
 	private function literal(string $text, array $values): string {
 		$html = htmlspecialchars($text);
+		// The placeholder values stand out: bold and monospace in the HTML variant
+		$styled = [];
+		foreach ($values as $placeholder => $value) {
+			$styled[$placeholder] = '<strong style="font-family:monospace">' . htmlspecialchars($value) . '</strong>';
+		}
 		if (str_contains($html, '{logo}')) {
+			// In the same single pass: strtr never scans a replacement, so a
+			// placeholder inside the instance name (the alt text) stays literal.
 			// Keep the logo small: at most 250px and 20% of the email width.
 			// The doubled max-width is progressive enhancement — clients that
 			// do not understand min() fall back to the plain 250px limit. A
 			// percentage height cap is not enforceable in emails (no sized
 			// parent), so the height is limited to 250px only.
-			$html = str_replace(
-				'{logo}',
-				'<img src="' . htmlspecialchars($this->logoUrl()) . '" alt="' . htmlspecialchars($this->defaults->getName())
-					. '" style="max-width:min(250px, 20%);max-height:250px">',
-				$html,
-			);
-		}
-		// The placeholder values stand out: bold and monospace in the HTML variant
-		$styled = [];
-		foreach ($values as $placeholder => $value) {
-			$styled[$placeholder] = '<strong style="font-family:monospace">' . htmlspecialchars($value) . '</strong>';
+			$styled['{logo}'] = '<img src="' . htmlspecialchars($this->logoUrl()) . '" alt="' . htmlspecialchars($this->defaults->getName())
+				. '" style="max-width:min(250px, 20%);max-height:250px">';
 		}
 		return strtr($html, $styled);
 	}
