@@ -31,6 +31,7 @@
     "Subject" : "Assunto",
     "Body" : "Corpo",
     "Reset all Two-Factor email app-wide admin settings to their defaults" : "Redefinir todas as configurações administrativas de autenticação de dois fatores por e-mail em todo o aplicativo para os valores padrão",
+    "Could not reset the settings. Reload the page to see their current state." : "Não foi possível redefinir as configurações. Atualize a página para ver o estado atual delas.",
     "No email address available, please contact your administrator." : "Não há endereço de e-mail disponível. Entre em contato com o seu administrador.",
     "Could not enable/disable two-factor authentication via email." : "Não foi possível ativar/desativar a autenticação de dois fatores por e-mail.",
     "Unhandled error!" : "Erro não tratado!",
