@@ -92,6 +92,15 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   chain has a fix, and none of it reaches the built bundle. Likewise the `EBADENGINE`
   warnings, which appear because the `@nextcloud/*` packages have not declared Node 26
   yet.
+- **The inline `${{ ... }}` versions in the workflows that pull requests trigger, and
+  CodeQL's cache poisoning alerts.** `npm-audit.yml` passes the npm version through the
+  environment because it audits a branch other than the default one. The other workflows
+  keep the template's inline form on purpose: they run on `pull_request`, where a fork
+  gets a read-only token and no secrets, and they execute the pull request's own code
+  anyway — `npm ci` and the build, or the `psalm` script from its `composer.json`.
+  Injection wins nothing there. The two `actions/cache-poisoning/poisonable-step` alerts
+  on `npm-audit.yml` are dismissed for that reason and a stronger one: no workflow in
+  this repository writes or restores an Actions cache, so there is nothing to poison.
 - **Formatting.** `php-cs-fixer` with `nextcloud/coding-standard` owns it, ESLint and
   Stylelint own the frontend. Tabs, brace placement and import order are not review
   material.
