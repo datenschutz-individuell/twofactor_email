@@ -28,6 +28,8 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
+use Throwable;
 
 final class EMailSenderTest extends TestCase {
 	private IMailer&MockObject $mailer;
@@ -109,6 +111,55 @@ final class EMailSenderTest extends TestCase {
 		$this->expectException(EMailNotSet::class);
 
 		$this->sender->sendChallengeEMail($this->mockUser(null), '123456');
+	}
+
+	/**
+	 * A code is a credential while it is valid, so no message and no context
+	 * value may carry it.
+	 *
+	 * @throws Exception
+	 */
+	public function testNeverLogsTheCode(): void {
+		$logged = [];
+		$this->collectLogCalls($logged);
+		$this->mailer->method('createEMailTemplate')->willReturn($this->template);
+		$this->mailer->method('createMessage')->willReturn($this->createMock(IMessage::class));
+		// Thrown from inside the call, as a real mailer does: only then does the
+		// exception's own stack trace hold the frames that carry the code.
+		$this->mailer->method('send')->willReturnCallback(
+			static fn (): never => throw new RuntimeException('the server said no'),
+		);
+
+		try {
+			$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
+		} catch (SendEMailFailed) {
+			// the failure is what makes the sender log the error at all
+		}
+
+		$errors = array_filter($logged, static fn (string $entry): bool => str_contains($entry, 'failed sending email message'));
+		self::assertNotSame([], $errors);
+		foreach ($logged as $entry) {
+			self::assertStringNotContainsString('123456', $entry);
+		}
+	}
+
+	/**
+	 * Collects every log call as its message plus its context, with an attached
+	 * exception reduced to class and message. What PHP records in that
+	 * exception's stack trace is not the app's own text; doc/threat-model.md
+	 * says why that is left alone.
+	 *
+	 * @param list<string> $calls
+	 */
+	private function collectLogCalls(array &$calls): void {
+		$this->logger->method($this->anything())
+			->willReturnCallback(static function (mixed ...$args) use (&$calls): void {
+				$context = $args[1] ?? [];
+				if (($context['exception'] ?? null) instanceof Throwable) {
+					$context['exception'] = $context['exception']::class . ': ' . $context['exception']->getMessage();
+				}
+				$calls[] = print_r([$args[0], $context], true);
+			});
 	}
 
 	/**

@@ -24,6 +24,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 final class LoginChallengeTest extends TestCase {
 	private ICodeGenerator&MockObject $codeGenerator;
@@ -33,6 +34,7 @@ final class LoginChallengeTest extends TestCase {
 	private IAppSettings&MockObject $settings;
 
 	private LoginChallenge $challenge;
+	private LoggerInterface&MockObject $logger;
 
 	/**
 	 * @throws Exception
@@ -45,6 +47,7 @@ final class LoginChallengeTest extends TestCase {
 		$this->emailSender = $this->createMock(IEMailSender::class);
 		$this->hasher = $this->createMock(IHasher::class);
 		$this->settings = $this->createMock(IAppSettings::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
 
 		$this->challenge = new LoginChallenge(
 			$this->codeGenerator,
@@ -52,7 +55,7 @@ final class LoginChallengeTest extends TestCase {
 			$this->emailSender,
 			$this->hasher,
 			$this->settings,
-			$this->createMock(LoggerInterface::class),
+			$this->logger,
 		);
 	}
 
@@ -165,6 +168,82 @@ final class LoginChallengeTest extends TestCase {
 
 		// min(1800, 600) - 60 = 540
 		$this->assertSame(540, $this->challenge->secondsUntilResendAllowed($this->mockUser()));
+	}
+
+	/**
+	 * A code is a credential while it is valid, so no message and no context
+	 * value may carry it.
+	 *
+	 * @throws Exception
+	 */
+	public function testNeverLogsTheCodeWhenTheMailerFails(): void {
+		$logged = [];
+		$this->collectLogCalls($logged);
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->willReturn(null);
+		$this->codeGenerator->method('generateChallengeCode')->willReturn('123456');
+		// Thrown from inside the sender, as in production: only then does the
+		// exception's own stack trace hold the frames that carry the code.
+		$this->emailSender->method('sendChallengeEMail')->willReturnCallback(
+			static fn (): never => throw new SendEMailFailed(),
+		);
+
+		try {
+			$this->challenge->sendChallenge($user);
+		} catch (SendEMailFailed) {
+			// the failure is what makes the service log the error at all
+		}
+
+		$errors = array_filter($logged, static fn (string $entry): bool => str_contains($entry, 'mailer error'));
+		self::assertNotSame([], $errors);
+		foreach ($logged as $entry) {
+			self::assertStringNotContainsString('123456', $entry);
+		}
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testNeverLogsTheCodeWhenTheAddressIsMissing(): void {
+		$logged = [];
+		$this->collectLogCalls($logged);
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->willReturn(null);
+		$this->codeGenerator->method('generateChallengeCode')->willReturn('123456');
+		$this->emailSender->method('sendChallengeEMail')->willReturnCallback(
+			static fn (IUser $sendTo): never => throw new EMailNotSet($sendTo),
+		);
+
+		try {
+			$this->challenge->sendChallenge($user);
+		} catch (EMailNotSet) {
+			// the failure is what makes the service log the warning at all
+		}
+
+		$warnings = array_filter($logged, static fn (string $entry): bool => str_contains($entry, 'No email address configured'));
+		self::assertNotSame([], $warnings);
+		foreach ($logged as $entry) {
+			self::assertStringNotContainsString('123456', $entry);
+		}
+	}
+
+	/**
+	 * Collects every log call as its message plus its context, with an attached
+	 * exception reduced to class and message. What PHP records in that
+	 * exception's stack trace is not the app's own text; doc/threat-model.md
+	 * says why that is left alone.
+	 *
+	 * @param list<string> $calls
+	 */
+	private function collectLogCalls(array &$calls): void {
+		$this->logger->method($this->anything())
+			->willReturnCallback(static function (mixed ...$args) use (&$calls): void {
+				$context = $args[1] ?? [];
+				if (($context['exception'] ?? null) instanceof Throwable) {
+					$context['exception'] = $context['exception']::class . ': ' . $context['exception']->getMessage();
+				}
+				$calls[] = print_r([$args[0], $context], true);
+			});
 	}
 
 	/**
