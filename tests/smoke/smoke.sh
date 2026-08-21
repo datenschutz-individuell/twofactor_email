@@ -116,6 +116,8 @@ post() {
 		-o "$TMP/body" -w '%{http_code}' ${args[@]+"${args[@]}"} "$url"
 }
 
+server_log() { docker compose exec -T nextcloud sh -c 'cat /var/www/html/data/nextcloud.log' 2>/dev/null; }
+
 mails() { curl -s "$MAILBOX/api/v1/messages?limit=20"; }
 # One key, no fallback: a rename must fail loudly rather than read as "no mail was sent",
 # and the image is pinned by digest so a rename cannot arrive unnoticed. (mailpit's
@@ -295,14 +297,52 @@ run_checks() {
 	fi
 
 	echo "-- server log"
-	if docker compose exec -T nextcloud sh -c 'cat /var/www/html/data/nextcloud.log' 2>/dev/null \
-		| grep twofactor_email | grep -qE '"level":[34]'; then
+	server_log >"$TMP/nclog"
+	if grep twofactor_email "$TMP/nclog" | grep -qE '"level":[34]'; then
 		bad "the app logged an error:"
-		docker compose exec -T nextcloud sh -c 'cat /var/www/html/data/nextcloud.log' 2>/dev/null \
-			| grep twofactor_email | grep -E '"level":[34]' | head -3 | cut -c1-160 | sed 's/^/       /'
+		grep twofactor_email "$TMP/nclog" | grep -E '"level":[34]' | head -3 | cut -c1-160 | sed 's/^/       /'
 	else
 		ok "no app errors in the server log"
 	fi
+
+	# Nextcloud does not throw when it cannot deliver: it catches the transport error and
+	# returns the addresses it refused, so an app that ignores that return value stores a
+	# code and reports it as sent while nothing went out (#202). An address without an "@"
+	# is the one refusal a smoke test can provoke without breaking the mail setup for
+	# everything else. This deliberately logs an error, so it runs after the log check
+	# above — and last of all, because it ends logged out: there is no form to submit.
+	echo "-- a recipient the mailer refuses"
+	rm -f "$TMP/jar"
+	local rtok mails_before address
+	# A code still stored would be reused instead of a new one being sent, and then there
+	# would be no send left to fail.
+	occ twofactor_email:delete-codes admin >/dev/null
+	# occ writes its errors to stdout here, so an unset address would come back as a
+	# sentence — and be written back as the address at the end of the section.
+	address=$(occ user:setting admin settings email)
+	case $address in *@*) ;; *) address=admin@example.org ;; esac
+	occ user:setting admin settings email no-at-sign >/dev/null
+	mails_before=$(mail_count)
+	rtok=$(page_token "$BASE/login")
+	post "$BASE/login" "$rtok" "user=admin" "password=$PW" "timezone=Europe/Berlin" >/dev/null
+	curl -s -b "$TMP/jar" -c "$TMP/jar" -o "$TMP/refused.html" "$BASE/login/challenge/email"
+	# Without this the two checks below would also pass on a page that is not the
+	# challenge page at all — the login failing would read as "no code was offered".
+	grep -q 'twofactor_email-challenge-icon' "$TMP/refused.html" \
+		&& ok "the challenge page was reached" || bad "the login did not reach the challenge page"
+	grep -q 'could not be sent' "$TMP/refused.html" \
+		&& ok "the challenge page reports the failure" \
+		|| bad "the challenge page does not report the failure (the instance has to be English)"
+	grep -q 'twofactor_email-challenge-form' "$TMP/refused.html" \
+		&& bad "the page still asks for a code that was never sent" \
+		|| ok "no code entry is offered"
+	is "nothing was mailed" "$(mail_count)" "$mails_before"
+	server_log >"$TMP/nclog"
+	grep -qF 'Failed to send 2FA challenge email due to a mailer error' "$TMP/nclog" \
+		&& ok "the app logged the failure" || bad "the app logged nothing about the failure"
+	# Put the address back, so a later section or run finds the mailbox setup.sh chose.
+	occ user:setting admin settings email "$address" >/dev/null
+	is "the address was restored" "$(occ user:setting admin settings email)" "$address"
 }
 
 # Which server versions? Default: both ends of the declared range, because that is
@@ -474,8 +514,7 @@ for tag in "${TAGS[@]}"; do
 	# following CI step — cannot work: the teardown below has already removed them.
 	if [ "$fail" -gt "$before" ]; then
 		echo "-- server log (last 40 lines, this instance failed)"
-		docker compose exec -T nextcloud sh -c 'tail -n 40 /var/www/html/data/nextcloud.log' \
-			2>/dev/null | cut -c1-200 | sed 's/^/     /' || echo "     (log not readable)"
+		server_log | tail -n 40 | cut -c1-200 | sed 's/^/     /' || echo "     (log not readable)"
 		echo "-- container log (last 20 lines)"
 		docker compose logs --tail 20 nextcloud 2>/dev/null | sed 's/^/     /'
 	fi
