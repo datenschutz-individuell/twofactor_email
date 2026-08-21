@@ -31,6 +31,7 @@ final class EMailSenderTest extends TestCase {
 	private IURLGenerator&MockObject $urlGenerator;
 	private IAppSettings&MockObject $appSettings;
 	private IEMailTemplate&MockObject $template;
+	private LoggerInterface&MockObject $logger;
 
 	private EMailSender $sender;
 
@@ -45,6 +46,7 @@ final class EMailSenderTest extends TestCase {
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->appSettings = $this->createMock(IAppSettings::class);
 		$this->template = $this->createMock(IEMailTemplate::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
 
 		$this->defaults->method('getName')->willReturn('Example Cloud');
 		$this->appSettings->method('getCodeValidMinutes')->willReturn(10);
@@ -53,7 +55,7 @@ final class EMailSenderTest extends TestCase {
 		// the full rendering pipeline. The localized default texts come from
 		// the mocked IAppSettings (their real content is tested in AppSettingsTest).
 		$this->sender = new EMailSender(
-			$this->createMock(LoggerInterface::class),
+			$this->logger,
 			$this->mailer,
 			$this->appSettings,
 			new TemplateRenderer($this->defaults, $this->urlGenerator, $this->appSettings),
@@ -73,10 +75,16 @@ final class EMailSenderTest extends TestCase {
 	/**
 	 * @throws Exception
 	 */
-	private function expectMailWithTemplate(): void {
-		$message = $this->createMock(IMessage::class);
+	private function mockMailer(): void {
 		$this->mailer->method('createEMailTemplate')->willReturn($this->template);
-		$this->mailer->method('createMessage')->willReturn($message);
+		$this->mailer->method('createMessage')->willReturn($this->createMock(IMessage::class));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function expectMailWithTemplate(): void {
+		$this->mockMailer();
 		$this->mailer->expects($this->once())->method('send');
 	}
 
@@ -174,5 +182,47 @@ final class EMailSenderTest extends TestCase {
 				'Use >>> 123456 <<< on Example Cloud within 10 minutes.',
 			],
 		], $bodyTexts);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function mockSendableMail(): void {
+		$this->mockMailer();
+		$this->appSettings->method('getEMailSubject')->willReturn('Code {code}');
+		$this->appSettings->method('getEMailTemplate')->willReturn('Use {code}.');
+	}
+
+	/**
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testReportsAFailureWhenTheMailerThrows(): void {
+		$this->mockSendableMail();
+		$this->mailer->method('send')->willThrowException(new \RuntimeException('smtp is down'));
+		$this->logger->expects($this->once())->method('error');
+
+		$this->expectException(SendEMailFailed::class);
+
+		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
+	}
+
+	/**
+	 * A refused recipient comes back as a return value, not as an exception.
+	 *
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testReportsAFailureWhenTheMailerRefusesTheRecipient(): void {
+		$this->mockSendableMail();
+		$this->mailer->method('send')->willReturn(['jane@example.com']);
+		// The refused address must not reach the log
+		$this->logger->expects($this->once())
+			->method('error')
+			->with($this->logicalNot($this->stringContains('jane@example.com')));
+
+		$this->expectException(SendEMailFailed::class);
+
+		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 	}
 }

@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Require the second factor for the admin settings routes while an admin is still being set up
 
+### Fixed
+
+- A code was reported as sent when the mail server refused the address (#202)
+
 ## 3.4.2 (2026-08-11)
 
 ### Security
