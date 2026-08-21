@@ -181,6 +181,22 @@ class LoginChallengeTest extends TestCase {
 	}
 
 	/**
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testSendChallengeStoresNoCodeWhenSendingFails(): void {
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->with('alice')->willReturn(null);
+		$this->codeGenerator->method('generateChallengeCode')->willReturn('123456');
+		$this->emailSender->method('sendChallengeEMail')->willThrowException(new SendEMailFailed());
+		$this->codeStorage->expects($this->never())->method('writeCode');
+
+		$this->expectException(SendEMailFailed::class);
+
+		$this->challenge->sendChallenge($user);
+	}
+
+	/**
 	 * @throws SendEMailFailed
 	 * @throws EMailNotSet
 	 * @throws Exception

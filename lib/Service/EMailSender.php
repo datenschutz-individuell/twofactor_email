@@ -52,10 +52,19 @@ final class EMailSender implements IEMailSender {
 		$message->useTemplate($template);
 
 		try {
-			$this->mailer->send($message);
+			$failedRecipients = $this->mailer->send($message);
 		} catch (Exception $e) {
 			$this->logger->error('failed sending email message to user ' . $user->getUID() . '.', ['exception' => $e]);
 			throw new SendEMailFailed(previous: $e);
+		}
+
+		// Nextcloud does not throw when it cannot deliver: it catches the transport error
+		// and returns the addresses it refused. Without this check the app would store
+		// the code and report it as sent while nothing went out.
+		if ($failedRecipients !== []) {
+			// Deliberately without the address (data minimization)
+			$this->logger->error('failed sending email message to user ' . $user->getUID() . ': the mailer refused the recipient.');
+			throw new SendEMailFailed('The mailer refused the recipient address');
 		}
 	}
 }
