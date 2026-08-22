@@ -131,7 +131,13 @@ treating them as background noise, and re-check whether the existing pins and
   `npm install-scripts deny fsevents` cannot recreate it here (`ENOMATCH`).
 - **`@nextcloud/vite-config` is pinned to a pre-release.** Only that version allows
   Vite 8; the stable line is still on Vite 7. **This one expires:** switch as soon as a
-  stable release supports Vite 8, and treat the pin as a finding from then on.
+  stable release supports Vite 8, and treat the pin as a finding from then on. Two
+  things ride along with it and were accepted deliberately. It pulls the `yuku-*`
+  parser family, young and single-maintainer, through `rolldown-plugin-dts` — dev-only,
+  no install script, and only `libConfig` ever imports the plugin, so an app built
+  through `createAppConfig` never loads it. And its chunk splitting is overridden in
+  `vite.config.js`, which keeps the login challenge off the settings bundle; that file
+  says when to compare the groups against upstream again.
 
 ## Releasing
 
