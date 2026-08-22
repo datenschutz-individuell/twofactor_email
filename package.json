@@ -57,8 +57,8 @@
     "@nextcloud/password-confirmation": "^6.1.0",
     "@nextcloud/router": "^3.1.0",
     "@nextcloud/vue": "^9.9.0",
-    "pinia": "^4.0.2",
-    "vue": "^3.5.40"
+    "pinia": "^4.0.3",
+    "vue": "^3.5.41"
   },
   "browserslist": [
     "extends @nextcloud/browserslist-config"
@@ -78,11 +78,11 @@
     "@nextcloud/typings": "^1.10.0",
     "@nextcloud/vite-config": "^2.5.4",
     "@vitejs/plugin-vue": "^6.0.8",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.11",
     "@vue/test-utils": "^2.4.11",
-    "eslint": "^10.7.0",
-    "happy-dom": "^20.11.0",
-    "vite": "^7.1.9",
-    "vitest": "^4.1.10"
+    "eslint": "^10.9.0",
+    "happy-dom": "^20.11.6",
+    "vite": "^7.3.6",
+    "vitest": "^4.1.11"
   }
 }
