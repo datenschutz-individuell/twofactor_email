@@ -33,6 +33,7 @@ OC.L10N.register(
     "Subject" : "Betreff",
     "Body" : "Inhalt",
     "Reset all Two-Factor email app-wide admin settings to their defaults" : "Alle App-weiten Administrations-Einstellungen für die Zwei-Faktor-E-Mail auf die Standardwerte zurücksetzen",
+    "Could not reset the settings. Reload the page to see their current state." : "Die Einstellungen konnten nicht zurückgesetzt werden. Die Seite neuladen, um den aktuellen Status anzuzeigen.",
     "No email address available, please contact your administrator." : "Keine E-Mail-Adresse hinterlegt, kontaktiere deine Administration.",
     "Could not enable/disable two-factor authentication via email." : "Die Zwei-Faktor-Authentifizierung via E-Mail konnte nicht aktiviert/deaktiviert werden.",
     "Unhandled error!" : "Unbehandelter Fehler",
