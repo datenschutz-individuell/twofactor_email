@@ -33,6 +33,7 @@ OC.L10N.register(
     "Subject" : "Ábhar",
     "Body" : "Corp",
     "Reset all Two-Factor email app-wide admin settings to their defaults" : "Athshocraigh gach socrú riarthóra ar fud an aip ríomhphoist Dhá Fhachtóir chuig a réamhshocruithe",
+    "Could not reset the settings. Reload the page to see their current state." : "Níorbh fhéidir na socruithe a athshocrú. Athlódáil an leathanach chun a staid reatha a fheiceáil.",
     "No email address available, please contact your administrator." : "Níl aon seoladh ríomhphoist ar fáil, déan teagmháil le do riarthóir le do thoil.",
     "Could not enable/disable two-factor authentication via email." : "Níorbh fhéidir fíordheimhniú dhá fhachtóir a chumasú/a dhíchumasú trí ríomhphost.",
     "Unhandled error!" : "Earráid neamhláimhseáilte!",

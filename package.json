@@ -57,7 +57,7 @@
     "@nextcloud/password-confirmation": "^6.1.0",
     "@nextcloud/router": "^3.1.0",
     "@nextcloud/vue": "^9.9.0",
-    "pinia": "^4.0.2",
+    "pinia": "^4.0.3",
     "vue": "^3.5.41"
   },
   "browserslist": [
@@ -67,7 +67,6 @@
     "node": "^24.0.0 || ^26.0.0"
   },
   "overrides": {
-    "brace-expansion": "^5.0.9",
     "glob": "^13"
   },
   "devDependencies": {
@@ -76,14 +75,14 @@
     "@nextcloud/eslint-config": "^9.0.1",
     "@nextcloud/stylelint-config": "^3.2.2",
     "@nextcloud/typings": "^1.10.0",
-    "@nextcloud/vite-config": "3.0.0-beta.0",
+    "@nextcloud/vite-config": "3.0.0-beta.1",
     "@vitejs/plugin-vue": "^6.0.8",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.11",
     "@vue/test-utils": "^2.4.11",
-    "eslint": "^10.8.1",
-    "happy-dom": "^20.11.2",
-    "vite": "^8.2.1",
-    "vitest": "^4.1.10"
+    "eslint": "^10.9.0",
+    "happy-dom": "^20.11.6",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
   },
   "allowScripts": {
     "@parcel/watcher": false,

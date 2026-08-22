@@ -31,6 +31,7 @@
     "Subject" : "主旨",
     "Body" : "內文",
     "Reset all Two-Factor email app-wide admin settings to their defaults" : "將所有兩階段驗證電子郵件的應用程式層級管理設定重設為預設值",
+    "Could not reset the settings. Reload the page to see their current state." : "無法重設設定。重新載入頁面以檢視目前狀態。",
     "No email address available, please contact your administrator." : "沒有電子郵件地址，請聯絡您的系統管理員。",
     "Could not enable/disable two-factor authentication via email." : "無法透過電子郵件啟用或停用兩階段驗證。",
     "Unhandled error!" : "發生無法處理的錯誤！",
