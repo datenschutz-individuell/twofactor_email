@@ -14,6 +14,7 @@ use OCA\TwoFactorEMail\Controller\ChallengeController;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\ResendTooSoon;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
+use OCA\TwoFactorEMail\Exception\SendRateLimited;
 use OCA\TwoFactorEMail\Service\ILoginChallenge;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\AppFramework\Http;
@@ -131,5 +132,24 @@ final class ChallengeControllerTest extends TestCase {
 
 		$this->assertEquals(Http::STATUS_INTERNAL_SERVER_ERROR, $response->getStatus());
 		$this->assertEquals(['error' => 'send-failed'], $response->getData());
+		$this->assertTrue($response->isThrottled());
+	}
+
+	/**
+	 * A capped send is a decision of the app, not a failure of the mail server and
+	 * not a suspicious request, so it is answered like the cooldown but without the
+	 * brute-force strike that a real attempt earns.
+	 *
+	 * @throws Exception
+	 */
+	public function testResendReportsTheSendCapAsTooManyRequests(): void {
+		$this->withEnabledUser();
+		$this->challenge->method('resendChallenge')->willThrowException(new SendRateLimited(300));
+
+		$response = $this->controller->resend();
+
+		$this->assertEquals(Http::STATUS_TOO_MANY_REQUESTS, $response->getStatus());
+		$this->assertEquals(['error' => 'too-soon', 'retryAfter' => 300], $response->getData());
+		$this->assertFalse($response->isThrottled());
 	}
 }

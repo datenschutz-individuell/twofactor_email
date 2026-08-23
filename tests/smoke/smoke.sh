@@ -313,14 +313,22 @@ run_checks() {
 	# above — and last of all, because it ends logged out: there is no form to submit.
 	echo "-- a recipient the mailer refuses"
 	rm -f "$TMP/jar"
-	local rtok mails_before address
+	local rtok mails_before address primary
 	# A code still stored would be reused instead of a new one being sent, and then there
 	# would be no send left to fail.
 	occ twofactor_email:delete-codes admin >/dev/null
 	# occ writes its errors to stdout here, so an unset address would come back as a
 	# sentence — and be written back as the address at the end of the section.
-	address=$(occ user:setting admin settings email)
+	address=$(occ user:setting admin settings email | tr -d ' \r')
 	case $address in *@*) ;; *) address=admin@example.org ;; esac
+	# The app is given whichever address the account resolves to, and that is
+	# primary_email whenever one is set. On an instance that has one, the code would
+	# be mailed normally and every check below would read as a regression.
+	# --default-value is what keeps an unset key from returning a sentence.
+	primary=$(occ user:setting admin settings primary_email --default-value= | tr -d ' \r')
+	if [ -n "$primary" ]; then
+		occ user:setting --delete admin settings primary_email >/dev/null
+	fi
 	occ user:setting admin settings email no-at-sign >/dev/null
 	mails_before=$(mail_count)
 	rtok=$(page_token "$BASE/login")
@@ -340,9 +348,32 @@ run_checks() {
 	server_log >"$TMP/nclog"
 	grep -qF 'Failed to send 2FA challenge email due to a mailer error' "$TMP/nclog" \
 		&& ok "the app logged the failure" || bad "the app logged nothing about the failure"
+
+	# A send that fails stores no code, and the challenge page has no rate limit of its
+	# own, so every reload would open another connection to the mail server. The app
+	# caps that at ten in five minutes through Nextcloud's limiter, and a whole run
+	# stays inside that window: the sections above spend at most three of the ten, so
+	# twelve reloads reach the cap, and then the log has to show the app refusing by
+	# itself instead of another mailer error.
+	echo "-- the reload cap"
+	local i
+	for i in $(seq 12); do
+		curl -s -b "$TMP/jar" -c "$TMP/jar" -o "$TMP/refused.html" "$BASE/login/challenge/email"
+	done
+	grep -q 'could not be sent' "$TMP/refused.html" \
+		&& ok "a capped reload still reports the failure" \
+		|| bad "a capped reload does not report the failure"
+	server_log >"$TMP/nclog"
+	grep -qF 'the account reached the send rate limit' "$TMP/nclog" \
+		&& ok "the cap stopped further attempts" \
+		|| bad "reloading the challenge page kept asking the mail server"
+	is "still nothing was mailed" "$(mail_count)" "$mails_before"
 	# Put the address back, so a later section or run finds the mailbox setup.sh chose.
 	occ user:setting admin settings email "$address" >/dev/null
-	is "the address was restored" "$(occ user:setting admin settings email)" "$address"
+	if [ -n "$primary" ]; then
+		occ user:setting admin settings primary_email "$primary" >/dev/null
+	fi
+	is "the address was restored" "$(occ user:setting admin settings email | tr -d ' \r')" "$address"
 }
 
 # Which server versions? Default: both ends of the declared range, because that is

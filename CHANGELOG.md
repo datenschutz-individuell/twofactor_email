@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A code was reported as sent when the mail server refused the address (#202)
+- Reloading the challenge page no longer retries a failing mail server without limit
 
 ## 3.4.2 (2026-08-11)
 

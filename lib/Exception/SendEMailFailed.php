@@ -11,5 +11,9 @@ namespace OCA\TwoFactorEMail\Exception;
 
 use Exception;
 
-final class SendEMailFailed extends Exception {
+/**
+ * Not final: SendRateLimited is the one case that needs to be told apart while
+ * still being treated as a failed send everywhere a code was expected.
+ */
+class SendEMailFailed extends Exception {
 }
