@@ -154,10 +154,10 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
 
 - **`{logo}` inside a web address is allowed.** It expands to an image tag or to
   nothing and never inserts a value, so it hands no data to whoever owns the address.
-  Only the placeholders in `LinkScanner::VALUE_PLACEHOLDERS` are refused there, and
-  the renderer builds its values by walking that list, so a placeholder cannot be
-  substituted without the settings checks knowing it — psalm reports the incomplete
-  match instead of a test comparing two lists.
+  Only the placeholders in `TemplateRenderer::VALUE_PLACEHOLDERS` are refused there.
+  The list belongs to the renderer, which builds its values by walking it, so a
+  placeholder cannot be substituted without the settings checks knowing it — psalm
+  reports the incomplete match instead of a test comparing two lists.
 
 - **The fallback to the default text is not checked again before sending.** The
   default keeps `{code}` in a paragraph of its own, outside every translatable

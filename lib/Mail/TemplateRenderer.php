@@ -42,6 +42,15 @@ final readonly class TemplateRenderer {
 	// getting it wrong here costs a link, not a code.
 	private const URL_PATTERN = '~https?://[^\s<>"]+~i';
 
+	/**
+	 * The placeholders that insert a value, and therefore the ones that must not sit
+	 * inside a web address — LinkScanner refuses them there. placeholderValues() walks
+	 * this list, so a placeholder cannot be substituted without that check knowing it:
+	 * adding an entry here leaves the match expression there incomplete, which psalm
+	 * reports.
+	 */
+	public const VALUE_PLACEHOLDERS = ['{code}', '{user}', '{cloud}', '{validity}'];
+
 	// The placeholders that insert no text. {logo} becomes an image in the HTML
 	// variant and disappears everywhere else — in the subject, in the plain text and
 	// inside a web address alike, so both parts of a mail carry the same address.
@@ -104,15 +113,14 @@ final readonly class TemplateRenderer {
 	}
 
 	/**
-	 * The value of every placeholder that inserts one. Built by walking the list the
-	 * settings checks work from, so a placeholder cannot be substituted without those
-	 * checks knowing it: adding one there leaves this match incomplete.
+	 * The value of every placeholder that inserts one. Built by walking
+	 * VALUE_PLACEHOLDERS, so adding an entry there leaves this match incomplete.
 	 *
 	 * @return array<string, string> placeholder => replacement value
 	 */
 	private function placeholderValues(IUser $user, string $code): array {
 		$values = [];
-		foreach (LinkScanner::VALUE_PLACEHOLDERS as $placeholder) {
+		foreach (self::VALUE_PLACEHOLDERS as $placeholder) {
 			$values[$placeholder] = match ($placeholder) {
 				'{code}' => $code,
 				'{user}' => $user->getDisplayName(),

@@ -26,18 +26,11 @@ namespace OCA\TwoFactorEMail\Mail;
 final class LinkScanner {
 
 	/**
-	 * The placeholders that insert a value, and therefore the ones that must not sit
-	 * inside a web address: {logo} expands to an image tag or to nothing, so it hands
-	 * no data to whoever owns the address. TemplateRenderer builds its values by
-	 * walking this list, so the two cannot drift apart — adding an entry here leaves
-	 * a match expression there incomplete, which psalm reports.
-	 */
-	public const VALUE_PLACEHOLDERS = ['{code}', '{user}', '{cloud}', '{validity}'];
-
-	/**
-	 * Whether any web address in the text contains a placeholder. Such a text renders
-	 * a value into a link, so the mail would go out with the default text instead —
-	 * SettingsValidator tells the admin before it comes to that.
+	 * Whether any web address in the text contains a placeholder that inserts a value.
+	 * Such a text renders a value into a link, so the mail would go out with the
+	 * default text instead — SettingsValidator tells the admin before it comes to that.
+	 * {logo} is not on the list: it expands to an image tag or to nothing and hands no
+	 * data to whoever owns the address.
 	 *
 	 * Reads an address the same way couldLeakCode() does, through the same function,
 	 * and must keep doing so: anything the send-side check would stop has to be
@@ -46,7 +39,7 @@ final class LinkScanner {
 	 */
 	public static function hasPlaceholderInUrl(string $text): bool {
 		foreach (self::linkableRuns($text) as $run) {
-			foreach (self::VALUE_PLACEHOLDERS as $placeholder) {
+			foreach (TemplateRenderer::VALUE_PLACEHOLDERS as $placeholder) {
 				if (str_contains($run, $placeholder)) {
 					return true;
 				}
