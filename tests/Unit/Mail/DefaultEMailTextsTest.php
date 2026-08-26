@@ -14,11 +14,12 @@ use OCA\TwoFactorEMail\Mail\TemplateRenderer;
 use OCA\TwoFactorEMail\Service\AppSettings;
 use OCA\TwoFactorEMail\Service\WarnOnce;
 use OCA\TwoFactorEMail\Test\Support\ServerL10N;
+use OCA\TwoFactorEMail\Test\Support\ShippedTranslations;
 use OCP\Defaults;
 use OCP\IAppConfig;
 use OCP\IURLGenerator;
 use OCP\IUser;
-use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -43,7 +44,7 @@ final class DefaultEMailTextsTest extends TestCase {
 	/**
 	 * @throws Exception
 	 */
-	#[DataProvider('languages')]
+	#[DataProviderExternal(ShippedTranslations::class, 'languages')]
 	public function testTheDefaultTextsKeepTheCodeOutOfEveryWebAddress(string $language): void {
 		$appSettings = $this->appSettings($language);
 		$body = $appSettings->getDefaultEMailBody();
@@ -82,7 +83,7 @@ final class DefaultEMailTextsTest extends TestCase {
 	 * @throws Exception
 	 */
 	public function testTheShippedTranslationsAreApplied(): void {
-		$this->assertGreaterThan(1, count(self::languages()), 'No translation file was found');
+		$this->assertGreaterThan(1, count(ShippedTranslations::languages()), 'No translation file was found');
 		$this->assertNotSame(
 			$this->appSettings('en')->getDefaultEMailBody(),
 			$this->appSettings('de')->getDefaultEMailBody(),
@@ -91,27 +92,12 @@ final class DefaultEMailTextsTest extends TestCase {
 	}
 
 	/**
-	 * Every shipped translation, plus the untranslated English source. Only the
-	 * language, so a failure names it instead of dumping every translated string.
-	 *
-	 * @return array<string, array{string}>
-	 */
-	public static function languages(): array {
-		$cases = ['en' => ['en']];
-		foreach (glob(dirname(__DIR__, 3) . '/l10n/*.json') ?: [] as $file) {
-			$language = basename($file, '.json');
-			$cases[$language] = [$language];
-		}
-		return $cases;
-	}
-
-	/**
 	 * @throws Exception
 	 */
 	private function appSettings(string $language): AppSettings {
 		return new AppSettings(
 			$this->createMock(IAppConfig::class),
-			new ServerL10N(self::translations($language)),
+			new ServerL10N(ShippedTranslations::of($language)),
 			new WarnOnce($this->createMock(LoggerInterface::class)),
 		);
 	}
@@ -128,18 +114,5 @@ final class DefaultEMailTextsTest extends TestCase {
 		$urlGenerator->method('getAbsoluteURL')->willReturn('https://cloud.example/themes/logo.png');
 
 		return new TemplateRenderer($defaults, $urlGenerator, $appSettings);
-	}
-
-	/**
-	 * @return array<string, string> source string => translation; empty for English
-	 */
-	private static function translations(string $language): array {
-		if ($language === 'en') {
-			return [];
-		}
-		$file = dirname(__DIR__, 3) . '/l10n/' . $language . '.json';
-		$contents = json_decode((string)file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
-		// Plural forms are arrays; the default texts use none of them
-		return array_filter($contents['translations'] ?? [], is_string(...));
 	}
 }
