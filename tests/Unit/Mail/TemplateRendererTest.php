@@ -21,6 +21,12 @@ use PHPUnit\Framework\TestCase;
 final class TemplateRendererTest extends TestCase {
 	private const STRONG = '<strong style="font-family:monospace">%s</strong>';
 
+	private Defaults&MockObject $defaults;
+
+	private IURLGenerator&MockObject $urlGenerator;
+
+	private IAppSettings&MockObject $appSettings;
+
 	private IUser&MockObject $user;
 
 	private TemplateRenderer $renderer;
@@ -31,22 +37,22 @@ final class TemplateRendererTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$defaults = $this->createMock(Defaults::class);
-		$defaults->method('getName')->willReturn('Example Cloud');
-		$defaults->method('getLogo')->with(false)->willReturn('/themes/logo.png');
+		$this->defaults = $this->createMock(Defaults::class);
+		$this->defaults->method('getName')->willReturn('Example Cloud');
+		$this->defaults->method('getLogo')->with(false)->willReturn('/themes/logo.png');
 
-		$urlGenerator = $this->createMock(IURLGenerator::class);
-		$urlGenerator->method('getAbsoluteURL')
+		$this->urlGenerator = $this->createMock(IURLGenerator::class);
+		$this->urlGenerator->method('getAbsoluteURL')
 			->with('/themes/logo.png')
 			->willReturn('https://cloud.example/themes/logo.png');
 
-		$appSettings = $this->createMock(IAppSettings::class);
-		$appSettings->method('getCodeValidMinutes')->willReturn(10);
+		$this->appSettings = $this->createMock(IAppSettings::class);
+		$this->appSettings->method('getCodeValidMinutes')->willReturn(10);
 
 		$this->user = $this->createMock(IUser::class);
 		$this->user->method('getDisplayName')->willReturn('Jane Doe');
 
-		$this->renderer = new TemplateRenderer($defaults, $urlGenerator, $appSettings);
+		$this->renderer = new TemplateRenderer($this->defaults, $this->urlGenerator, $this->appSettings);
 	}
 
 	private function strong(string $value): string {
@@ -101,6 +107,43 @@ final class TemplateRendererTest extends TestCase {
 		));
 	}
 
+	/** The pattern runs to the next whitespace, so a quoted URL must not keep the quote. */
+	public function testBodyDoesNotLinkTrailingQuotesOrBrackets(): void {
+		$rendered = $this->renderer->renderBody(
+			'Reset it at "https://cloud.example/reset" or see <https://cloud.example/help>.',
+			$this->user,
+			'123456',
+		);
+
+		$this->assertStringContainsString('href="https://cloud.example/reset"', $rendered[1][0]);
+		$this->assertStringContainsString('href="https://cloud.example/help"', $rendered[1][0]);
+	}
+
+	/**
+	 * The instance name is inserted, and inserted values must not smuggle in
+	 * placeholders — also inside the logo's alt attribute.
+	 *
+	 * @throws Exception
+	 */
+	public function testAPlaceholderInTheInstanceNameStaysLiteralInTheLogoAltText(): void {
+		$defaults = $this->createMock(Defaults::class);
+		$defaults->method('getName')->willReturn('{user} Cloud');
+		$defaults->method('getLogo')->with(false)->willReturn('/themes/logo.png');
+		$renderer = new TemplateRenderer($defaults, $this->urlGenerator, $this->appSettings);
+
+		$rendered = $renderer->renderBody('{logo}', $this->user, '123456');
+
+		$this->assertStringContainsString('alt="{user} Cloud"', $rendered[1][0]);
+		$this->assertStringNotContainsString('Jane', $rendered[1][0]);
+	}
+
+	/** A lone CR breaks the line like CRLF and LF, as the subject already treats it. */
+	public function testBodyTurnsALoneCarriageReturnIntoALineBreak(): void {
+		$rendered = $this->renderer->renderBody("line1\rline2", $this->user, '123456');
+
+		$this->assertSame('line1<br>line2', $rendered[1][0]);
+	}
+
 	public function testBodyAutoLinksUrls(): void {
 		$this->assertSame([
 			['&nbsp;', false],
@@ -129,6 +172,42 @@ final class TemplateRendererTest extends TestCase {
 				'<b>Hi</b> & Co',
 			],
 		], $this->renderer->renderBody('<b>Hi</b> & Co', $this->user, '123456'));
+	}
+
+	/** {logo} has no text form, so the subject drops it like the plain text does. */
+	public function testSubjectDropsTheLogoToken(): void {
+		$this->assertSame(
+			'Code for Jane Doe',
+			$this->renderer->renderSubject('Code {logo}for {user}', $this->user, '123456'),
+		);
+	}
+
+	/**
+	 * A placeholder in a web address is substituted like any other — bare, so no
+	 * markup reaches the attribute. Whether the result may be sent is decided once,
+	 * on the finished mail, by EMailSender.
+	 */
+	public function testBodySubstitutesInsideAUrlAndInsertsTheValueBare(): void {
+		$rendered = $this->renderer->renderBody('See https://cloud.example/u/{user} please.', $this->user, '123456');
+
+		$this->assertStringContainsString('href="https://cloud.example/u/Jane Doe"', $rendered[1][0]);
+	}
+
+	/**
+	 * The settings checks accept {logo} inside a web address because it inserts no
+	 * value. It must then drop out of the address in every part of the mail, or the
+	 * HTML link and the plain text would point at different places.
+	 */
+	public function testBodyDropsTheLogoTokenInsideAUrl(): void {
+		$rendered = $this->renderer->renderBody('Code {code} at https://cloud.example/{logo}', $this->user, '123456');
+
+		$this->assertSame([
+			['&nbsp;', false],
+			[
+				'Code ' . $this->strong('123456') . ' at <a href="https://cloud.example/">https://cloud.example/</a>',
+				'Code >>> 123456 <<< at https://cloud.example/',
+			],
+		], $rendered);
 	}
 
 	public function testBodyRendersTheLogoTokenInHtmlOnly(): void {

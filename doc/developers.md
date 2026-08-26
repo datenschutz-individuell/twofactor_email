@@ -6,7 +6,7 @@ The app plugs into Nextcloud's [two-factor provider framework](https://docs.next
 
 - Set up a local dev environment with Docker: see [development-setup.md](development-setup.md).
 - Build the release package with `krankerl package`, or follow the manual steps in the README's [Building yourself](../README.md#building-yourself).
-- **PHP:** PHPUnit for the services, php-cs-fixer for style, and Psalm (including taint analysis) for static analysis. Psalm runs on the app's minimum PHP version, not on newer runtimes it does not yet support.
+- **PHP:** PHPUnit for the services, php-cs-fixer for style, and Psalm (including taint analysis) for static analysis, which *analyses* against the app's minimum PHP version — see below.
 - **Frontend:** Vitest for the logic and components, plus ESLint and Stylelint; `npm run build` produces the bundle.
 
 ## Contributing
@@ -35,13 +35,15 @@ only show up in a running Nextcloud — see [development-setup.md](development-s
 
 ## Security mechanisms
 
+What these mechanisms promise, and against whom, is bounded by the [threat model](threat-model.md): input through an interface is checked; write access to the instance's files or database is not something they can defend against.
+
 - **Code generation.** `NumericalCodeGenerator` uses `OCP\Security\ISecureRandom` (a CSPRNG) with `CHAR_DIGITS` and the configured length. No `rand()`/`mt_rand()`.
 - **Storage at rest.** `CodeStorage` stores `IHasher::hash($code)` — never the plaintext — in the user's config, plus a creation timestamp. The value is flagged `IUserConfig::FLAG_SENSITIVE`, so it is masked in `occ config:list` and in system/support reports.
 - **Verification.** `IHasher::verify()` is constant-time. The code is deleted only on **successful** verification (so a mistyped code can be retried); wrong tries are absorbed by Nextcloud's brute-force protection.
 - **Issuance policy.** A new code is issued only when no valid code is stored, which stops login-page reloads from flooding the mailbox. The new hash is persisted **only after** the email was sent successfully, so a failed delivery leaves the previous code valid.
 - **Resend throttling.** `ChallengeController::resend()` carries `#[NoAdminRequired]`, `#[NoTwoFactorRequired]`, `#[UserRateLimit(limit: 1, period: 60)]` and `#[BruteForceProtection]`, on top of the app-level resend cooldown (`ResendTooSoon`). See Nextcloud's [rate limiting](https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/security.html#rate-limiting) docs.
 - **Sensitive-action confirmation & CSRF.** `StateController::save()` (enable/disable) carries `#[PasswordConfirmationRequired]`. All controllers are session-authenticated Nextcloud controllers subject to its CSRF protection.
-- **Email content safety (`TemplateRenderer`).** Everything is HTML-escaped (`htmlspecialchars`); raw HTML is impossible. Placeholders (`{code}`, `{user}`, `{cloud}`, `{validity}`, `{logo}`) and detected URLs are escaped individually, and inserted values (e.g. a display name) cannot smuggle in placeholders. The **subject** has CR/LF stripped as defense-in-depth against header injection.
+- **Email content safety.** Everything is HTML-escaped (`htmlspecialchars`); raw HTML is impossible. Placeholders (`{code}`, `{user}`, `{cloud}`, `{validity}`, `{logo}`) and detected URLs are escaped individually, values are inserted in a single pass so an inserted value cannot smuggle in a placeholder, and inside a URL the values are inserted bare so no markup reaches an attribute. Whether the one-time code may leave the system is decided **once, on the finished mail**: `EMailSender` asks `LinkScanner::couldLeakCode()` whether the code ended up in something a link scanner would fetch — including an address that a display name built around it, which no check on the template could see. If so the mail is sent with the localized default text instead, which keeps `{code}` in a paragraph of its own where no inserted value can reach it — `DefaultEMailTextsTest` renders it in every translated language to keep that true. That last check asks about the **one-time code**; any other value in a web address is refused when the text is written, and an already stored one is reported on upgrade, but it is not stopped again at send time. `SettingsValidator` still refuses such a template when it is written, so the admin hears about it early, but the guarantee does not depend on it. The **subject** has CR/LF stripped as defense-in-depth against header injection.
 - **Input validation.** `SettingsValidator` enforces numeric ranges and string limits for every admin setting and is the single validation path shared by the web controller and the `occ` command.
 
 ## Assurance

@@ -119,6 +119,61 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
 - **Test doubles that look over-specific.** Assertions on exact mock calls are
   deliberate here; the unit tests are meant to pin behaviour, not to be flexible.
 
+- **Precision where a mistake is cosmetic, caution where it is fatal.** URL detection
+  in `TemplateRenderer` serves the auto-linking, where getting a boundary wrong costs
+  a link. It is deliberately **not** the security boundary: where a URL ends in free
+  text is not decidable, and every mail client answers it differently. The one check
+  that decides whether the code may be sent runs on the **finished** mail
+  (`LinkScanner::couldLeakCode()`), is cruder than everything before it, and cannot
+  fail. When in doubt it says yes, because sending the default text for one mail
+  without need is better than letting one code slip through.
+  Making the template checks carry that job produced eleven review rounds of boundary
+  bugs (2026-08-06); do not move it back. `hasPlaceholderInUrl()` and
+  `couldLeakCode()` read a text into addresses through the **same** function, and
+  must keep doing so: if the write-side check were the narrower one, an admin could
+  save a text that is then never sent.
+  `LinkScanner` is where both live, so neither the renderer nor the validator depends
+  on the other (2026-08-26).
+
+- **The check on the finished mail asks about the one-time code, nothing else.** It is
+  the last stop before sending, and it exists for the secret that logging in depends
+  on. Any other value in a web address — a display name in a tracking link, say — is
+  refused when the text is written and reported on upgrade, but it is not stopped
+  again at send time: it is not a secret, and replacing the admin's whole text over a
+  privacy nuisance they can fix themselves is the worse trade. `doc/developers.md`
+  states the limit. Decided 2026-08-06; widening it is a product decision, not a bug.
+
+- **A stored text with a placeholder in a web address saves without a warning in
+  the admin UI.** The save is deliberately not blocked — an instance can carry such
+  a text without anyone having typed it there, and blocking would freeze every other
+  setting. Reporting it *without* blocking needs a second channel next to `errors`
+  in the JSON and a warning state in the field component; that is a UI change with
+  its own cut, not an oversight. Until then the condition is named by `occ upgrade`,
+  by the log on every affected mail, and by the validator as soon as the text is
+  touched. Known since 2026-08-06.
+
+- **`{logo}` inside a web address is allowed.** It expands to an image tag or to
+  nothing and never inserts a value, so it hands no data to whoever owns the address.
+  Only the placeholders in `TemplateRenderer::VALUE_PLACEHOLDERS` are refused there.
+  The list belongs to the renderer, which builds its values by walking it, so a
+  placeholder cannot be substituted without the settings checks knowing it — psalm
+  reports the incomplete match instead of a test comparing two lists.
+
+- **The fallback to the default text is not checked again before sending.** The
+  default keeps `{code}` in a paragraph of its own, outside every translatable
+  string, so neither a translation nor an inserted value can move an address next to
+  it. `DefaultEMailTextsTest` asserts both halves of that for **every** shipped
+  language: that the body still contains `"\n\n{code}\n\n"`, and that rendering it
+  with a display name and an instance name that end in an unfinished web address
+  delivers the code and keeps it out of every address. A run-time check of our own
+  text could only fire if that text were changed in the source, which is where a test
+  belongs (2026-08-26).
+  A **theme** can replace a translated string of ours — a translation file under
+  `themes/` that the server merges over the app's own — and the substitution would
+  then run on that text. That needs write access to the instance, which
+  `doc/threat-model.md` puts out of scope: the same access removes the check. It is
+  not a separate attack path.
+
 ## What "ready" means here
 
 CI green, no new Psalm or taint findings, and — for anything touching routes,

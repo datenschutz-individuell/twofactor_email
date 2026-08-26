@@ -28,13 +28,33 @@ use OCP\IUser;
  *   - {logo} inserts the instance logo; it only appears in the HTML variant
  *   - all placeholders ({code}, {user}, {cloud}, {validity}) render bold
  *     and monospace in the HTML variant; in the plain text variant they are
- *     inserted bare, {code} with ">>> <<<" markers; inside URLs and in the
- *     subject all are inserted bare
+ *     inserted bare, {code} with ">>> <<<" markers; in the subject bare
+ *   - inside a URL the placeholders are inserted bare, so no markup can end
+ *     up in an attribute
  * Everything else is HTML-escaped — raw HTML is not possible.
+ *
+ * Nothing here decides whether the one-time code may leave the system. That is
+ * asked once, of the finished mail, by EMailSender — see LinkScanner.
  */
 final readonly class TemplateRenderer {
 
+	// Detection for linking only. Where an address ends is a matter of taste, and
+	// getting it wrong here costs a link, not a code.
 	private const URL_PATTERN = '~https?://[^\s<>"]+~i';
+
+	/**
+	 * The placeholders that insert a value, and therefore the ones that must not sit
+	 * inside a web address — LinkScanner refuses them there. placeholderValues() walks
+	 * this list, so a placeholder cannot be substituted without that check knowing it:
+	 * adding an entry here leaves the match expression there incomplete, which psalm
+	 * reports.
+	 */
+	public const VALUE_PLACEHOLDERS = ['{code}', '{user}', '{cloud}', '{validity}'];
+
+	// The placeholders that insert no text. {logo} becomes an image in the HTML
+	// variant and disappears everywhere else — in the subject, in the plain text and
+	// inside a web address alike, so both parts of a mail carry the same address.
+	private const WITHOUT_TEXT = ['{logo}' => ''];
 
 	public function __construct(
 		private Defaults $defaults,
@@ -51,7 +71,7 @@ final readonly class TemplateRenderer {
 	 * reach the mailer (header injection, defense in depth).
 	 */
 	public function renderSubject(string $subject, IUser $user, string $code): string {
-		$rendered = strtr($subject, $this->placeholderValues($user, $code));
+		$rendered = strtr($subject, $this->textValues($user, $code));
 		return str_replace(["\r\n", "\r", "\n"], ' ', $rendered);
 	}
 
@@ -65,14 +85,14 @@ final readonly class TemplateRenderer {
 	 *                                           counterpart
 	 */
 	public function renderBody(string $body, IUser $user, string $code): array {
-		$values = $this->placeholderValues($user, $code);
+		$values = $this->textValues($user, $code);
 		// The logo is solely controlled by the {logo} token — there is no
 		// automatic logo header. Without that header the first paragraph would
 		// stick to the top edge (the server's <p> only has a bottom margin),
 		// so an empty paragraph provides the spacing.
 		$rendered = [['&nbsp;', false]];
 		foreach ($this->paragraphs($body) as $paragraph) {
-			$plain = $this->toPlain(str_replace('{logo}', '', $paragraph), $values);
+			$plain = $this->toPlain($paragraph, $values);
 			// An empty plain text (e.g. a logo-only paragraph) must be passed
 			// as false — with '' the server would fall back to escaping the
 			// HTML.
@@ -82,22 +102,40 @@ final readonly class TemplateRenderer {
 	}
 
 	/**
+	 * Every placeholder in the form plain text uses. The subject, the plain body and
+	 * the target of a link all substitute this one map, so no part of a mail can treat
+	 * a placeholder differently from another part.
+	 *
+	 * @return array<string, string> placeholder => replacement text
+	 */
+	private function textValues(IUser $user, string $code): array {
+		return self::WITHOUT_TEXT + $this->placeholderValues($user, $code);
+	}
+
+	/**
+	 * The value of every placeholder that inserts one. Built by walking
+	 * VALUE_PLACEHOLDERS, so adding an entry there leaves this match incomplete.
+	 *
 	 * @return array<string, string> placeholder => replacement value
 	 */
 	private function placeholderValues(IUser $user, string $code): array {
-		return [
-			'{code}' => $code,
-			'{user}' => $user->getDisplayName(),
-			'{cloud}' => $this->defaults->getName(),
-			'{validity}' => (string)$this->appSettings->getCodeValidMinutes(),
-		];
+		$values = [];
+		foreach (self::VALUE_PLACEHOLDERS as $placeholder) {
+			$values[$placeholder] = match ($placeholder) {
+				'{code}' => $code,
+				'{user}' => $user->getDisplayName(),
+				'{cloud}' => $this->defaults->getName(),
+				'{validity}' => (string)$this->appSettings->getCodeValidMinutes(),
+			};
+		}
+		return $values;
 	}
 
 	/**
 	 * @return string[] non-empty paragraphs, split on blank lines
 	 */
 	private function paragraphs(string $text): array {
-		$split = preg_split('/\R\s*\R/u', $text) ?: [];
+		$split = preg_split('/\R\s*\R/u', $text) ?: [$text];
 		return array_values(array_filter(array_map(trim(...), $split), static fn (string $p): bool => $p !== ''));
 	}
 
@@ -115,24 +153,21 @@ final readonly class TemplateRenderer {
 			// Trailing punctuation usually ends the sentence, not the URL
 			$url = rtrim($match[0][0], '.,;:!?)');
 			$result .= $this->literal(substr($paragraph, $offset, $position - $offset), $values);
-			// Inside URLs the placeholders are inserted bare — markup must not
-			// end up in attributes
+			// Inside URLs the placeholders are inserted bare — markup must not end up
+			// in attributes
 			$href = htmlspecialchars(strtr($url, $values));
 			$result .= '<a href="' . $href . '">' . $href . '</a>';
 			$offset = $position + strlen($url);
 		}
 		$result .= $this->literal(substr($paragraph, $offset), $values);
-		return str_replace(["\r\n", "\n"], ['<br>', '<br>'], $result);
+		return str_replace(["\r\n", "\n", "\r"], '<br>', $result);
 	}
 
 	/**
 	 * @param array<string, string> $values placeholder => replacement value
 	 */
 	private function toPlain(string $paragraph, array $values): string {
-		// No styling in plain text — bare values, the code with markers.
-		// strtr() replaces in a single pass, so placeholder-like fragments in
-		// the inserted values (e.g. a display name containing "{code}") stay
-		// as-is.
+		// Single pass, so a "{code}" inside an inserted display name stays as-is
 		return strtr($paragraph, ['{code}' => '>>> ' . $values['{code}'] . ' <<<'] + $values);
 	}
 
@@ -141,23 +176,22 @@ final readonly class TemplateRenderer {
 	 */
 	private function literal(string $text, array $values): string {
 		$html = htmlspecialchars($text);
+		// The placeholder values stand out: bold and monospace in the HTML variant.
+		// The ones without a text form are not values and get their own form below.
+		$styled = [];
+		foreach (array_diff_key($values, self::WITHOUT_TEXT) as $placeholder => $value) {
+			$styled[$placeholder] = '<strong style="font-family:monospace">' . htmlspecialchars($value) . '</strong>';
+		}
 		if (str_contains($html, '{logo}')) {
+			// In the same single pass: strtr never scans a replacement, so a
+			// placeholder inside the instance name (the alt text) stays literal.
 			// Keep the logo small: at most 250px and 20% of the email width.
 			// The doubled max-width is progressive enhancement — clients that
 			// do not understand min() fall back to the plain 250px limit. A
 			// percentage height cap is not enforceable in emails (no sized
 			// parent), so the height is limited to 250px only.
-			$html = str_replace(
-				'{logo}',
-				'<img src="' . htmlspecialchars($this->logoUrl()) . '" alt="' . htmlspecialchars($this->defaults->getName())
-					. '" style="max-width:min(250px, 20%);max-height:250px">',
-				$html,
-			);
-		}
-		// The placeholder values stand out: bold and monospace in the HTML variant
-		$styled = [];
-		foreach ($values as $placeholder => $value) {
-			$styled[$placeholder] = '<strong style="font-family:monospace">' . htmlspecialchars($value) . '</strong>';
+			$styled['{logo}'] = '<img src="' . htmlspecialchars($this->logoUrl()) . '" alt="' . htmlspecialchars($this->defaults->getName())
+				. '" style="max-width:min(250px, 20%);max-height:250px">';
 		}
 		return strtr($html, $styled);
 	}

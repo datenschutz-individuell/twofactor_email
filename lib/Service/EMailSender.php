@@ -13,6 +13,7 @@ use Exception;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCA\TwoFactorEMail\Exception\SendRateLimited;
+use OCA\TwoFactorEMail\Mail\LinkScanner;
 use OCA\TwoFactorEMail\Mail\TemplateRenderer;
 use OCP\IUser;
 use OCP\Mail\IMailer;
@@ -56,9 +57,27 @@ final readonly class EMailSender implements IEMailSender {
 		$subject = $this->appSettings->getEMailSubject() ?: $this->appSettings->getDefaultEMailSubject();
 		$body = $this->appSettings->getEMailTemplate() ?: $this->appSettings->getDefaultEMailBody();
 
+		$renderedSubject = $this->templateRenderer->renderSubject($subject, $user, $code);
+		$parts = $this->templateRenderer->renderBody($body, $user, $code);
+
+		// The last check before the code leaves this system, on the finished text.
+		// Everything before it works on the template, where an inserted value is not
+		// yet visible — a display name can build a web address around the code.
+		if (LinkScanner::couldLeakCode($renderedSubject, $parts, $code)) {
+			$this->logger->warning(
+				'The configured email text would have put the code into a web address. The default text '
+				. 'was used instead. Fix it with occ twofactor_email:settings.',
+			);
+			// The default texts keep the code in a paragraph of its own, where no inserted
+			// value can reach it. DefaultEMailTextsTest renders them in every translated
+			// language, with values that try to build an address around the code.
+			$renderedSubject = $this->templateRenderer->renderSubject($this->appSettings->getDefaultEMailSubject(), $user, $code);
+			$parts = $this->templateRenderer->renderBody($this->appSettings->getDefaultEMailBody(), $user, $code);
+		}
+
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');
-		$template->setSubject($this->templateRenderer->renderSubject($subject, $user, $code));
-		foreach ($this->templateRenderer->renderBody($body, $user, $code) as [$html, $plain]) {
+		$template->setSubject($renderedSubject);
+		foreach ($parts as [$html, $plain]) {
 			$template->addBodyText($html, $plain);
 		}
 		// Standard footer of this Nextcloud instance (theming slogan)
