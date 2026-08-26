@@ -51,8 +51,12 @@ jobs:
         with:
           node-version: ${{ steps.versions.outputs.nodeVersion }}
 
+      # The version comes from a file rather than from this workflow, so it reaches
+      # the shell as data. REVIEW.md says why the pull request workflows differ.
       - name: Set up npm ${{ steps.versions.outputs.npmVersion }}
-        run: npm i -g 'npm@${{ steps.versions.outputs.npmVersion }}'
+        env:
+          NPM_VERSION: ${{ steps.versions.outputs.npmVersion }}
+        run: npm i -g "npm@$NPM_VERSION"
 
       # The lock file is what a release ships, and needs no install to be judged.
       - name: Audit
