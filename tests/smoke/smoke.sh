@@ -81,6 +81,16 @@ body_has() { grep -q -- "$2" "$TMP/body" && ok "$1" || bad "$1: '$2' not in the 
 occ() { docker compose exec -T -u www-data nextcloud php occ --no-ansi "$@" 2>&1; }
 tfa_enabled() { occ twofactorauth:state admin | grep -q '^Two-factor authentication is enabled'; }
 
+# An expired code for one user, without driving a login. The value is not a real
+# hash: nothing reads it back, the cleanup only asks whether one is stored.
+seed_code() {
+	occ user:setting "$1" twofactor_email code 'not-a-real-hash' >/dev/null
+	occ user:setting "$1" twofactor_email code_created_at 0 >/dev/null
+}
+
+# How many of the two keys a stored code consists of are present.
+code_keys() { occ user:setting "$1" twofactor_email | grep -cE '^ +- code(_created_at)?: '; }
+
 # The request token is in every rendered page.
 page_token() { curl -s -b "$TMP/jar" -c "$TMP/jar" "$1" | grep -oP 'data-requesttoken="\K[^"]+' | head -1; }
 
@@ -240,6 +250,32 @@ run_checks() {
 	status=$(post "$BASE/apps/twofactor_email/state/save" "$stok" "state=true")
 	is "state/save switches it on again" "$status" "200"
 	tfa_enabled && ok "registry reports it as enabled" || bad "registry still reports it as off"
+
+	# No HTTP route reaches either command, so nothing else in this run touches them.
+	# The user id is digits only because Nextcloud allows that and PHP then hands the
+	# id back as an int; the unit tests pin that conversion at class level, this pins
+	# the two commands end to end.
+	echo "-- occ cleanup commands"
+	local digits=12345
+	docker compose exec -T -u www-data -e OC_PASS=smoke-pw-12345 nextcloud \
+		php occ --no-ansi user:add --password-from-env "$digits" >"$TMP/adduser" 2>&1
+	grep -q 'created successfully' "$TMP/adduser" \
+		&& ok "a user whose id is digits only exists" \
+		|| bad "creating the user $digits: $(tr '\n' ' ' <"$TMP/adduser")"
+	occ twofactor_email:delete-codes --all >/dev/null
+	seed_code "$digits"
+	is "both keys of the seeded code are stored" "$(code_keys "$digits")" "2"
+	is "cleanup removes the expired code" \
+		"$(occ twofactor_email:cleanup | grep -c 'Removed 1 expired code')" "1"
+	# The display name proves the listing came from a user that exists. Without it,
+	# "no keys left" would also hold for a user that was never created at all.
+	is "the user is still there" \
+		"$(occ user:setting "$digits" twofactor_email | grep -c 'display_name')" "1"
+	is "cleanup leaves no code behind" "$(code_keys "$digits")" "0"
+	seed_code "$digits"
+	is "delete-codes removes the code of that id" \
+		"$(occ twofactor_email:delete-codes "$digits" | grep -c 'Deleted the stored code')" "1"
+	is "delete-codes leaves no code behind" "$(code_keys "$digits")" "0"
 
 	echo "-- assets"
 	local broken=0 count=0 url code_

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * SPDX-FileCopyrightText: 2025 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -80,9 +82,11 @@ final readonly class CodeStorage implements ICodeStorage {
 		$creationTime = $this->config->getValuesByUsers(Application::APP_ID, self::KEY_CREATED_AT, ValueType::INT);
 
 		$count = 0;
+		// A user id of digits only arrives as an int: PHP converts numeric array
+		// keys, and Nextcloud allows such ids.
 		foreach ($creationTime as $userId => $createdAt) {
 			if ($createdAt < $expiresBefore) {
-				$this->deleteCode($userId);
+				$this->deleteCode((string)$userId);
 				$count++;
 			}
 		}
