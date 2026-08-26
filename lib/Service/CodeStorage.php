@@ -49,6 +49,16 @@ final class CodeStorage implements ICodeStorage {
 
 	public function deleteCode(string $userId): bool {
 		$existed = $this->config->getValueString($userId, Application::APP_ID, self::KEY_CODE) !== '';
+		// A timestamp without a code still has to go: deleteExpired() finds users by
+		// their timestamp alone, and would otherwise report a removal that never
+		// happened. Reads are cached, the two deletes below are not, and readCode()
+		// lands here for every user who has no code at all — a missing timestamp
+		// reads as 0, which always counts as expired.
+		$hasTimestamp = $this->config->getValueInt($userId, Application::APP_ID, self::KEY_CREATED_AT) !== 0;
+		if (!$existed && !$hasTimestamp) {
+			return false;
+		}
+
 		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CODE);
 		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CREATED_AT);
 		return $existed;

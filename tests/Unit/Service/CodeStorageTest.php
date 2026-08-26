@@ -64,6 +64,32 @@ class CodeStorageTest extends TestCase {
 		$this->assertFalse($this->storage->deleteCode('alice'));
 	}
 
+	public function testDeleteCodeTouchesNothingWhenNothingIsStored(): void {
+		$this->config->method('getValueString')->willReturn('');
+		$this->config->method('getValueInt')->willReturn(0);
+		$this->config->expects($this->never())->method('deleteUserConfig');
+
+		$this->assertFalse($this->storage->deleteCode('alice'));
+	}
+
+	/**
+	 * readCode() deletes what it finds expired, and a timestamp with no code is what
+	 * an interrupted write or a hand-edited setting leaves behind. deleteExpired()
+	 * finds such a user by the timestamp alone, so it has to be removable.
+	 */
+	public function testDeleteCodeRemovesATimestampLeftWithoutACode(): void {
+		$this->config->method('getValueString')->willReturn('');
+		$this->config->method('getValueInt')->willReturn(1234567890);
+		$deletedKeys = [];
+		$this->config->expects($this->exactly(2))->method('deleteUserConfig')
+			->willReturnCallback(function (string $userId, string $app, string $key) use (&$deletedKeys): void {
+				$deletedKeys[] = $key;
+			});
+
+		$this->assertFalse($this->storage->deleteCode('alice'));
+		$this->assertSame(['code', 'code_created_at'], $deletedKeys);
+	}
+
 	public function testDeleteExpiredReturnsRemovedCount(): void {
 		// validity is 10 minutes: created_at 0 is expired, a fresh one is not
 		$this->config->method('getValuesByUsers')->willReturn(['old' => 0, 'fresh' => time()]);
@@ -91,8 +117,11 @@ class CodeStorageTest extends TestCase {
 	}
 
 	public function testReadCodeReturnsNullAndClearsAnExpiredCode(): void {
-		// created_at 0 is far older than the validity window → expired
-		$this->config->method('getValueInt')->willReturn(0);
+		// A real expired code: one is stored, and its timestamp is an hour old against
+		// a ten-minute validity. Zero would mean "never written" instead, which is the
+		// case deleteCode() now leaves untouched.
+		$this->config->method('getValueInt')->willReturn(time() - 3600);
+		$this->config->method('getValueString')->willReturn('hashed-code');
 		$this->config->expects($this->atLeastOnce())->method('deleteUserConfig');
 
 		$this->assertNull($this->storage->readCode('alice'));
