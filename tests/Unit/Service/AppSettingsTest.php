@@ -13,8 +13,8 @@ use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Service\AppSettings;
 use OCA\TwoFactorEMail\Service\SettingsValidator;
 use OCA\TwoFactorEMail\Service\WarnOnce;
+use OCA\TwoFactorEMail\Test\Support\ServerL10N;
 use OCP\IAppConfig;
-use OCP\IL10N;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -35,13 +35,8 @@ final class AppSettingsTest extends TestCase {
 
 		$this->appConfig = $this->createMock(IAppConfig::class);
 
-		$l10n = $this->createMock(IL10N::class);
-		$l10n->method('t')->willReturnCallback(
-			static fn (string $text, $parameters = []) => vsprintf($text, (array)$parameters),
-		);
-
 		$this->logger = $this->createMock(LoggerInterface::class);
-		$this->settings = new AppSettings($this->appConfig, $l10n, new WarnOnce($this->logger));
+		$this->settings = new AppSettings($this->appConfig, new ServerL10N(), new WarnOnce($this->logger));
 	}
 
 	public function testGetCodeLengthReadsFromAppConfig(): void {

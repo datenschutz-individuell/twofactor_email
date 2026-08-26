@@ -13,9 +13,9 @@ use OCA\TwoFactorEMail\Mail\LinkScanner;
 use OCA\TwoFactorEMail\Mail\TemplateRenderer;
 use OCA\TwoFactorEMail\Service\AppSettings;
 use OCA\TwoFactorEMail\Service\WarnOnce;
+use OCA\TwoFactorEMail\Test\Support\ServerL10N;
 use OCP\Defaults;
 use OCP\IAppConfig;
-use OCP\IL10N;
 use OCP\IURLGenerator;
 use OCP\IUser;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -111,7 +111,7 @@ final class DefaultEMailTextsTest extends TestCase {
 	private function appSettings(string $language): AppSettings {
 		return new AppSettings(
 			$this->createMock(IAppConfig::class),
-			$this->translating(self::translations($language)),
+			new ServerL10N(self::translations($language)),
 			new WarnOnce($this->createMock(LoggerInterface::class)),
 		);
 	}
@@ -141,25 +141,5 @@ final class DefaultEMailTextsTest extends TestCase {
 		$contents = json_decode((string)file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
 		// Plural forms are arrays; the default texts use none of them
 		return array_filter($contents['translations'] ?? [], is_string(...));
-	}
-
-	/**
-	 * Translates like IL10N does: the stored translation if there is one, and the
-	 * parameters filled in only when there are any.
-	 *
-	 * @param array<string, string> $translations
-	 *
-	 * @throws Exception
-	 */
-	private function translating(array $translations): IL10N {
-		$l10n = $this->createMock(IL10N::class);
-		$l10n->method('t')->willReturnCallback(
-			static function (string $text, $parameters = []) use ($translations): string {
-				$translated = $translations[$text] ?? $text;
-				$parameters = (array)$parameters;
-				return $parameters === [] ? $translated : vsprintf($translated, $parameters);
-			},
-		);
-		return $l10n;
 	}
 }
