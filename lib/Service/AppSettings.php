@@ -12,9 +12,8 @@ namespace OCA\TwoFactorEMail\Service;
 use OCA\TwoFactorEMail\AppInfo\Application;
 use OCP\IAppConfig;
 use OCP\IL10N;
-use Psr\Log\LoggerInterface;
 
-final class AppSettings implements IAppSettings {
+final readonly class AppSettings implements IAppSettings {
 
 	// Config keys used to store the settings in the app config. Public so the repair
 	// step can read the raw values, which the getters here correct or hide.
@@ -34,26 +33,11 @@ final class AppSettings implements IAppSettings {
 	private const DEFAULT_EMAIL_SUBJECT = '';
 	private const DEFAULT_EMAIL_TEMPLATE = '';
 
-	/** @var array<string, true> conditions already reported for this instance */
-	private array $reported = [];
-
 	public function __construct(
-		private readonly IAppConfig $appConfig,
-		private readonly IL10N $l10n,
-		private readonly LoggerInterface $logger,
+		private IAppConfig $appConfig,
+		private IL10N $l10n,
+		private WarnOnce $warnOnce,
 	) {
-	}
-
-	/**
-	 * A stored value is read many times per request — the code validity alone once
-	 * per rendered mail part. The condition is the same every time, so say it once.
-	 */
-	private function reportOnce(string $condition, string $message): void {
-		if (isset($this->reported[$condition])) {
-			return;
-		}
-		$this->reported[$condition] = true;
-		$this->logger->warning($message);
 	}
 
 	/**
@@ -67,7 +51,7 @@ final class AppSettings implements IAppSettings {
 		if ($value === '' || mb_check_encoding($value, 'UTF-8')) {
 			return $value;
 		}
-		$this->reportOnce(
+		$this->warnOnce->warn(
 			$setting,
 			'The stored ' . $setting . ' is not valid UTF-8 and is ignored; the default text is used. '
 			. 'Set it again with occ twofactor_email:settings.',
@@ -115,7 +99,7 @@ final class AppSettings implements IAppSettings {
 		if ($clamped !== $value) {
 			// Without this line, a value written past the validator is invisible:
 			// every read, including occ twofactor_email:settings, shows the clamped one.
-			$this->reportOnce(
+			$this->warnOnce->warn(
 				$name,
 				'The stored ' . $name . ' (' . $value . ') is outside the allowed range; ' . $clamped
 				. ' is used instead. Set it again with occ twofactor_email:settings.',
