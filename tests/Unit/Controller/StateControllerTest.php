@@ -14,6 +14,7 @@ use OCA\TwoFactorEMail\Controller\StateController;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
+use OCP\Authentication\TwoFactorAuth\ALoginSetupController;
 use OCP\IRequest;
 use OCP\IUser;
 use OCP\IUserSession;
@@ -45,6 +46,18 @@ final class StateControllerTest extends TestCase {
 		]);
 
 		$this->assertEquals($expected, $this->controller->save(false));
+	}
+
+	/**
+	 * The opposite of its sibling in AdminSettingsControllerTest, and just as deliberate.
+	 * The enrolment step shown during login posts here to switch the provider on, at a
+	 * point where the second factor cannot be complete yet — a user with two-factor
+	 * enforced and no provider has nothing to complete it with. Nextcloud allows that
+	 * for an ALoginSetupController only, so dropping the base class would lock exactly
+	 * those users out.
+	 */
+	public function testIsALoginSetupControllerSoEnrolmentDuringLoginWorks(): void {
+		$this->assertInstanceOf(ALoginSetupController::class, $this->controller);
 	}
 
 	/**

@@ -5,7 +5,7 @@ This app raises the bar for account takeover but, like every second factor, it i
 - **The email channel is the trust anchor.** The factor is "something you can *receive*". Its strength equals the security of the user's mailbox and the mail transport. A compromised mailbox, or mail read in transit, defeats it. This is the fundamental trade-off of email-based 2FA versus "something you *have*" factors (TOTP apps, hardware keys).
 - **No phishing resistance.** A real-time phishing proxy can prompt for the code and replay it, exactly as with TOTP. Only origin-bound factors ([FIDO2/WebAuthn](https://docs.nextcloud.com/server/latest/user_manual/en/user_2fa.html)) resist this.
 - **Limited code entropy, compensated by policy.** A six-digit code has ~10⁶ values; brute force is contained by the short validity, the single valid code, the resend rate limit, and Nextcloud's login brute-force protection — not by entropy alone.
-- **Residual timing side channel (accepted).** `verifyChallenge()` returns early when no code is stored, which is measurably faster than a hash comparison, so response time reveals whether an unexpired code exists — but only to someone who already passed the first factor, and the comparison itself stays constant-time. A decoy hash comparison on the miss path was deliberately left out.
+- **Residual timing side channel (accepted).** `verifyChallenge()` returns early when no code is stored, which is measurably faster than a hash comparison, so response time reveals whether an unexpired code exists — but only to someone who already passed the first factor, and the comparison itself stays constant-time. A decoy hash comparison on the miss path was deliberately left out. That it takes the first factor to get there at all is the first invariant below.
 - **A full server compromise defeats any 2FA**, this one included; storing codes hashed limits exposure from lower-privilege config/DB reads, not from root.
 
 ## How email 2FA compares
@@ -17,3 +17,51 @@ This app raises the bar for account takeover but, like every second factor, it i
 | Hardware / FIDO2 (WebAuthn) | **Yes** (origin-bound) | A physical key                  | Medium                       |
 
 Email 2FA is a low-friction, broadly available second factor — a clear improvement over password-only. Nextcloud lets a user enable several providers at once, so pair it with a stronger, phishing-resistant method where possible. Users able to use one then get the better protection, with email as a fallback.
+
+## Verified invariants
+
+These are statements about **Nextcloud's own behaviour** that the app depends on. None
+of them can be read off the public `OCP` interfaces: the code that enforces them lives
+in the server's private classes. So each was checked against the server's source for
+every supported version, and each says where.
+
+**Checked 2026-08-26**, against pinned commits of
+[nextcloud/server](https://github.com/nextcloud/server) rather than a moving branch, so
+every line number below can still be found:
+
+| Server line | Commit | Version |
+|-------------|--------|---------|
+| `stable33`  | [`a91897f4`](https://github.com/nextcloud/server/commit/a91897f461c4bd1a1c9eca44147fb3c7366dfa0c) | 33.0.8.2 |
+| `stable34`  | [`a599620e`](https://github.com/nextcloud/server/commit/a599620e9b75dc3c919b39dabd82a4f98b543b74) | 34.0.3.2 |
+
+Adding a server version to the supported range means checking these against the commit
+that version ships, and pinning it here, rather than assuming they still hold.
+
+**1. Every route of this app requires a completed first factor.** None of them carries
+`#[PublicPage]`, and `SecurityMiddleware` answers a request to a non-public route from
+a session without a user with `NotLoggedInException`
+(`lib/private/AppFramework/Middleware/Security/SecurityMiddleware.php`, line 135 on
+stable33, line 139 on stable34). The two-factor exemption below is read by a different
+middleware and does not touch this: it lifts the *second* factor, never the first.
+
+**2. `NoTwoFactorRequired` is read differently per version.** Nextcloud 33 reads the
+exemption from the docblock annotation only (`core/Middleware/TwoFactorMiddleware.php`
+line 46), Nextcloud 34 from the annotation *or* the attribute (line 50, via
+`hasAnnotationOrAttribute`). That is why `ChallengeController::resend()` carries both:
+the attribute is `@since 34`, and removing either one breaks a supported server.
+
+**3. Extending `ALoginSetupController` lifts the second-factor gate.** That class is
+empty; its only effect is that `TwoFactorMiddleware` recognises it and skips the gate
+while a user needs a second factor and has no primary provider to complete it with
+(`core/Middleware/TwoFactorMiddleware.php`, line 67 on stable33, line 72 on stable34).
+That state is the enrolment case, and `StateController` needs it — the setup step shown
+during login switches the provider on through it. `AdminSettingsController` therefore
+does **not** extend it: with the base class, changing this app's settings would need
+the password alone while an admin is still being set up.
+
+**4. A delegated group passes `#[AuthorizedAdminSetting]`.** Being a member of the
+`admin` group is not the only way in. `SecurityMiddleware` also matches the settings
+classes named in the attribute against the classes delegated to the user's groups
+(line 147 on stable33, line 151 on stable34). So an admin who delegates this app's
+settings with `occ admin-delegation:add` grants exactly the routes that attribute
+guards — which is the point of the feature, and worth knowing before delegating.
