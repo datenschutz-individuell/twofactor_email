@@ -29,7 +29,7 @@ use OCP\Migration\IRepairStep;
  * Everything else is only reported. A placeholder inside a web address puts a value
  * into a link, so EMailSender falls back to the default text and the code still
  * arrives. A body without {code} delivers no code, but it did not before this
- * release either. Deleting either one would throw away the admin\'s text
+ * release either. Deleting either one would throw away the admin's text
  * irrecoverably, and there is no backup key.
  *
  * Reads the raw values, since AppSettings already hides an unusable one.

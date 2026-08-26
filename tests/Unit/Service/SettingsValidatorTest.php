@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
  * SPDX-License-Identifier: AGPL-3.0-or-later
@@ -11,7 +13,7 @@ use OCA\TwoFactorEMail\Service\SettingsValidator;
 use PHPUnit\Framework\TestCase;
 
 /** Own test file since the placeholder-in-URL rule decides whether a code can leak. */
-class SettingsValidatorTest extends TestCase {
+final class SettingsValidatorTest extends TestCase {
 	private SettingsValidator $validator;
 
 	protected function setUp(): void {
@@ -32,8 +34,8 @@ class SettingsValidatorTest extends TestCase {
 		$this->assertSame([], $this->validateTemplate("{user}, your code is {code}.\nhttps://example.com/"));
 	}
 
-	/** Link scanners fetch such a URL unattended, so the code would leave the message. */
 	/**
+	 * Link scanners fetch such a URL unattended, so the code would leave the message.
 	 * The check on the finished mail stops every scheme and a bare "www.", so the
 	 * admin has to hear about those too — otherwise the setting saves and never works.
 	 */

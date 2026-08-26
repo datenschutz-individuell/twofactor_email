@@ -16,7 +16,7 @@ use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class RepairEmailTextsTest extends TestCase {
+final class RepairEmailTextsTest extends TestCase {
 	private IAppConfig&MockObject $appConfig;
 
 	private IOutput&MockObject $output;
