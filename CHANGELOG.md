@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Contributing guidelines, a code of conduct and an overview of the licences used
+- The login screen names the masked address the code was sent to
 
 ### Changed
 
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Changing or clearing the account email address now drops a pending code
+- The address was not masked in rare cases
 
 ## 3.3.2 (2026-08-11)
 
