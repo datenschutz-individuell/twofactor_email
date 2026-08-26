@@ -10,5 +10,11 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Service;
 
 interface IEMailAddressMasker {
+	/**
+	 * What maskForUI() returns for an address it cannot take apart. It names no
+	 * address, so a caller that wants to show one has nothing to show.
+	 */
+	public const HIDDEN = '*@*';
+
 	public function maskForUI(string $emailAddress): string;
 }

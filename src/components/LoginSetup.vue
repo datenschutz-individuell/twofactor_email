@@ -18,8 +18,11 @@
 		<div v-else-if="loading" class="loading" style="min-height: 50px" />
 		<div v-else>
 			<p>{{ t('twofactor_email', 'Two-factor authentication via email was enabled.') }}</p>
-			<p>
+			<p v-if="store.maskedEmail">
 				{{ t('twofactor_email', 'Codes will be sent to your primary email address:') }} <b>{{ store.maskedEmail }}</b>
+			</p>
+			<p v-else>
+				{{ t('twofactor_email', 'Codes will be sent to your primary email address.') }}
 			</p>
 			<form method="POST">
 				<button>{{ t('twofactor_email', 'Proceed') }}</button>

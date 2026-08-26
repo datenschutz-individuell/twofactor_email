@@ -100,7 +100,7 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 		}
 
 		$template->assign('codeLength', $this->settings->getCodeLength());
-		$template->assign('maskedEmail', $this->emailAddressMasker->maskForUI($user->getEMailAddress() ?? ''));
+		$template->assign('maskedEmail', $this->nameableMask($user));
 		$template->assign('newCodeWasSent', $newCodeWasSent);
 		$template->assign('error', $error);
 		$template->assign('resendCooldown', $this->settings->getResendCooldownSeconds());
@@ -163,8 +163,19 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	 */
 	#[\Override]
 	public function getLoginSetup(IUser $user): ILoginSetupProvider {
-		$maskedEmail = $this->emailAddressMasker->maskForUI($this->addressSource->getAddress($user) ?? '');
-		$this->initialStateService->provideInitialState('maskedEmail', $maskedEmail);
+		$this->initialStateService->provideInitialState('maskedEmail', $this->nameableMask($user));
 		return $this->container->get(LoginSetup::class);
+	}
+
+	/**
+	 * The user's masked address, or an empty string when the mask names none.
+	 *
+	 * Both screens that show the address need that distinction: a mask that names
+	 * nothing is not worth showing, and the empty string is what tells them to use
+	 * the wording that names no address instead.
+	 */
+	private function nameableMask(IUser $user): string {
+		$masked = $this->emailAddressMasker->maskForUI($this->addressSource->getAddress($user) ?? '');
+		return $masked === IEMailAddressMasker::HIDDEN ? '' : $masked;
 	}
 }

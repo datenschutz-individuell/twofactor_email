@@ -13,7 +13,13 @@ final class EMailAddressMasker implements IEMailAddressMasker {
 	#[\Override]
 	public function maskForUI(string $emailAddress): string {
 		if (!preg_match('/^([^@\s]+)@([^@\s]+)$/', $emailAddress, $m)) {
-			return $emailAddress;
+			// Anything this cannot take apart is hidden whole. A quoted local
+			// part may hold a space or a second '@', and an address written
+			// through occ passes no validation at all — neither may end up
+			// readable on the login screen. An empty address stays empty, so
+			// that callers can tell "no address" from "an address we cannot
+			// name": only the first of the two is worth a message of its own.
+			return $emailAddress === '' ? '' : self::HIDDEN;
 		}
 
 		$local = $m[1];
