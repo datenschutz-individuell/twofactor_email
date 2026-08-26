@@ -23,12 +23,19 @@ Email 2FA is a low-friction, broadly available second factor — a clear improve
 These are statements about **Nextcloud's own behaviour** that the app depends on. None
 of them can be read off the public `OCP` interfaces: the code that enforces them lives
 in the server's private classes. So each was checked against the server's source for
-every supported version, and each says where. Line numbers are from the `stable33` and
-`stable34` branches of [nextcloud/server](https://github.com/nextcloud/server) as they
-stood on the date given — a version bump is the moment to check them again rather than
-to assume they still hold.
+every supported version, and each says where.
 
-**Checked 2026-08-13.**
+**Checked 2026-08-26**, against pinned commits of
+[nextcloud/server](https://github.com/nextcloud/server) rather than a moving branch, so
+every line number below can still be found:
+
+| Server line | Commit | Version |
+|-------------|--------|---------|
+| `stable33`  | [`a91897f4`](https://github.com/nextcloud/server/commit/a91897f461c4bd1a1c9eca44147fb3c7366dfa0c) | 33.0.8.2 |
+| `stable34`  | [`a599620e`](https://github.com/nextcloud/server/commit/a599620e9b75dc3c919b39dabd82a4f98b543b74) | 34.0.3.2 |
+
+Adding a server version to the supported range means checking these against the commit
+that version ships, and pinning it here, rather than assuming they still hold.
 
 **1. Every route of this app requires a completed first factor.** None of them carries
 `#[PublicPage]`, and `SecurityMiddleware` answers a request to a non-public route from
