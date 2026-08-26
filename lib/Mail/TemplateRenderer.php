@@ -122,9 +122,10 @@ final readonly class TemplateRenderer {
 			// Trailing punctuation usually ends the sentence, not the URL
 			$url = rtrim($match[0][0], '.,;:!?)');
 			$result .= $this->literal(substr($paragraph, $offset, $position - $offset), $values);
-			// Inside URLs the placeholders are inserted bare — markup must not
-			// end up in attributes
-			$href = htmlspecialchars(strtr($url, $values));
+			// Inside URLs the placeholders are inserted bare — markup must not end up
+			// in attributes — and {logo} drops out as it does in the plain text and
+			// the subject, so both parts of the mail carry the same address.
+			$href = htmlspecialchars(strtr($url, ['{logo}' => ''] + $values));
 			$result .= '<a href="' . $href . '">' . $href . '</a>';
 			$offset = $position + strlen($url);
 		}

@@ -210,6 +210,23 @@ final class TemplateRendererTest extends TestCase {
 		$this->assertStringContainsString('href="https://cloud.example/u/Jane Doe"', $rendered[1][0]);
 	}
 
+	/**
+	 * The settings checks accept {logo} inside a web address because it inserts no
+	 * value. It must then drop out of the address in every part of the mail, or the
+	 * HTML link and the plain text would point at different places.
+	 */
+	public function testBodyDropsTheLogoTokenInsideAUrl(): void {
+		$rendered = $this->renderer->renderBody('Code {code} at https://cloud.example/{logo}', $this->user, '123456');
+
+		$this->assertSame([
+			['&nbsp;', false],
+			[
+				'Code ' . $this->strong('123456') . ' at <a href="https://cloud.example/">https://cloud.example/</a>',
+				'Code >>> 123456 <<< at https://cloud.example/',
+			],
+		], $rendered);
+	}
+
 	public function testBodyRendersTheLogoTokenInHtmlOnly(): void {
 		$this->assertSame([
 			['&nbsp;', false],
