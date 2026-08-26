@@ -83,15 +83,37 @@ final class LinkScanner {
 				}
 			}
 			// What the reader sees, without the markup between the words: a client
-			// that links the rendered text does not see the tags either. Only the
-			// tags that break the line become a separator — dropping <br> silently
-			// would glue the code to the address on the next line.
-			$visible = preg_replace('~<br\s*/?>|<img\b[^>]*>~i', ' ', $html) ?? $html;
+			// that links the rendered text does not see the tags either. A <br>
+			// becomes a separator, because dropping it would glue the code to the
+			// address on the next line; an image becomes its alt text, without a
+			// separator, because a client with images blocked renders that text
+			// exactly where the image stood.
+			$visible = preg_replace_callback('~<img\b[^>]*>~i', self::altText(...), $html);
+			$visible = $visible === null ? null : preg_replace('~<br\s*/?>~i', ' ', $visible);
+			if ($visible === null) {
+				// A failed replacement leaves no text to judge, and this check must
+				// not pass by accident.
+				return true;
+			}
 			if (self::codeCouldBeFetched(htmlspecialchars_decode(strip_tags($visible)), $code)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * What a client with images blocked shows in place of the image: its alt text,
+	 * which here is the instance name — a value an admin sets in the web UI. Nothing
+	 * is put around it, because such a client renders it exactly where the image
+	 * stood, so the name can end up directly in front of the code.
+	 *
+	 * @param array<int, string> $match
+	 */
+	private static function altText(array $match): string {
+		return preg_match('~\balt="([^"]*)"~i', $match[0], $alt) === 1
+			? htmlspecialchars_decode($alt[1])
+			: ' ';
 	}
 
 	/**

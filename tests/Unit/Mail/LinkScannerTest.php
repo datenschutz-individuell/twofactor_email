@@ -54,6 +54,19 @@ final class LinkScannerTest extends TestCase {
 		$this->assertTrue(self::inBody('https://evil.example/?c=<strong>123456</strong>', false));
 	}
 
+	/**
+	 * A client with images blocked renders the alt text in the flow, in place of the
+	 * image — and the alt text is the instance name, which an admin sets in the web
+	 * UI. So it can stand directly in front of the code without any separator.
+	 */
+	public function testSeesACodeBehindAnAddressInTheLogoAltText(): void {
+		$this->assertTrue(self::inBody(
+			'<img src="https://cloud.example/logo.png" alt="https://evil.example/?c=" style="max-width:250px">'
+			. '<strong style="font-family:monospace">123456</strong>',
+			false,
+		));
+	}
+
 	/** A line break separates the code from the address for every reader. */
 	public function testDoesNotReportACodeOnItsOwnLine(): void {
 		$this->assertFalse(self::inBody(
