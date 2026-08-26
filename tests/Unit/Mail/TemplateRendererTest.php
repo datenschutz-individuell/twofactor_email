@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Test\Unit\Mail;
 
+use OCA\TwoFactorEMail\Mail\LinkScanner;
 use OCA\TwoFactorEMail\Mail\TemplateRenderer;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\Defaults;
@@ -164,15 +165,19 @@ final class TemplateRendererTest extends TestCase {
 		));
 	}
 
-	/** A placeholder added to the map but not the constant would be invisible to the validator. */
-	public function testPlaceholderConstantCoversEveryPlaceholderThatIsSubstituted(): void {
+	/**
+	 * A placeholder substituted here but missing from the constant would be invisible
+	 * to both settings checks; one in the constant that is never substituted would
+	 * refuse a text for no reason. So the two lists must match exactly.
+	 */
+	public function testTheScannerKnowsEveryPlaceholderThatIsSubstituted(): void {
 		$method = new \ReflectionMethod(TemplateRenderer::class, 'placeholderValues');
 		$substituted = array_keys($method->invoke($this->renderer, $this->user, '123456'));
 
-		$this->assertSame(
-			[],
-			array_diff($substituted, TemplateRenderer::PLACEHOLDERS),
-			'TemplateRenderer::PLACEHOLDERS is missing a placeholder that placeholderValues() substitutes',
+		$this->assertEqualsCanonicalizing(
+			LinkScanner::VALUE_PLACEHOLDERS,
+			$substituted,
+			'LinkScanner::VALUE_PLACEHOLDERS and TemplateRenderer::placeholderValues() have drifted apart',
 		);
 	}
 
@@ -192,22 +197,6 @@ final class TemplateRendererTest extends TestCase {
 			'Code for Jane Doe',
 			$this->renderer->renderSubject('Code {logo}for {user}', $this->user, '123456'),
 		);
-	}
-
-	/**
-	 * The case no template check can see: the address does not exist until an
-	 * inserted value builds it around the code.
-	 */
-	public function testSeesACodeInAnAddressThatAValueBuilt(): void {
-		$this->assertTrue(TemplateRenderer::codeCouldBeFetched('Hi https://evil.example/?c=123456 bye', '123456'));
-		$this->assertTrue(TemplateRenderer::codeCouldBeFetched('www.evil.example/123456', '123456'));
-		// An invisible separator does not end the address here either
-		$this->assertTrue(TemplateRenderer::codeCouldBeFetched("https://evil.example/\u{00A0}123456", '123456'));
-	}
-
-	/** A code next to an address, but not in it, is not reported. */
-	public function testDoesNotReportACodeOutsideEveryAddress(): void {
-		$this->assertFalse(TemplateRenderer::codeCouldBeFetched('See https://cloud.example/help — code 123456', '123456'));
 	}
 
 	/**

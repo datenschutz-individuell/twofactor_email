@@ -34,7 +34,7 @@ use OCP\IUser;
  * Everything else is HTML-escaped — raw HTML is not possible.
  *
  * Nothing here decides whether the one-time code may leave the system. That is
- * asked once, of the finished text, by EMailSender — see codeCouldBeFetched().
+ * asked once, of the finished mail, by EMailSender — see LinkScanner.
  */
 final readonly class TemplateRenderer {
 
@@ -47,62 +47,6 @@ final readonly class TemplateRenderer {
 		private IURLGenerator $urlGenerator,
 		private IAppSettings $appSettings,
 	) {
-	}
-
-	/**
-	 * Whether any web address in the text contains a placeholder. Such a text renders
-	 * a value into a link, so the mail would go out with the default text instead —
-	 * SettingsValidator tells the admin before it comes to that.
-	 *
-	 * Reads an address the same way codeCouldBeFetched() does, and must keep doing so:
-	 * anything that check would stop has to be refused when it is written, or the
-	 * admin is told a setting was saved that then never takes effect.
-	 */
-	public static function hasPlaceholderInUrl(string $text): bool {
-		foreach (self::linkableRuns($text) as $run) {
-			foreach (self::VALUE_PLACEHOLDERS as $placeholder) {
-				if (str_contains($run, $placeholder)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * The parts of the text a link scanner would read as one address: separated by
-	 * ASCII whitespace, containing a scheme or a leading "www.". Without the `u` flag,
-	 * so unusual bytes cannot make it fail — and if the split ever did fail, the whole
-	 * text counts as one address, which errs towards reporting.
-	 *
-	 * @return list<string>
-	 */
-	private static function linkableRuns(string $text): array {
-		$runs = preg_split('~[ \t\r\n\x0B\f]+~', $text) ?: [$text];
-		return array_values(array_filter($runs, static fn (string $run): bool => preg_match('~://|www\.~i', $run) === 1));
-	}
-
-	/**
-	 * Whether a link scanner could fetch the code from this text: it sits in a run
-	 * of characters that such a scanner would read as a web address.
-	 *
-	 * This asks about the finished text, not about the template, so it also sees an
-	 * address that an inserted value built around the code. It is deliberately
-	 * cruder than URL_PATTERN: it splits on ASCII whitespace only, treats every
-	 * scheme and a leading "www." as linkable, and uses no `u` flag, so it cannot
-	 * fail on unusual bytes. When in doubt it should say yes: sending the default
-	 * text without need is better than letting one code slip through.
-	 */
-	public static function codeCouldBeFetched(string $text, string $code): bool {
-		if ($code === '') {
-			return false;
-		}
-		foreach (self::linkableRuns($text) as $run) {
-			if (str_contains($run, $code)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -143,21 +87,6 @@ final readonly class TemplateRenderer {
 		}
 		return $rendered;
 	}
-
-	/**
-	 * The placeholders that insert a value. Only these matter inside a web address:
-	 * {logo} expands to an image tag or to nothing, so it hands no data to anyone.
-	 * A test pins this list against placeholderValues().
-	 */
-	private const VALUE_PLACEHOLDERS = ['{code}', '{user}', '{cloud}', '{validity}'];
-
-	/**
-	 * Every placeholder this class expands. A test pins it against placeholderValues()
-	 * and literal(). The admin settings hint lists them again inside its translated
-	 * sentences, which this constant cannot fill in without hurting the translation —
-	 * so a new placeholder has to be added there by hand.
-	 */
-	public const PLACEHOLDERS = [...self::VALUE_PLACEHOLDERS, '{logo}'];
 
 	/**
 	 * @return array<string, string> placeholder => replacement value

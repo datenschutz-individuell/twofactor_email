@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Service;
 
-use OCA\TwoFactorEMail\Mail\TemplateRenderer;
+use OCA\TwoFactorEMail\Mail\LinkScanner;
 
 /**
  * Validates the admin settings. Used by the admin settings web UI and the
@@ -104,7 +104,7 @@ final class SettingsValidator {
 		// Unchanged: an instance can carry such a text without anyone having typed it
 		// here, and it must not block the other settings.
 		if (!isset($errors['eMailSubject'])
-			&& TemplateRenderer::hasPlaceholderInUrl($eMailSubject)
+			&& LinkScanner::hasPlaceholderInUrl($eMailSubject)
 			&& !self::unchanged($eMailSubject, $storedSubject)) {
 			$errors['eMailSubject'] = 'email-subject-placeholder-in-url';
 		}
@@ -120,7 +120,7 @@ final class SettingsValidator {
 		// would be substituted into a link that scanners fetch unattended. Again only
 		// when nothing worse was found — a body without {code} delivers nothing.
 		if (!isset($errors['eMailTemplate'])
-			&& TemplateRenderer::hasPlaceholderInUrl($eMailTemplate)
+			&& LinkScanner::hasPlaceholderInUrl($eMailTemplate)
 			&& !self::unchanged($eMailTemplate, $storedTemplate)) {
 			$errors['eMailTemplate'] = 'email-template-placeholder-in-url';
 		}

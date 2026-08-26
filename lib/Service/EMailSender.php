@@ -13,6 +13,7 @@ use Exception;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCA\TwoFactorEMail\Exception\SendRateLimited;
+use OCA\TwoFactorEMail\Mail\LinkScanner;
 use OCA\TwoFactorEMail\Mail\TemplateRenderer;
 use OCP\IUser;
 use OCP\Mail\IMailer;
@@ -62,14 +63,14 @@ final readonly class EMailSender implements IEMailSender {
 		// The last check before the code leaves this system, on the finished text.
 		// Everything before it works on the template, where an inserted value is not
 		// yet visible — a display name can build a web address around the code.
-		if ($this->couldLeakCode($renderedSubject, $parts, $code)) {
+		if (LinkScanner::couldLeakCode($renderedSubject, $parts, $code)) {
 			$this->logger->warning(
 				'The configured email text would have put the code into a web address. The default text '
 				. 'was used instead. Fix it with occ twofactor_email:settings.',
 			);
 			$renderedSubject = $this->templateRenderer->renderSubject($this->appSettings->getDefaultEMailSubject(), $user, $code);
 			$parts = $this->templateRenderer->renderBody($this->appSettings->getDefaultEMailBody(), $user, $code);
-			if ($this->couldLeakCode($renderedSubject, $parts, $code)) {
+			if (LinkScanner::couldLeakCode($renderedSubject, $parts, $code)) {
 				// Only reachable through an inserted value, so no text can repair it.
 				// Not sending keeps the user out; sending would hand the code away.
 				$this->logger->error(
@@ -144,38 +145,5 @@ final readonly class EMailSender implements IEMailSender {
 			$this->logger->error('failed to check the send rate limit for user ' . $user->getUID() . '.', ['exception' => $e]);
 			throw new SendEMailFailed(previous: $e);
 		}
-	}
-
-	/**
-	 * @param list<array{string, string|false}> $parts
-	 */
-	private function couldLeakCode(string $subject, array $parts, string $code): bool {
-		if (TemplateRenderer::codeCouldBeFetched($subject, $code)) {
-			return true;
-		}
-		foreach ($parts as [$html, $plain]) {
-			if ($plain !== false && TemplateRenderer::codeCouldBeFetched($plain, $code)) {
-				return true;
-			}
-			// The link targets are ours, so they are read back the way they were
-			// written. A code in one of them is fetched without any scanner.
-			if (preg_match_all('~href="([^"]*)"~', $html, $matches) === false) {
-				return true;
-			}
-			foreach ($matches[1] as $href) {
-				if (str_contains(htmlspecialchars_decode($href), $code)) {
-					return true;
-				}
-			}
-			// What the reader sees, without the markup between the words: a client
-			// that links the rendered text does not see the tags either. Only the
-			// tags that break the line become a separator — dropping <br> silently
-			// would glue the code to the address on the next line.
-			$visible = preg_replace('~<br\s*/?>|<img\b[^>]*>~i', ' ', $html) ?? $html;
-			if (TemplateRenderer::codeCouldBeFetched(htmlspecialchars_decode(strip_tags($visible)), $code)) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

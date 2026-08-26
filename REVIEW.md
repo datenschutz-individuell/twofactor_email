@@ -124,14 +124,16 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   a link. It is deliberately **not** the security boundary: where a URL ends in free
   text is not decidable, and every mail client answers it differently. The one check
   that decides whether the code may be sent runs on the **finished** mail
-  (`codeCouldBeFetched`), is cruder than everything before it, and cannot fail. When
-  in doubt it says yes, because sending the default text for one mail without need is
-  better than letting one code slip through.
+  (`LinkScanner::couldLeakCode()`), is cruder than everything before it, and cannot
+  fail. When in doubt it says yes, because sending the default text for one mail
+  without need is better than letting one code slip through.
   Making the template checks carry that job produced eleven review rounds of boundary
   bugs (2026-08-06); do not move it back. `hasPlaceholderInUrl()` and
-  `codeCouldBeFetched()` read a text into addresses through the **same** function, and
+  `couldLeakCode()` read a text into addresses through the **same** function, and
   must keep doing so: if the write-side check were the narrower one, an admin could
   save a text that is then never sent.
+  `LinkScanner` is where both live, so neither the renderer nor the validator depends
+  on the other (2026-08-26).
 
 - **The check on the finished mail asks about the one-time code, nothing else.** It is
   the last stop before sending, and it exists for the secret that logging in depends
@@ -152,7 +154,9 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
 
 - **`{logo}` inside a web address is allowed.** It expands to an image tag or to
   nothing and never inserts a value, so it hands no data to whoever owns the address.
-  Only the placeholders in `VALUE_PLACEHOLDERS` are refused there.
+  Only the placeholders in `LinkScanner::VALUE_PLACEHOLDERS` are refused there, and
+  `TemplateRendererTest` pins that list against what the renderer substitutes, in both
+  directions.
 
 ## What "ready" means here
 

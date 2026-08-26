@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Migration;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
-use OCA\TwoFactorEMail\Mail\TemplateRenderer;
+use OCA\TwoFactorEMail\Mail\LinkScanner;
 use OCA\TwoFactorEMail\Service\AppSettings;
 use OCA\TwoFactorEMail\Service\SettingsValidator;
 use OCP\IAppConfig;
@@ -111,7 +111,7 @@ final readonly class RepairEmailTexts implements IRepairStep {
 			);
 		}
 
-		if (TemplateRenderer::hasPlaceholderInUrl($stored)) {
+		if (LinkScanner::hasPlaceholderInUrl($stored)) {
 			$output->warning(
 				'The email ' . $part . ' puts a placeholder inside a web address. Such a mail would carry the '
 				. 'code in a link, so the default text is sent instead. Fix it with occ twofactor_email:settings.',
