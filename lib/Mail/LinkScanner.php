@@ -28,8 +28,9 @@ final class LinkScanner {
 	/**
 	 * The placeholders that insert a value, and therefore the ones that must not sit
 	 * inside a web address: {logo} expands to an image tag or to nothing, so it hands
-	 * no data to whoever owns the address. TemplateRendererTest pins this list against
-	 * TemplateRenderer::placeholderValues() in both directions.
+	 * no data to whoever owns the address. TemplateRenderer builds its values by
+	 * walking this list, so the two cannot drift apart — adding an entry here leaves
+	 * a match expression there incomplete, which psalm reports.
 	 */
 	public const VALUE_PLACEHOLDERS = ['{code}', '{user}', '{cloud}', '{validity}'];
 

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Test\Unit\Mail;
 
-use OCA\TwoFactorEMail\Mail\LinkScanner;
 use OCA\TwoFactorEMail\Mail\TemplateRenderer;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\Defaults;
@@ -163,22 +162,6 @@ final class TemplateRendererTest extends TestCase {
 			$this->user,
 			'123456',
 		));
-	}
-
-	/**
-	 * A placeholder substituted here but missing from the constant would be invisible
-	 * to both settings checks; one in the constant that is never substituted would
-	 * refuse a text for no reason. So the two lists must match exactly.
-	 */
-	public function testTheScannerKnowsEveryPlaceholderThatIsSubstituted(): void {
-		$method = new \ReflectionMethod(TemplateRenderer::class, 'placeholderValues');
-		$substituted = array_keys($method->invoke($this->renderer, $this->user, '123456'));
-
-		$this->assertEqualsCanonicalizing(
-			LinkScanner::VALUE_PLACEHOLDERS,
-			$substituted,
-			'LinkScanner::VALUE_PLACEHOLDERS and TemplateRenderer::placeholderValues() have drifted apart',
-		);
 	}
 
 	public function testBodyEscapesRawHtml(): void {
