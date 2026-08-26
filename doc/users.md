@@ -20,7 +20,7 @@ The app then emails you a short one-time code and shows the code-entry screen. Y
 
 ![Entering the emailed code on the login screen](../screenshots/challenge.png)
 
-If the email does not arrive, request a fresh one with **Resend** after a short cooldown. Each code is single-use and only one is valid at a time, so reloading the page never floods your inbox.
+If the email does not arrive, request a fresh one with **Send a new code** after a short cooldown. Each code is single-use and only one is valid at a time, so reloading the page never floods your inbox.
 
 ## Desktop and mobile apps
 
