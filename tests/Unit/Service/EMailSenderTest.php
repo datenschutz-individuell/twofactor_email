@@ -193,28 +193,6 @@ final class EMailSenderTest extends TestCase {
 	}
 
 	/**
-	 * If even the default is unsafe, no text can repair it. Not sending keeps the
-	 * user out; sending would hand the code away.
-	 *
-	 * @throws Exception
-	 */
-	public function testSendsNothingWhenEvenTheDefaultWouldCarryTheCodeInAnAddress(): void {
-		$this->appSettings->method('getEMailSubject')->willReturn('');
-		$this->appSettings->method('getEMailTemplate')->willReturn('');
-		$this->appSettings->method('getDefaultEMailSubject')->willReturn('Code {user}{code}');
-		$this->appSettings->method('getDefaultEMailBody')->willReturn('{code}');
-		$this->logger->expects($this->once())->method('error');
-		$this->mailer->expects($this->never())->method('send');
-
-		$user = $this->createMock(IUser::class);
-		$user->method('getEMailAddress')->willReturn('jane@example.com');
-		$user->method('getDisplayName')->willReturn('https://evil.example/?c=');
-
-		$this->expectException(SendEMailFailed::class);
-		$this->sender->sendChallengeEMail($user, '123456');
-	}
-
-	/**
 	 * A code line directly above an address line: the line break separates them for
 	 * every reader, so this template must be sent as written.
 	 *

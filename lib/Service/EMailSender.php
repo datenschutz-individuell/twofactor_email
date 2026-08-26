@@ -68,17 +68,11 @@ final readonly class EMailSender implements IEMailSender {
 				'The configured email text would have put the code into a web address. The default text '
 				. 'was used instead. Fix it with occ twofactor_email:settings.',
 			);
+			// The default texts keep the code in a paragraph of its own, where no inserted
+			// value can reach it. DefaultEMailTextsTest renders them in every translated
+			// language, with values that try to build an address around the code.
 			$renderedSubject = $this->templateRenderer->renderSubject($this->appSettings->getDefaultEMailSubject(), $user, $code);
 			$parts = $this->templateRenderer->renderBody($this->appSettings->getDefaultEMailBody(), $user, $code);
-			if (LinkScanner::couldLeakCode($renderedSubject, $parts, $code)) {
-				// Only reachable through an inserted value, so no text can repair it.
-				// Not sending keeps the user out; sending would hand the code away.
-				$this->logger->error(
-					'Even the default email text would have put the code into a web address, most likely '
-					. 'through the display name. No mail was sent.',
-				);
-				throw new SendEMailFailed();
-			}
 		}
 
 		$template = $this->mailer->createEMailTemplate('twofactor_email.send');

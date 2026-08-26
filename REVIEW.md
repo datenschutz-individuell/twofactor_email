@@ -158,6 +158,22 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   `TemplateRendererTest` pins that list against what the renderer substitutes, in both
   directions.
 
+- **The fallback to the default text is not checked again before sending.** The
+  default keeps `{code}` in a paragraph of its own, outside every translatable
+  string, so neither a translation nor an inserted value can move an address next to
+  it. `DefaultEMailTextsTest` asserts both halves of that for **every** shipped
+  language: that the body still contains `"\n\n{code}\n\n"`, and that rendering it
+  with a display name and an instance name that end in an unfinished web address
+  delivers the code and keeps it out of every address. A run-time check of our own
+  text could only fire if that text were changed in the source, which is where a test
+  belongs (2026-08-26).
+  A **theme** can replace a translated string of ours — a translation file under
+  `themes/` that the server merges over the app's own — and the placeholder
+  substitution would then run on that text. Both writing that file and setting
+  `'theme'` in `config.php` need write access to the server's file system, the same
+  access that could change this app's code: not a separate attack path, and not
+  something a check on every mail would answer.
+
 ## What "ready" means here
 
 CI green, no new Psalm or taint findings, and — for anything touching routes,
