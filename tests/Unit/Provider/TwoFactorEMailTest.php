@@ -202,6 +202,21 @@ class TwoFactorEMailTest extends TestCase {
 	/**
 	 * @throws Exception
 	 */
+	public function testGetTemplateNamesTheMaskedAddress(): void {
+		$assigns = [];
+		$user = $this->createMock(IUser::class);
+		$user->method('getEMailAddress')->willReturn('alice@example.com');
+		$this->templateManager->method('getTemplate')->willReturn($this->templateCapturing($assigns));
+		$this->masker->method('maskForUI')->with('alice@example.com')->willReturn('a*@*.com');
+
+		$this->provider->getTemplate($user);
+
+		self::assertSame('a*@*.com', $assigns['maskedEmail']);
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public function testGetTemplateReportsNoEmailWhenTheAddressIsMissing(): void {
 		$assigns = [];
 		$user = $this->createMock(IUser::class);

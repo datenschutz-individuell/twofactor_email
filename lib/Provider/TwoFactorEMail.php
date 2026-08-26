@@ -90,6 +90,7 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 		}
 
 		$template->assign('codeLength', $this->settings->getCodeLength());
+		$template->assign('maskedEmail', $this->emailAddressMasker->maskForUI($user->getEMailAddress() ?? ''));
 		$template->assign('newCodeWasSent', $newCodeWasSent);
 		$template->assign('error', $error);
 		$template->assign('resendCooldown', $this->settings->getResendCooldownSeconds());
