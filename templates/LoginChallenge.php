@@ -26,6 +26,7 @@ if (!empty($codeLength)) {
 }
 
 $newCodeWasSent = $_['newCodeWasSent']; // provided in Provider/TwoFactorEMail.php
+$maskedEmail = $_['maskedEmail'] ?? ''; // provided in Provider/TwoFactorEMail.php
 $error = $_['error'] ?? null; // caught and passed in Provider/TwoFactorEMail.php
 $resendCooldown = (int)($_['resendCooldown'] ?? 0); // full cooldown in seconds
 $resendAvailableIn = (int)($_['resendAvailableIn'] ?? 0); // seconds left before a resend is allowed
@@ -43,10 +44,16 @@ $resendAvailableIn = (int)($_['resendAvailableIn'] ?? 0); // seconds left before
 	</p>
 <?php else: ?>
 	<p><?php
+		// The address is part of the sentence, not a line of its own: a translator
+		// needs the whole sentence to put it in the right place and the right case.
 		if ($newCodeWasSent) {
-			p($l->t('A new authentication code was just sent. Please enter it:'));
+			p($maskedEmail !== ''
+				? $l->t('A new authentication code was just sent to %s. Please enter it:', [$maskedEmail])
+				: $l->t('A new authentication code was just sent. Please enter it:'));
 		} else {
-			p($l->t('Enter the authentication code that was sent to you:'));
+			p($maskedEmail !== ''
+				? $l->t('Enter the authentication code that was sent to %s:', [$maskedEmail])
+				: $l->t('Enter the authentication code that was sent to you:'));
 		}
 	?></p>
 	<form method="POST" class="twofactor_email-challenge-form">
