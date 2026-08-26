@@ -14,17 +14,17 @@ A new code is issued only when no unexpired one is stored, and the hash is writt
 
 The building blocks and the interface each one implements:
 
-| Concern                       | Interface                     | Implementation                                        |
-|-------------------------------|-------------------------------|-------------------------------------------------------|
-| 2FA provider entry point      | `IProvider` (OCP)             | `Provider\TwoFactorEMail`                             |
-| Login-setup at enforced login | `ILoginSetupProvider` (OCP)   | `Provider\LoginSetup`                                 |
-| Challenge orchestration       | `Service\ILoginChallenge`     | `Service\LoginChallenge`                              |
-| Code generation               | `Service\ICodeGenerator`      | `Service\NumericalCodeGenerator`                      |
-| Code storage                  | `Service\ICodeStorage`        | `Service\CodeStorage`                                 |
-| Email delivery                | `Service\IEMailSender`        | `Service\EMailSender` (+ `Mail\TemplateRenderer`)     |
-| Address masking               | `Service\IEMailAddressMasker` | `Service\EMailAddressMasker`                          |
-| Enable/disable state          | `Service\IStateManager`       | `Service\StateManager`                                |
-| Settings                      | `Service\IAppSettings`        | `Service\AppSettings` (+ `Service\SettingsValidator`) |
+| Concern                       | Interface                     | Implementation                                                            |
+|-------------------------------|-------------------------------|---------------------------------------------------------------------------|
+| 2FA provider entry point      | `IProvider` (OCP)             | `Provider\TwoFactorEMail`                                                 |
+| Login-setup at enforced login | `ILoginSetupProvider` (OCP)   | `Provider\LoginSetup`                                                     |
+| Challenge orchestration       | `Service\ILoginChallenge`     | `Service\LoginChallenge`                                                  |
+| Code generation               | `Service\ICodeGenerator`      | `Service\NumericalCodeGenerator`                                          |
+| Code storage                  | `Service\ICodeStorage`        | `Service\CodeStorage`                                                     |
+| Email delivery                | `Service\IEMailSender`        | `Service\EMailSender` (+ `Mail\TemplateRenderer`, `Mail\LinkScanner`)     |
+| Address masking               | `Service\IEMailAddressMasker` | `Service\EMailAddressMasker`                                              |
+| Enable/disable state          | `Service\IStateManager`       | `Service\StateManager`                                                    |
+| Settings                      | `Service\IAppSettings`        | `Service\AppSettings` (+ `Service\SettingsValidator`, `Service\WarnOnce`) |
 
 Around these services sit the HTTP controllers, event listeners (activity/notifications/registry updates on state change and on email removal), the daily cleanup background job, `occ` commands, and the admin/personal settings sections.
 
