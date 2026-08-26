@@ -11,15 +11,19 @@ namespace OCA\TwoFactorEMail\Test\Unit\Service;
 
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
+use OCA\TwoFactorEMail\Exception\SendRateLimited;
 use OCA\TwoFactorEMail\Mail\TemplateRenderer;
 use OCA\TwoFactorEMail\Service\EMailSender;
 use OCA\TwoFactorEMail\Service\IAppSettings;
+use OCP\DB\Exception as DbException;
 use OCP\Defaults;
 use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\Mail\IEMailTemplate;
 use OCP\Mail\IMailer;
 use OCP\Mail\IMessage;
+use OCP\Security\RateLimiting\ILimiter;
+use OCP\Security\RateLimiting\IRateLimitExceededException;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +35,8 @@ final class EMailSenderTest extends TestCase {
 	private IURLGenerator&MockObject $urlGenerator;
 	private IAppSettings&MockObject $appSettings;
 	private IEMailTemplate&MockObject $template;
+	private LoggerInterface&MockObject $logger;
+	private ILimiter&MockObject $limiter;
 
 	private EMailSender $sender;
 
@@ -45,6 +51,8 @@ final class EMailSenderTest extends TestCase {
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->appSettings = $this->createMock(IAppSettings::class);
 		$this->template = $this->createMock(IEMailTemplate::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
+		$this->limiter = $this->createMock(ILimiter::class);
 
 		$this->defaults->method('getName')->willReturn('Example Cloud');
 		$this->appSettings->method('getCodeValidMinutes')->willReturn(10);
@@ -53,11 +61,17 @@ final class EMailSenderTest extends TestCase {
 		// the full rendering pipeline. The localized default texts come from
 		// the mocked IAppSettings (their real content is tested in AppSettingsTest).
 		$this->sender = new EMailSender(
-			$this->createMock(LoggerInterface::class),
+			$this->logger,
 			$this->mailer,
 			$this->appSettings,
 			new TemplateRenderer($this->defaults, $this->urlGenerator, $this->appSettings),
+			$this->limiter,
 		);
+	}
+
+	private function rateLimitExceeded(): IRateLimitExceededException {
+		return new class extends \RuntimeException implements IRateLimitExceededException {
+		};
 	}
 
 	/**
@@ -73,10 +87,16 @@ final class EMailSenderTest extends TestCase {
 	/**
 	 * @throws Exception
 	 */
-	private function expectMailWithTemplate(): void {
-		$message = $this->createMock(IMessage::class);
+	private function mockMailer(): void {
 		$this->mailer->method('createEMailTemplate')->willReturn($this->template);
-		$this->mailer->method('createMessage')->willReturn($message);
+		$this->mailer->method('createMessage')->willReturn($this->createMock(IMessage::class));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function expectMailWithTemplate(): void {
+		$this->mockMailer();
 		$this->mailer->expects($this->once())->method('send');
 	}
 
@@ -174,5 +194,137 @@ final class EMailSenderTest extends TestCase {
 				'Use >>> 123456 <<< on Example Cloud within 10 minutes.',
 			],
 		], $bodyTexts);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function mockSendableMail(): void {
+		$this->mockMailer();
+		$this->appSettings->method('getEMailSubject')->willReturn('Code {code}');
+		$this->appSettings->method('getEMailTemplate')->willReturn('Use {code}.');
+	}
+
+	/**
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testReportsAFailureWhenTheMailerThrows(): void {
+		$this->mockSendableMail();
+		$this->mailer->method('send')->willThrowException(new \RuntimeException('smtp is down'));
+		$this->logger->expects($this->once())->method('error');
+
+		$this->expectException(SendEMailFailed::class);
+
+		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
+	}
+
+	/**
+	 * A refused recipient comes back as a return value, not as an exception.
+	 *
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testReportsAFailureWhenTheMailerRefusesTheRecipient(): void {
+		$this->mockSendableMail();
+		$this->mailer->method('send')->willReturn(['jane@example.com']);
+		// The refused address must not reach the log
+		$this->logger->expects($this->once())
+			->method('error')
+			->with($this->logicalNot($this->stringContains('jane@example.com')));
+
+		$this->expectException(SendEMailFailed::class);
+
+		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
+	}
+
+	/**
+	 * @throws SendEMailFailed
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testAsksTheRateLimiterBeforeContactingTheMailServer(): void {
+		$this->mockSendableMail();
+		$user = $this->mockUser('jane@example.org');
+
+		$this->limiter->expects($this->once())
+			->method('registerUserRequest')
+			->with('twofactor_email-send', 10, 300, $user);
+
+		$this->sender->sendChallengeEMail($user, '123456');
+	}
+
+	/**
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testSendsNothingOnceTheRateLimitIsReached(): void {
+		$this->mockMailer();
+		$this->limiter->method('registerUserRequest')->willThrowException($this->rateLimitExceeded());
+
+		$this->mailer->expects($this->never())->method('send');
+
+		$this->expectException(SendRateLimited::class);
+
+		$this->sender->sendChallengeEMail($this->mockUser('jane@example.org'), '123456');
+	}
+
+	/**
+	 * The limiter counts in the database and fails with it. Every caller of this
+	 * service handles a failed send, and nothing else — an error from the counter
+	 * would reach the login page instead of the message that no code went out.
+	 *
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testReportsAFailedSendWhenTheLimiterCannotAnswer(): void {
+		$this->mockMailer();
+		$this->limiter->method('registerUserRequest')->willThrowException(new DbException());
+
+		$this->mailer->expects($this->never())->method('send');
+
+		try {
+			$this->sender->sendChallengeEMail($this->mockUser('jane@example.org'), '123456');
+			$this->fail('a limiter that cannot answer has to be reported as a failed send');
+		} catch (SendRateLimited) {
+			$this->fail('a limiter that cannot answer is not a cap that was reached');
+		} catch (SendEMailFailed $e) {
+			$this->assertInstanceOf(DbException::class, $e->getPrevious());
+		}
+	}
+
+	/**
+	 * The whole period is the longest the account can have to wait, and the resend
+	 * dialog counts down from it.
+	 *
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testNamesHowLongTheCapLasts(): void {
+		$this->mockMailer();
+		$this->limiter->method('registerUserRequest')->willThrowException($this->rateLimitExceeded());
+
+		try {
+			$this->sender->sendChallengeEMail($this->mockUser('jane@example.org'), '123456');
+			$this->fail('the capped send has to throw');
+		} catch (SendRateLimited $e) {
+			$this->assertSame(300, $e->retryAfterSeconds);
+		}
+	}
+
+	/**
+	 * An account without an address never reaches the mail server, so counting it
+	 * would spend the budget on nothing and turn a missing address into a mail
+	 * server that did not answer.
+	 *
+	 * @throws SendEMailFailed
+	 * @throws Exception
+	 */
+	public function testSpendsNoLimitWhenNoEmailIsSet(): void {
+		$this->limiter->expects($this->never())->method('registerUserRequest');
+
+		$this->expectException(EMailNotSet::class);
+
+		$this->sender->sendChallengeEMail($this->mockUser(null), '123456');
 	}
 }

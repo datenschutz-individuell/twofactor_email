@@ -11,6 +11,7 @@ namespace OCA\TwoFactorEMail\Service;
 
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
+use OCA\TwoFactorEMail\Exception\SendRateLimited;
 use OCP\IUser;
 
 interface IEMailSender {
@@ -18,6 +19,8 @@ interface IEMailSender {
 	 * @param IUser $user
 	 * @param string $code
 	 * @throws EMailNotSet
+	 * @throws SendRateLimited if the account reached the cap on how often the app
+	 *                         opens a connection to the mail server
 	 * @throws SendEMailFailed
 	 */
 	public function sendChallengeEMail(IUser $user, string $code): void;

@@ -123,7 +123,7 @@ test the working tree instead with `APP_DIR=…`.
 Login and challenge, the mail, `challenge/resend` including its cooldown, a wrong and
 then the right code, `admin/save` with its validation path, `admin/reset`,
 `state/save` in both directions with the registry state, every asset the challenge
-page pulls, and the server log.
+page pulls, the server log, and a recipient the mail server refuses.
 
 It also covers what no HTTP route reaches: `admin-delegation:show`, which is where the
 server asks the settings class for its name and priority, and the `twofactor_email:cleanup`

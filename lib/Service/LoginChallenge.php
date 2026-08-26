@@ -12,6 +12,7 @@ namespace OCA\TwoFactorEMail\Service;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\ResendTooSoon;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
+use OCA\TwoFactorEMail\Exception\SendRateLimited;
 use OCP\IUser;
 use OCP\Security\IHasher;
 use Psr\Log\LoggerInterface;
@@ -40,11 +41,11 @@ final readonly class LoginChallenge implements ILoginChallenge {
 		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
 
 		/**
-		 * Login retry throttling is done by Nextcloud, but re-loading the form would generate and send new codes.
-		 * This is not handled by the brute force protection. We could skip sending emails once a rate limit is reached,
-		 * see https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/security.html#rate-limiting
-		 * Instead, we don't generate and send a new code as long as we can read a code from the user's preferences.
-		 * We can only successfully read a code if there is one stored and while that one is still valid.
+		 * Nextcloud throttles login retries, but not a reload of the challenge page,
+		 * which would otherwise generate and send a new code every time. A stored code
+		 * stops that: it can only be read while one exists and is still valid. Because
+		 * a send that failed stores nothing, that alone is not enough, so EMailSender
+		 * also asks Nextcloud's rate limiter before it opens a connection.
 		 */
 		if (!is_null($storedCodeHash)) {
 			return false;
@@ -128,6 +129,12 @@ final readonly class LoginChallenge implements ILoginChallenge {
 			$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode));
 		} catch (EMailNotSet $e) {
 			$this->logger->warning('Could not send 2FA challenge: No email address configured for user.', [
+				'exception' => $e,
+				'app' => 'twofactor_email',
+			]);
+			throw $e;
+		} catch (SendRateLimited $e) {
+			$this->logger->warning('Not sending a 2FA challenge email: the account reached the send rate limit.', [
 				'exception' => $e,
 				'app' => 'twofactor_email',
 			]);

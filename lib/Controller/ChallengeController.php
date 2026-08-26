@@ -16,6 +16,7 @@ namespace OCA\TwoFactorEMail\Controller;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\ResendTooSoon;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
+use OCA\TwoFactorEMail\Exception\SendRateLimited;
 use OCA\TwoFactorEMail\Service\ILoginChallenge;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\AppFramework\Http;
@@ -88,6 +89,13 @@ final class ChallengeController extends ALoginSetupController {
 			);
 			$response->throttle(['action' => self::BRUTE_FORCE_ACTION]);
 			return $response;
+		} catch (SendRateLimited $e) {
+			// No brute-force strike: the app declined to send, the request itself was
+			// legitimate, and this endpoint already allows only one of them a minute.
+			return new JSONResponse(
+				['error' => 'too-soon', 'retryAfter' => $e->retryAfterSeconds],
+				Http::STATUS_TOO_MANY_REQUESTS,
+			);
 		} catch (EMailNotSet) {
 			return new JSONResponse(['error' => 'no-email'], Http::STATUS_BAD_REQUEST);
 		} catch (SendEMailFailed) {

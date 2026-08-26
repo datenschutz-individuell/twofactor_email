@@ -12,6 +12,7 @@ namespace OCA\TwoFactorEMail\Test\Unit\Service;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\ResendTooSoon;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
+use OCA\TwoFactorEMail\Exception\SendRateLimited;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Service\ICodeGenerator;
 use OCA\TwoFactorEMail\Service\ICodeStorage;
@@ -183,6 +184,22 @@ final class LoginChallengeTest extends TestCase {
 	}
 
 	/**
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testSendChallengeStoresNoCodeWhenSendingFails(): void {
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->with('alice')->willReturn(null);
+		$this->codeGenerator->method('generateChallengeCode')->willReturn('123456');
+		$this->emailSender->method('sendChallengeEMail')->willThrowException(new SendEMailFailed());
+		$this->codeStorage->expects($this->never())->method('writeCode');
+
+		$this->expectException(SendEMailFailed::class);
+
+		$this->challenge->sendChallenge($user);
+	}
+
+	/**
 	 * @throws SendEMailFailed
 	 * @throws EMailNotSet
 	 * @throws Exception
@@ -194,6 +211,27 @@ final class LoginChallengeTest extends TestCase {
 		$this->codeStorage->expects($this->never())->method('writeCode');
 
 		$this->assertFalse($this->challenge->sendChallenge($user));
+	}
+
+	/**
+	 * The cap lives in EMailSender, at the connection it protects. What matters
+	 * here is that a capped send is not turned into a mailer error on the way out.
+	 *
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testSendChallengeStoresNoCodeWhenTheSendWasCapped(): void {
+		$user = $this->mockUser();
+		$this->codeStorage->method('readCode')->willReturn(null);
+		$this->codeGenerator->method('generateChallengeCode')->willReturn('123456');
+		$this->emailSender->method('sendChallengeEMail')
+			->willThrowException(new SendRateLimited(300));
+
+		$this->codeStorage->expects($this->never())->method('writeCode');
+
+		$this->expectException(SendRateLimited::class);
+
+		$this->challenge->sendChallenge($user);
 	}
 
 	/**

@@ -12,6 +12,7 @@ namespace OCA\TwoFactorEMail\Service;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\ResendTooSoon;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
+use OCA\TwoFactorEMail\Exception\SendRateLimited;
 use OCP\IUser;
 
 interface ILoginChallenge {
@@ -22,6 +23,8 @@ interface ILoginChallenge {
 	 * @return bool true if a new code was sent
 	 *
 	 * @throws EMailNotSet
+	 * @throws SendRateLimited if the account reached the send cap. The login page
+	 *                         reports it as a failed send like any other.
 	 * @throws SendEMailFailed
 	 */
 	public function sendChallenge(IUser $user): bool;
@@ -33,6 +36,9 @@ interface ILoginChallenge {
 	 * @param IUser $user UID
 	 *
 	 * @throws ResendTooSoon if the cooldown has not elapsed yet
+	 * @throws SendRateLimited if the account may not contact the mail server again
+	 *                         yet, which callers can report as "too often" rather
+	 *                         than as a failed send
 	 * @throws EMailNotSet
 	 * @throws SendEMailFailed
 	 */
