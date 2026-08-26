@@ -35,6 +35,8 @@ only show up in a running Nextcloud — see [development-setup.md](development-s
 
 ## Security mechanisms
 
+What these mechanisms promise, and against whom, is bounded by the [threat model](threat-model.md): input through an interface is checked; write access to the instance's files or database is not something they can defend against.
+
 - **Code generation.** `NumericalCodeGenerator` uses `OCP\Security\ISecureRandom` (a CSPRNG) with `CHAR_DIGITS` and the configured length. No `rand()`/`mt_rand()`.
 - **Storage at rest.** `CodeStorage` stores `IHasher::hash($code)` — never the plaintext — in the user's config, plus a creation timestamp. The value is flagged `IUserConfig::FLAG_SENSITIVE`, so it is masked in `occ config:list` and in system/support reports.
 - **Verification.** `IHasher::verify()` is constant-time. The code is deleted only on **successful** verification (so a mistyped code can be retried); wrong tries are absorbed by Nextcloud's brute-force protection.

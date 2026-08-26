@@ -2,12 +2,23 @@
 
 This app raises the bar for account takeover but, like every second factor, it is not absolute.
 
+## Who the promises are made against
+
+Everything this app checks, it checks against input that arrives **through an interface**:
+
+- a **user in the browser**, including one who already passed the password;
+- an **admin in the web UI** and the app's own `occ` commands (`twofactor_email:settings`), which share one validator — so neither path can store a setting that weakens the factor or carries the code into a link;
+- a value that reached the app config on **another** path — the generic `occ config:app:set`, a database restored from a different release — is corrected or ignored when it is *read*, because a validator never saw it written. That is robustness on top, and it covers only the settings this app owns.
+
+**Out of scope: write access to the instance itself.** Whoever can change files (this app's code, a theme's translation files, `config.php`) or write to the database directly is already inside the trust boundary: the same access removes any check made here, so no check can defend against it. A full server compromise defeats any second factor, this one included. Read access is a different question and is treated above — codes are stored hashed and flagged sensitive, which limits what a config or database *read* yields, though not what root can do.
+
+## Limitations of the factor itself
+
 - **The email channel is the trust anchor.** The factor is "something you can *receive*". Its strength equals the security of the user's mailbox and the mail transport. A compromised mailbox, or mail read in transit, defeats it. This is the fundamental trade-off of email-based 2FA versus "something you *have*" factors (TOTP apps, hardware keys).
 - **No phishing resistance.** A real-time phishing proxy can prompt for the code and replay it, exactly as with TOTP. Only origin-bound factors ([FIDO2/WebAuthn](https://docs.nextcloud.com/server/latest/user_manual/en/user_2fa.html)) resist this.
 - **Limited code entropy, compensated by policy.** A six-digit code has ~10⁶ values; brute force is contained by the short validity, the single valid code, the resend rate limit, and Nextcloud's login brute-force protection — not by entropy alone.
 - **Reloading the challenge page is capped, not free.** Nextcloud rate-limits submitting a code and this app's resend endpoint, but not a reload of the challenge page. A code that was sent is stored, and a stored code stops the next reload from sending another. A send that failed stores nothing, so the app registers every connection it opens to the mail server with Nextcloud's rate limiter, ten in five minutes per account, and refuses the rest. The window is that long on purpose: a mail server that hangs holds each attempt for the SMTP timeout, so a shorter one would expire before the cap is reached. Without that, an unreachable mail server would cost one outgoing connection per reload, and a failed page offers nothing else to do. The cap sits behind the address check, so an account with no address is still reported as exactly that, however often the page is loaded. Only someone who already passed the first factor can reach the page at all.
 - **Residual timing side channel (accepted).** `verifyChallenge()` returns early when no code is stored, which is measurably faster than a hash comparison, so response time reveals whether an unexpired code exists — but only to someone who already passed the first factor, and the comparison itself stays constant-time. A decoy hash comparison on the miss path was deliberately left out. That it takes the first factor to get there at all is the first invariant below.
-- **A full server compromise defeats any 2FA**, this one included; storing codes hashed limits exposure from lower-privilege config/DB reads, not from root.
 
 ## How email 2FA compares
 

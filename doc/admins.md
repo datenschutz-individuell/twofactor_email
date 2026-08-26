@@ -10,7 +10,7 @@ This page covers installing, configuring, and running the provider.
 
 ## Settings
 
-Code length, code validity, the resend cooldown, and the challenge email subject/template are configurable — from the admin UI **and** via `occ`. All values go through one validator with fixed bounds (length, validity, cooldown ranges; subject/template max length; CR/LF rejected in the subject), so the web UI and `occ` cannot be used to set out-of-range or malformed values.
+Code length, code validity, the resend cooldown, and the challenge email subject/template are configurable — from the admin UI **and** via `occ`. All values go through one validator with fixed bounds (length, validity, cooldown ranges; subject/template max length; CR/LF rejected in the subject), so neither the admin UI nor `occ twofactor_email:settings` can store an out-of-range or malformed value. The generic `occ config:app:set` writes to the app config directly and is not bound by that validator — see the read-side bounds below.
 
 **A placeholder must not sit inside a web address.** `https://example.com/{code}` in the subject or the body is rejected, because the value would become part of the link — and link scanners fetch such addresses on their own, which would hand the one-time code to whoever owns that address. Should such a text already be stored, it is kept and reported: before every mail the finished text is checked once more, and if the code ended up in a web address the mail is sent with the default text instead. So nobody is locked out, and no code leaves in a link.
 

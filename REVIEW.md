@@ -168,11 +168,10 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   text could only fire if that text were changed in the source, which is where a test
   belongs (2026-08-26).
   A **theme** can replace a translated string of ours — a translation file under
-  `themes/` that the server merges over the app's own — and the placeholder
-  substitution would then run on that text. Both writing that file and setting
-  `'theme'` in `config.php` need write access to the server's file system, the same
-  access that could change this app's code: not a separate attack path, and not
-  something a check on every mail would answer.
+  `themes/` that the server merges over the app's own — and the substitution would
+  then run on that text. That needs write access to the instance, which
+  `doc/threat-model.md` puts out of scope: the same access removes the check. It is
+  not a separate attack path.
 
 ## What "ready" means here
 
