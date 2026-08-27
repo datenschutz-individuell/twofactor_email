@@ -29,7 +29,9 @@ use OCP\User\Events\UserChangedEvent;
  * Once the address is gone and the provider is still enabled:
  *   - another active provider remains → disable, no protection is lost;
  *   - email was the sole factor → keep it enabled (fail-closed), whoever
- *     cleared the address.
+ *     cleared the address. Backup codes are not such a factor: Nextcloud does
+ *     not accept them alone, so an account holding only those keeps email
+ *     enabled and its user logs in with a backup code.
  *
  * Disabling the sole factor would drop the account to password-only. That would
  * skip the password confirmation which turning 2FA off directly requires

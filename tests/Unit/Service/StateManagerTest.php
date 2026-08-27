@@ -59,6 +59,18 @@ final class StateManagerTest extends TestCase {
 		$this->assertFalse($this->stateManager->hasOtherActiveProvider($user));
 	}
 
+	public function testHasOtherActiveProviderIsTrueForBackupCodesBesideARealProvider(): void {
+		$user = $this->withProviderStates(['email' => true, 'backup_codes' => true, 'totp' => true]);
+
+		$this->assertTrue($this->stateManager->hasOtherActiveProvider($user));
+	}
+
+	public function testHasOtherActiveProviderIsFalseForBackupCodesAlone(): void {
+		$user = $this->withProviderStates(['email' => true, 'backup_codes' => true]);
+
+		$this->assertFalse($this->stateManager->hasOtherActiveProvider($user));
+	}
+
 	public function testHasOtherActiveProviderIsFalseWithoutAnyProviders(): void {
 		$user = $this->withProviderStates([]);
 
