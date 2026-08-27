@@ -41,6 +41,6 @@ To build the app, check out the repo and use `krankerl package` or follow these 
 
 * `composer i --no-dev`
 * `npm ci`
-* `npm run build` or `npm run dev` [more info](https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/npm.html)
+* `npm run build` or `npm run dev` [more info](https://docs.nextcloud.com/server/stable/developer_manual/digging_deeper/npm.html)
 
 <small>[krankerl](https://github.com/ChristophWurst/krankerl/) is the tool proposed by Nextcloud to build apps.</small>

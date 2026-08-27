@@ -42,7 +42,7 @@ Create them under *Personal settings › Security › Devices & sessions* — se
 
 - Your codes arrive **by email**, so this factor is only as safe as your **mailbox**. Protect your email account with a strong, unique password and, ideally, its own second factor — or a passkey.
 - Like authenticator-app codes, an emailed code is **not phishing-proof**: a fake login page could ask you for the code and use it immediately. **Only ever enter a code on your genuine Nextcloud address.**
-- If you want the strongest protection, ask your admin whether a hardware security key or passkey (FIDO2/WebAuthn) is available — it resists phishing that codes cannot. Nextcloud lets you enable [several methods](https://docs.nextcloud.com/server/latest/user_manual/en/user_2fa.html) at once, so you can keep email as a fallback.
+- If you want the strongest protection, ask your admin whether a hardware security key or passkey (FIDO2/WebAuthn) is available — it resists phishing that codes cannot. Nextcloud lets you enable [several methods](https://docs.nextcloud.com/server/stable/user_manual/en/user_2fa.html) at once, so you can keep email as a fallback.
 
 For how email 2FA compares to other methods and where its limits are, see the [threat model](threat-model.md).
 
