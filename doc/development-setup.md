@@ -107,6 +107,33 @@ If the Docker daemon refuses to start with `error initializing graphdriver: driv
 supported`, the kernel was updated without a reboot since — the modules of the running
 kernel are gone, so overlayfs cannot be loaded. Rebooting fixes it.
 
+## The one check that is not in a lock file
+
+`composer install` brings PHPUnit, Psalm and php-cs-fixer, `npm install` the JavaScript
+side. Both put their tools inside the checkout. The `reuse` check has no such home, so
+it is the one that usually reports itself through a red CI job:
+
+```
+# on Arch, as root
+pacman -S reuse
+```
+
+Other systems are covered on [reuse.software](https://reuse.software/) — `pipx install
+reuse` works everywhere Python does. Install it **for the machine, not for one account**:
+unlike the tools above it is not part of the checkout, and a check only one user can run
+is one the next person does not know about.
+
+`reuse lint` in the repository root then answers what the CI job answers: does every file
+carry copyright and licence information, in an SPDX header or through an entry in
+`REUSE.toml`. A file with neither is the usual reason that job turns red. Watch the
+entries that are globbed — `doc/**`, `screenshots/**`, `vendor-bin/*/composer.json` and
+`.lock`, and under `l10n/` only `**.js`, `**.json` and `**.php`. Anything outside those
+patterns, a new file at the root above all, needs a **named** entry or a header of its
+own.
+
+Rector is the other tool that is not installed here, and CI does not run it either. That
+is deliberate; see below.
+
 ## Rector, when the Nextcloud range moves
 
 Rector can rewrite calls that a new server renamed, but it is not part of this project:
