@@ -24,6 +24,7 @@ function render({ cooldown = 60, availableIn = 0 } = {}) {
 			<a class="twofactor_email-resend" href="#">Send a new code</a>
 			<span class="twofactor_email-resend-status"></span>
 		</div>
+		<p class="twofactor_email-code-age-hint">No new code was sent, because an earlier one is still valid.</p>
 		<form class="twofactor_email-challenge-form">
 			<input name="challenge" value="123456">
 		</form>
@@ -70,6 +71,27 @@ describe('LoginChallenge resend', () => {
 		expect(input.value).toBe('')
 		expect(link.hidden).toBe(true)
 		expect(status.textContent).toContain('new code was sent')
+	})
+
+	it('removes the line about the earlier code once a new one was sent', async () => {
+		Axios.post.mockResolvedValue({})
+		const { link } = render({ availableIn: 0 })
+		expect(document.querySelector('.twofactor_email-code-age-hint')).not.toBeNull()
+
+		link.click()
+		await vi.advanceTimersByTimeAsync(0)
+
+		expect(document.querySelector('.twofactor_email-code-age-hint')).toBeNull()
+	})
+
+	it('keeps the line about the earlier code when the send failed', async () => {
+		Axios.post.mockRejectedValue({ response: { status: 500, data: {} } })
+		const { link } = render({ availableIn: 0 })
+
+		link.click()
+		await vi.advanceTimersByTimeAsync(0)
+
+		expect(document.querySelector('.twofactor_email-code-age-hint')).not.toBeNull()
 	})
 
 	it('shows a countdown when the server reports the cooldown (429)', async () => {

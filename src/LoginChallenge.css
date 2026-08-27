@@ -27,3 +27,10 @@
 .twofactor_email-resend {
     cursor: pointer;
 }
+
+/* The line that says no new code went out: an explanation, not a warning, so it
+   stays quieter than the sentence it belongs to. */
+.twofactor_email-code-age-hint {
+    font-size: 90%;
+    opacity: .8;
+}
