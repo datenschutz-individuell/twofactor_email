@@ -2,13 +2,21 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # A review is requested automatically where a change can weaken the second factor
-# or the checks that guard it. Everything else stays a deliberate choice per pull
+# or the checks that guard it — this list included, because an edit that drops an
+# owner is such a change. Everything else stays a deliberate choice per pull
 # request.
 #
 # All of lib/ counts: this app is a login guard, so its listeners, migrations,
 # background jobs and occ commands are as security-relevant as its controllers.
+#
+# The same change is often carried into both supported lines, as a pair of pull
+# requests. Whether a request is triggered automatically depends on the paths
+# listed below, as they stand in the branch a pull request targets, and the two
+# lines do not list the same paths. So whichever of the pair triggers a request
+# sets the reviewer, and the other one gets that same reviewer added by hand.
 
 /lib/                  @seyfahni @nursoda
+/.github/CODEOWNERS    @seyfahni @nursoda
 /appinfo/info.xml      @seyfahni @nursoda
 /.github/workflows/    @seyfahni @nursoda
 /SECURITY.md           @seyfahni @nursoda
