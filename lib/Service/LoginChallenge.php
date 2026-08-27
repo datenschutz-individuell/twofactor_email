@@ -22,6 +22,7 @@ final readonly class LoginChallenge implements ILoginChallenge {
 		private ICodeGenerator $codeGenerator,
 		private ICodeStorage $codeStorage,
 		private IEMailSender $emailSender,
+		private EMailAddressSource $addressSource,
 		private IHasher $hasher,
 		private IAppSettings $settings,
 		private LoggerInterface $logger,
@@ -38,20 +39,22 @@ final readonly class LoginChallenge implements ILoginChallenge {
 		 * The code is stored hashed, so it stays secret and resistant to timing
 		 * attacks even if an attacker managed to elevate their privileges.
 		 */
-		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
+		$address = $this->addressSource->getAddress($user);
+		$storedCodeHash = $this->codeStorage->readCode($user->getUID(), $address);
 
 		/**
 		 * Nextcloud throttles login retries, but not a reload of the challenge page,
 		 * which would otherwise generate and send a new code every time. A stored code
-		 * stops that: it can only be read while one exists and is still valid. Because
-		 * a send that failed stores nothing, that alone is not enough, so EMailSender
-		 * also asks Nextcloud's rate limiter before it opens a connection.
+		 * stops that: it can only be read while one exists, is still valid, and was
+		 * sent to the address delivery would use now. Because a send that failed stores
+		 * nothing, that alone is not enough, so EMailSender also asks Nextcloud's rate
+		 * limiter before it opens a connection.
 		 */
 		if (!is_null($storedCodeHash)) {
 			return false;
 		}
 
-		$this->issueCode($user);
+		$this->issueCode($user, $address);
 		return true;
 	}
 
@@ -65,18 +68,19 @@ final readonly class LoginChallenge implements ILoginChallenge {
 	 */
 	#[\Override]
 	public function resendChallenge(IUser $user): void {
-		$elapsed = $this->codeStorage->secondsSinceLastCode($user->getUID());
+		$address = $this->addressSource->getAddress($user);
+		$elapsed = $this->codeStorage->secondsSinceLastCode($user->getUID(), $address);
 		$cooldown = $this->settings->getResendCooldownSeconds();
 		if ($elapsed !== null && $elapsed < $cooldown) {
 			throw new ResendTooSoon($cooldown - $elapsed);
 		}
 
-		$this->issueCode($user);
+		$this->issueCode($user, $address);
 	}
 
 	#[\Override]
 	public function secondsUntilResendAllowed(IUser $user): int {
-		$elapsed = $this->codeStorage->secondsSinceLastCode($user->getUID());
+		$elapsed = $this->codeStorage->secondsSinceLastCode($user->getUID(), $this->addressSource->getAddress($user));
 		if ($elapsed === null) {
 			return 0;
 		}
@@ -90,7 +94,7 @@ final readonly class LoginChallenge implements ILoginChallenge {
 	#[\Override]
 	public function verifyChallenge(IUser $user, string $submittedCode): bool {
 		$submittedCode = trim($submittedCode);
-		$storedCodeHash = $this->codeStorage->readCode($user->getUID());
+		$storedCodeHash = $this->codeStorage->readCode($user->getUID(), $this->addressSource->getAddress($user));
 		// Accepted residual timing side channel: returning early when no code is
 		// stored is measurably faster than the hash comparison, so the response
 		// time reveals whether an unexpired code currently exists — but only to
@@ -118,15 +122,24 @@ final readonly class LoginChallenge implements ILoginChallenge {
 	 * Sends a fresh code and only then persists it, overwriting any existing
 	 * code. If sending fails, the previously stored code stays valid.
 	 *
+	 * @param string|null $address the address this account delivers to, as
+	 *                             EMailAddressSource named it for the caller
 	 * @throws EMailNotSet
 	 * @throws SendEMailFailed
 	 */
-	private function issueCode(IUser $user): void {
+	private function issueCode(IUser $user, ?string $address): void {
 		$generatedCode = $this->codeGenerator->generateChallengeCode();
 		try {
+			// A code can only be stored against an address, so an account without one
+			// stops here — before the sender, which refuses it as well.
+			if ($address === null) {
+				throw new EMailNotSet($user);
+			}
 			$this->emailSender->sendChallengeEMail($user, $generatedCode);
-			// Only store the code if it could be sent.
-			$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode));
+			// Only store the code if it could be sent. The sender reads the address from
+			// the same source, so the two agree within a request; if they ever did not,
+			// the code would be refused rather than accepted for the wrong mailbox.
+			$this->codeStorage->writeCode($user->getUID(), $this->hasher->hash($generatedCode), $address);
 		} catch (EMailNotSet $e) {
 			$this->logger->warning('Could not send 2FA challenge: No email address configured for user.', [
 				'exception' => $e,

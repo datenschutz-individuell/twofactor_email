@@ -14,6 +14,7 @@ use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCA\TwoFactorEMail\Provider\LoginSetup;
 use OCA\TwoFactorEMail\Provider\TwoFactorEMail;
+use OCA\TwoFactorEMail\Service\EMailAddressSource;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Service\IEMailAddressMasker;
 use OCA\TwoFactorEMail\Service\ILoginChallenge;
@@ -284,6 +285,7 @@ final class TwoFactorEMailTest extends TestCase {
 
 		$this->provider = new TwoFactorEMail(
 			$this->masker,
+			new EMailAddressSource(),
 			$this->templateManager,
 			$this->l10n,
 			$this->initialState,

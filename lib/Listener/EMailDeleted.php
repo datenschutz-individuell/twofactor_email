@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Listener;
 
 use OCA\TwoFactorEMail\Event\StateChangeActor;
+use OCA\TwoFactorEMail\Service\EMailAddressSource;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
@@ -66,6 +67,7 @@ final readonly class EMailDeleted implements IEventListener {
 
 	public function __construct(
 		private IStateManager $stateManager,
+		private EMailAddressSource $addressSource,
 	) {
 	}
 
@@ -80,7 +82,7 @@ final readonly class EMailDeleted implements IEventListener {
 			return;
 		}
 		$user = $event->getUser();
-		if ($user->getEMailAddress() !== null) {
+		if ($this->addressSource->getAddress($user) !== null) {
 			return; // still deliverable (e.g. the address was changed, not cleared)
 		}
 		if (!$this->stateManager->isEnabled($user)) {

@@ -16,8 +16,8 @@ use OCP\IUser;
 
 interface IEMailSender {
 	/**
-	 * @param IUser $user
-	 * @param string $code
+	 * Sends the code to the address EMailAddressSource names for this account.
+	 *
 	 * @throws EMailNotSet
 	 * @throws SendRateLimited if the account reached the cap on how often the app
 	 *                         opens a connection to the mail server

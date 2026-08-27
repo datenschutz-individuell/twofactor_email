@@ -22,6 +22,7 @@ The building blocks and the interface each one implements:
 | Code generation               | `Service\ICodeGenerator`      | `Service\NumericalCodeGenerator`                                          |
 | Code storage                  | `Service\ICodeStorage`        | `Service\CodeStorage`                                                     |
 | Email delivery                | `Service\IEMailSender`        | `Service\EMailSender` (+ `Mail\TemplateRenderer`, `Mail\LinkScanner`)     |
+| Delivery address              | — (concrete)                  | `Service\EMailAddressSource`                                              |
 | Address masking               | `Service\IEMailAddressMasker` | `Service\EMailAddressMasker`                                              |
 | Enable/disable state          | `Service\IStateManager`       | `Service\StateManager`                                                    |
 | Settings                      | `Service\IAppSettings`        | `Service\AppSettings` (+ `Service\SettingsValidator`, `Service\WarnOnce`) |

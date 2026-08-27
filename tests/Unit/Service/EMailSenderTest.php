@@ -13,6 +13,7 @@ use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCA\TwoFactorEMail\Exception\SendRateLimited;
 use OCA\TwoFactorEMail\Mail\TemplateRenderer;
+use OCA\TwoFactorEMail\Service\EMailAddressSource;
 use OCA\TwoFactorEMail\Service\EMailSender;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\DB\Exception as DbException;
@@ -69,6 +70,9 @@ final class EMailSenderTest extends TestCase {
 			$this->appSettings,
 			new TemplateRenderer($this->defaults, $this->urlGenerator, $this->appSettings),
 			$this->limiter,
+			// Pure delegation to IUser — the real class keeps the test on the address
+			// the app would actually deliver to.
+			new EMailAddressSource(),
 		);
 	}
 
@@ -111,6 +115,26 @@ final class EMailSenderTest extends TestCase {
 		$this->expectException(EMailNotSet::class);
 
 		$this->sender->sendChallengeEMail($this->mockUser(null), '123456');
+	}
+
+	/**
+	 * The recipient comes from EMailAddressSource, which is also what the caller binds
+	 * the stored code to. Both asking the same source is what keeps a code from
+	 * outliving the mailbox it was sent to.
+	 *
+	 * @throws SendEMailFailed
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testAddressesTheMailToTheAccountAddress(): void {
+		$message = $this->createMock(IMessage::class);
+		$this->mailer->method('createEMailTemplate')->willReturn($this->template);
+		$this->mailer->method('createMessage')->willReturn($message);
+		$this->mailer->expects($this->once())->method('send');
+
+		$message->expects($this->once())->method('setTo')->with(['jane@example.com' => 'Jane Doe']);
+
+		$this->sender->sendChallengeEMail($this->mockUser('jane@example.com'), '123456');
 	}
 
 	/**

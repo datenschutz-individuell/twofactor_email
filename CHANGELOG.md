@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Check the finished email and fall back to the default text if the one-time code ended up in a web address
 - Reject an email subject or body that puts a placeholder inside a web address
 - Report email texts that no longer work as intended, and reset one that is not valid text, on upgrade
+- A code is only accepted for the address it was sent to, whether or not Nextcloud reports the change
 
 ### Changed
 
@@ -29,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The admin settings page refuses to save while a stored text puts a placeholder inside a web address
 - Count the subject and body length limits in characters, not bytes
 - Skip the database writes that cleared a code no user had stored
+- Send a new code at once when the notification address changed, instead of waiting for the old one to expire
 
 ### Fixed
 

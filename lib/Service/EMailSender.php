@@ -40,12 +40,13 @@ final readonly class EMailSender implements IEMailSender {
 		private IAppSettings $appSettings,
 		private TemplateRenderer $templateRenderer,
 		private ILimiter $limiter,
+		private EMailAddressSource $addressSource,
 	) {
 	}
 
 	#[\Override]
 	public function sendChallengeEMail(IUser $user, string $code): void {
-		$email = $user->getEMailAddress();
+		$email = $this->addressSource->getAddress($user);
 		if ($email === null) {
 			throw new EMailNotSet($user);
 		}

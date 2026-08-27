@@ -11,6 +11,7 @@ namespace OCA\TwoFactorEMail\Test\Unit\Listener;
 
 use OCA\TwoFactorEMail\Event\StateChangeActor;
 use OCA\TwoFactorEMail\Listener\EMailDeleted;
+use OCA\TwoFactorEMail\Service\EMailAddressSource;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\Accounts\UserUpdatedEvent;
 use OCP\EventDispatcher\Event;
@@ -33,7 +34,7 @@ final class EMailDeletedTest extends TestCase {
 
 		$this->stateManager = $this->createMock(IStateManager::class);
 
-		$this->listener = new EMailDeleted($this->stateManager);
+		$this->listener = new EMailDeleted($this->stateManager, new EMailAddressSource());
 	}
 
 	/**
