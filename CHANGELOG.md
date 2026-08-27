@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Administrator documentation for occ, enforcement, email addresses and a FAQ
+- Fresh screenshots in the documentation
+
 ### Security
 
 - Require the second factor for the admin settings routes while an admin is still being set up

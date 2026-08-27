@@ -7,12 +7,13 @@ Two-factor email adds a second step to your Nextcloud login: after your password
 - Set a primary email address in *Personal info* first — the code is sent there.
 - Enable **Email** under *Personal settings › Security › Two-Factor Authentication*.
 - From then on, each login asks for a code after your password.
+- Your administrator can switch email 2FA on or off for your account as well. When they do, you get a notification and an entry in your activity list.
 
 ![The Email section of Personal settings, switched on and showing the address the codes are sent to](img/personal-settings.webp)
 
 ## Using it at login
 
-When you sign in, you enter your username and password as usual. If email is your only second factor, you go straight to the code step; if you have several methods enabled, Nextcloud first asks which one to use — choose **Email verification**:
+When you sign in, you enter your username and password as usual. If email is your only second factor, you go straight to the code step; if you have several methods enabled, Nextcloud first asks which one to use — choose **Email**:
 
 ![The login screen listing the enabled second factors — Email, TOTP and Security key — with Email at the top](img/challenge-select.webp)
 
@@ -50,3 +51,4 @@ For how email 2FA compares to other methods and where its limits are, see the [t
 - Check that your **primary email address** in *Personal info* is correct and that you can receive mail there.
 - Look in your spam/junk folder.
 - If mail delivery on the server is broken you will not receive codes — contact your administrator. Consider setting up a second 2FA method as a backup.
+- If you cannot reach your mailbox at all any more, ask your administrator to change the address your codes go to. Switching the factor off is not the way out: where 2FA is enforced it only sends you into setting it up again, and it takes the *Use backup code* link off the login screen.
