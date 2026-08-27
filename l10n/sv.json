@@ -19,7 +19,6 @@
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "Platshållare: {code}, {user}, {cloud}, {validity}, {logo}. {code} måste finnas i brödtexten.",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "Standardvärden: tomma fält använder den lokaliserade standardtexten, som visas som en ledtext i fältet.",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "Formatering: en tom rad inleder ett nytt stycke och en enkel radbrytning blir en radbrytning.",
-    "Links: URLs are detected and rendered as linked URL text." : "Länkar: URL:er identifieras och visas som länkad URL-text.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Dessa systemomfattande inställningar sparas automatiskt kort efter den sista tangenttryckningen.",
     "Authentication code" : "Autentiseringskod",
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Längd och giltighet för engångskoder som skickas via e-post samt hur snart användaren får begära en ny kod.",

@@ -21,7 +21,6 @@ OC.L10N.register(
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "Placeholdere: {code}, {user}, {cloud}, {validity}, {logo}. {code} skal være en del af kroppen.",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "Standard: tomme felter bruger den lokaliserede standardtekst, vist som et vink inde i feltet.",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "Formatering: en tom linje starter et nyt afsnit, en enkelt linje pause bliver en linje pause.",
-    "Links: URLs are detected and rendered as linked URL text." : "Links: URLs are detected and rendered as linked URL text.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Disse systembrede indstillinger gemmes automatisk kort efter den sidste tastetryk.",
     "Authentication code" : "Godkendelses kode",
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Længde og gyldighed af one-time koder sendt via e-mail, og hvor hurtigt en bruger kan anmode om en ny kode.",

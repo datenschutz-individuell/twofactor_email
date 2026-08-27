@@ -13,7 +13,6 @@
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "متغیرهایی مانند {code}،{user}،{cloud}،{validity}،{logo}.{code} باید بخشی از بدنه باشند.",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "پیش‌فرض‌ها: فیلدهای خالی از متن پیش‌فرض محلی‌شده استفاده می‌کنند که به عنوان راهنما در داخل فیلد نشان داده می‌شود.",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "قالب‌بندی: یک خط خالی، پاراگراف جدید را شروع می‌کند، یک خط شکسته تبدیل به یک خط شکسته می‌شود.",
-    "Links: URLs are detected and rendered as linked URL text." : "لینک‌ها: آدرس‌های اینترنتی (URL) شناسایی و به صورت متن URL لینک‌شده نمایش داده می‌شوند.",
     "These system wide settings are saved automatically shortly after the last keypress." : "این تنظیمات سراسری سیستم مدت کوتاهی پس از آخرین فشردن کلید به طور خودکار ذخیره می‌شوند.",
     "Authentication code" : "کد احراز هویت",
     "Length (characters)" : "طول (کاراکتر)",

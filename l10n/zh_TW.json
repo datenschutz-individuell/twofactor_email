@@ -19,7 +19,6 @@
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "佔位字串：{code}, {user}, {cloud}, {validity}, {logo}. {code} 必須包含在正文中。",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "預設值：空欄位會使用在地化的預設文字，並以提示形式顯示在欄位內。",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "格式設定：空行會開始一個新段落，單行換行則會產生換行。",
-    "Links: URLs are detected and rendered as linked URL text." : "連結：系統會偵測 URL 並將其呈現為可點擊的連結文字。",
     "These system wide settings are saved automatically shortly after the last keypress." : "這些系統全域設定會在您停止輸入後不久自動儲存。",
     "Authentication code" : "驗證碼",
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "透過電子郵件發送的一次性驗證碼的有效期限及有效時長，以及使用者何時可申請新的驗證碼。",

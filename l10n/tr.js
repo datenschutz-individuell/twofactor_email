@@ -21,7 +21,6 @@ OC.L10N.register(
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "Yer belirticiler: {code}, {user}, {cloud}, {validity}, {logo}. {code} içeriğin bir parçası olmalıdır.",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "Varsayılanlar: Boş alanlar, alanın içinde bir ipucu olarak gösterilen yerelleştirilmiş varsayılan içeriği kullanır.",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "Biçimlendirme: Boş bir satır yeni bir paragraf başlatır, tek bir satır sonu bir satır sonu olur.",
-    "Links: URLs are detected and rendered as linked URL text." : "Bağlantılar: Adresler algılanır ve bağlantılı adres yazısı olarak işlenir.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Bu sistem geneli ayarları, son tuşa basıldıktan kısa bir süre sonra otomatik olarak kaydedilir.",
     "Authentication code" : "Doğrulama kodu",
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "E-posta ile gönderilen tek kullanımlık kodların uzunluğu ve geçerliliği ve bir kullanıcının ne kadar sürede yeni bir kod isteyebileceği.",

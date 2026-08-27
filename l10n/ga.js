@@ -21,7 +21,6 @@ OC.L10N.register(
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "Coinníollacha áite: {code}, {user}, {cloud}, {validity}, {logo}. Ní mór {code} a bheith mar chuid den chorp.",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "Réamhshocruithe: úsáideann réimsí folamha an téacs réamhshocraithe logánta, a thaispeántar mar leid taobh istigh den réimse.",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "Formáidiú: tosaíonn líne bhán mír nua, bíonn briseadh líne de bhriseadh líne aonair.",
-    "Links: URLs are detected and rendered as linked URL text." : "Naisc: Braitear URLanna agus rindreáiltear iad mar théacs URL nasctha.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Sábháiltear na socruithe córais seo go huathoibríoch go gairid i ndiaidh an bhrú eochrach dheireanaigh.",
     "Authentication code" : "Cód fíordheimhnithe",
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Fad agus bailíocht na gcód aonuaire a sheoltar trí ríomhphost, agus cé chomh luath agus is féidir le húsáideoir cód nua a iarraidh.",

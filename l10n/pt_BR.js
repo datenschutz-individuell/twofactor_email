@@ -21,7 +21,6 @@ OC.L10N.register(
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "Marcadores de posição: {code}, {user}, {cloud}, {validity}, {logo}. {code} deve fazer parte do corpo.",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "Valores padrão: os campos vazios utilizam o texto padrão localizado, exibido como uma dica dentro do campo.",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "Formatação: uma linha em branco inicia um novo parágrafo; uma quebra de linha simples funciona como uma quebra de linha.",
-    "Links: URLs are detected and rendered as linked URL text." : "Links: os URLs são detectados e exibidos como texto com link.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Essas configurações gerais do sistema são salvas automaticamente logo após a última tecla ser pressionada.",
     "Authentication code" : "Código de autenticação",
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Comprimento e validade dos códigos únicos enviados por e-mail, e em quanto tempo um usuário pode solicitar um novo código.",

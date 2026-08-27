@@ -19,7 +19,6 @@
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "Διακριτικά θέσης (Placeholders): {code}, {user}, {cloud}, {validity}, {logo}. Το {code} πρέπει να περιλαμβάνεται στο σώμα του κειμένου.",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "Προεπιλογές: τα κενά πεδία χρησιμοποιούν το μεταφρασμένο προεπιλεγμένο κείμενο, το οποίο εμφανίζεται ως υπόδειξη μέσα στο πεδίο.",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "Μορφοποίηση: μια κενή γραμμή ξεκινά μια νέα παράγραφο, μια μεμονωμένη αλλαγή γραμμής παραμένει αλλαγή γραμμής.",
-    "Links: URLs are detected and rendered as linked URL text." : "Σύνδεσμοι: Τα URL εντοπίζονται και εμφανίζονται ως κείμενο με ενεργό σύνδεσμο.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Αυτές οι καθολικές ρυθμίσεις συστήματος αποθηκεύονται αυτόματα λίγο μετά το τελευταίο πάτημα πλήκτρου.",
     "Authentication code" : "Κωδικός πιστοποίησης",
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Το μήκος και η διάρκεια ισχύος των κωδικών μίας χρήσης που αποστέλλονται μέσω email, καθώς και το πόσο σύντομα μπορεί ένας χρήστης να ζητήσει νέο κωδικό.",

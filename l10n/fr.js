@@ -21,7 +21,6 @@ OC.L10N.register(
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "Variables disponibles : {code}, {user}, {cloud}, {validity}, {logo}. La variable {code} doit obligatoirement figurer dans le corps du message.",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "Valeurs par défaut : les champs laissés vides utilisent le texte localisé par défaut, affiché comme indication dans le champ.",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "Mise en forme : une ligne vide commence un nouveau paragraphe ; un simple retour à la ligne est conservé comme saut de ligne.",
-    "Links: URLs are detected and rendered as linked URL text." : "Liens : les URL sont détectées automatiquement et affichées comme des liens cliquables.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Ces paramètres globaux sont enregistrés automatiquement quelques instants après la dernière saisie.",
     "Authentication code" : "Code d’authentification",
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Définissez la longueur et la durée de validité des codes à usage unique envoyés par e-mail, ainsi que le délai avant qu'un utilisateur puisse demander un nouveau code.",
