@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- Keep email 2FA on when the only other factor is backup codes, which Nextcloud does not accept alone
 - Changing or clearing the account email address now drops a pending code
 - The address was not masked in rare cases
 
