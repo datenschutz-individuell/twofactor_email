@@ -21,6 +21,8 @@
 /node_modules
 /package*
 /psalm.xml
+# Both this entry and the directory go at the next release.
+/screenshots
 /src
 /stubs
 /stylelint.config.cjs
