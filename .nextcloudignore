@@ -21,7 +21,6 @@
 /node_modules
 /package*
 /psalm.xml
-/screenshots
 /src
 /stubs
 /stylelint.config.cjs
