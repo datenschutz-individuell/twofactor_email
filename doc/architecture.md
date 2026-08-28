@@ -1,6 +1,6 @@
 # Architecture
 
-The app plugs into Nextcloud's [two-factor provider framework](https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/two-factor-provider.html). It is built against Nextcloud's public interfaces ([`OCP`](https://github.com/nextcloud-deps/ocp)) and its own small service interfaces, so the pieces are individually testable and replaceable. This document shows how they fit together; for the security mechanisms see [developers.md](developers.md), and the [threat model](threat-model.md) for its limits.
+The app plugs into Nextcloud's [two-factor provider framework](https://docs.nextcloud.com/server/stable/developer_manual/digging_deeper/two-factor-provider.html). It is built against Nextcloud's public interfaces ([`OCP`](https://github.com/nextcloud-deps/ocp)) and its own small service interfaces, so the pieces are individually testable and replaceable. This document shows how they fit together; for the security mechanisms see [developers.md](developers.md), and the [threat model](threat-model.md) for its limits.
 
 ## Login challenge flow
 

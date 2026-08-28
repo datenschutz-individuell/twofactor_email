@@ -7,12 +7,13 @@ Two-factor email adds a second step to your Nextcloud login: after your password
 - Set a primary email address in *Personal info* first — the code is sent there.
 - Enable **Email** under *Personal settings › Security › Two-Factor Authentication*.
 - From then on, each login asks for a code after your password.
+- Your administrator can switch email 2FA on or off for your account as well. When they do, you get a notification and an entry in your activity list.
 
 ![The Email section of Personal settings, switched on and showing the address the codes are sent to](img/personal-settings.webp)
 
 ## Using it at login
 
-When you sign in, you enter your username and password as usual. If email is your only second factor, you go straight to the code step; if you have several methods enabled, Nextcloud first asks which one to use — choose **Email verification**:
+When you sign in, you enter your username and password as usual. If email is your only second factor, you go straight to the code step; if you have several methods enabled, Nextcloud first asks which one to use — choose **Email**:
 
 ![The login screen listing the enabled second factors — Email, TOTP and Security key — with Email at the top](img/challenge-select.webp)
 
@@ -41,7 +42,7 @@ Create them under *Personal settings › Security › Devices & sessions* — se
 
 - Your codes arrive **by email**, so this factor is only as safe as your **mailbox**. Protect your email account with a strong, unique password and, ideally, its own second factor — or a passkey.
 - Like authenticator-app codes, an emailed code is **not phishing-proof**: a fake login page could ask you for the code and use it immediately. **Only ever enter a code on your genuine Nextcloud address.**
-- If you want the strongest protection, ask your admin whether a hardware security key or passkey (FIDO2/WebAuthn) is available — it resists phishing that codes cannot. Nextcloud lets you enable [several methods](https://docs.nextcloud.com/server/latest/user_manual/en/user_2fa.html) at once, so you can keep email as a fallback.
+- If you want the strongest protection, ask your admin whether a hardware security key or passkey (FIDO2/WebAuthn) is available — it resists phishing that codes cannot. Nextcloud lets you enable [several methods](https://docs.nextcloud.com/server/stable/user_manual/en/user_2fa.html) at once, so you can keep email as a fallback.
 
 For how email 2FA compares to other methods and where its limits are, see the [threat model](threat-model.md).
 
@@ -50,3 +51,4 @@ For how email 2FA compares to other methods and where its limits are, see the [t
 - Check that your **primary email address** in *Personal info* is correct and that you can receive mail there.
 - Look in your spam/junk folder.
 - If mail delivery on the server is broken you will not receive codes — contact your administrator. Consider setting up a second 2FA method as a backup.
+- If you cannot reach your mailbox at all any more, ask your administrator to change the address your codes go to. Switching the factor off is not the way out: where 2FA is enforced it only sends you into setting it up again, and it takes the *Use backup code* link off the login screen.
