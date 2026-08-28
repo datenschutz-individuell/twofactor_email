@@ -6,7 +6,7 @@ The app plugs into Nextcloud's [two-factor provider framework](https://docs.next
 
 The email challenge is the **second** stage of login. The first stage is a password — or a passwordless credential such as a passkey or security key. Once it succeeds, Nextcloud asks the enabled provider for a challenge, and this app generates a code, emails it, and verifies what the user enters:
 
-![Login challenge flow: after the first login stage, the provider reuses a still-valid code or issues a new one — generate with a CSPRNG, email it, then store its hash only after the email is sent. The code the user enters is checked with a constant-time hash comparison and deleted on success.](login-challenge-flow.svg)
+![Login challenge flow: after the first login stage, the provider reuses a still-valid code or issues a new one — generate with a CSPRNG, email it, then store its hash only after the email is sent. The code the user enters is checked with a constant-time hash comparison and deleted on success.](img/login-challenge-flow.svg)
 
 A new code is issued only when no unexpired one is stored, and the hash is written only after the email was sent. So reloading the login page does not spam the mailbox, and a failed send leaves the previous code valid.
 

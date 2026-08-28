@@ -59,8 +59,8 @@ at the bottom of "Personal Settings/Security").]]></description>
     <bugs>https://github.com/datenschutz-individuell/twofactor_email/issues</bugs>
     <repository>https://github.com/datenschutz-individuell/twofactor_email.git</repository>
     <screenshot
-            small-thumbnail="https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/screenshots/select-auth_thumb.webp">
-        https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/screenshots/challenge.webp
+            small-thumbnail="https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/doc/store/challenge.webp">
+        https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/doc/store/challenge.png
     </screenshot>
     <dependencies>
         <php min-version="8.2" max-version="8.5"/>

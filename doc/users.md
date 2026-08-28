@@ -8,17 +8,17 @@ Two-factor email adds a second step to your Nextcloud login: after your password
 - Enable **Email** under *Personal settings › Security › Two-Factor Authentication*.
 - From then on, each login asks for a code after your password.
 
-![Enabling email two-factor authentication in Personal settings](../screenshots/personal-settings.png)
+![The Email section of Personal settings, switched on and showing the address the codes are sent to](img/personal-settings.webp)
 
 ## Using it at login
 
 When you sign in, you enter your username and password as usual. If email is your only second factor, you go straight to the code step; if you have several methods enabled, Nextcloud first asks which one to use — choose **Email verification**:
 
-![Choosing email verification at login](../screenshots/select-auth_thumb.png)
+![The login screen listing the enabled second factors — Email, TOTP and Security key — with Email at the top](img/challenge-select.webp)
 
 The app then emails you a short one-time code and shows the code-entry screen. Your address is displayed masked, so a bystander cannot read it. Enter the code to finish signing in:
 
-![Entering the emailed code on the login screen](../screenshots/challenge.png)
+![The code entry screen, showing the masked address the code went to and when a new one can be requested](img/challenge-initial.webp)
 
 If the email does not arrive, request a fresh one with **Send a new code** after a short cooldown. Each code is single-use and only one is valid at a time, so reloading the page never floods your inbox.
 

@@ -6,6 +6,7 @@ SPDX-PackageSupplier = "Two-Factor email Support <twofactor-email@datenschutz-in
 SPDX-PackageDownloadLocation = "https://github.com/datenschutz-individuell/twofactor_email"
 
 [[annotations]]
+# doc/** holds the screenshots too: they are binary and cannot carry a header.
 path = ["CHANGELOG.md", "CLAUDE.md", "CONTRIBUTORS.md", "README.md", "REVIEW.md",
     "SECURITY.md", "doc/**",
     "composer.json", "composer.lock", "package.json", "package-lock.json",
@@ -22,7 +23,7 @@ SPDX-FileCopyrightText = "2026 Translators <https://github.com/datenschutz-indiv
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
-# Screenshots are binary and cannot carry a header; this covers new ones too.
+# Temporary: this block goes with the directory at the next release.
 path = ["screenshots/**"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2025-2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>"
