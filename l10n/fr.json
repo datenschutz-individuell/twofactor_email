@@ -52,6 +52,7 @@
     "The subject must be a single line." : "L'objet doit tenir sur une seule ligne.",
     "The body must not exceed {max} characters." : "Le corps du message ne doit pas dépasser {max} caractères.",
     "The body must contain the {code} placeholder." : "Le corps du message doit contenir la variable {code}.",
+    "The text must be valid UTF-8." : "Le texte doit être en UTF-8 valide.",
     "The verification email could not be sent. Please try again later or contact your administrator." : "L'e-mail de vérification n'a pas pu être envoyé. Veuillez réessayer plus tard ou contacter votre administrateur.",
     "A new authentication code was just sent. Please enter it:" : "Un nouveau code d'authentification vient de vous être envoyé. Veuillez le saisir :",
     "Enter the authentication code that was sent to you:" : "Saisissez le code d'authentification qui vous a été envoyé :",
