@@ -7,8 +7,8 @@ SPDX-PackageDownloadLocation = "https://github.com/datenschutz-individuell/twofa
 
 [[annotations]]
 # doc/** holds the screenshots too: they are binary and cannot carry a header.
-path = ["CHANGELOG.md", "CLAUDE.md", "CONTRIBUTORS.md", "README.md", "REVIEW.md",
-    "SECURITY.md", "doc/**",
+path = ["CHANGELOG.md", "CLAUDE.md", "CODE_OF_CONDUCT.md", "CONTRIBUTING.md", "CONTRIBUTORS.md",
+    "LICENSE.md", "README.md", "REVIEW.md", "SECURITY.md", "doc/**",
     "composer.json", "composer.lock", "package.json", "package-lock.json",
     "vendor-bin/*/composer.json", "vendor-bin/*/composer.lock",
     "psalm.xml"]
