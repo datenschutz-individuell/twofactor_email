@@ -11,7 +11,7 @@ The app plugs into Nextcloud's [two-factor provider framework](https://docs.next
 
 ## Contributing
 
-Contributions are welcome — see [CONTRIBUTORS](../CONTRIBUTORS.md).
+Contributions are welcome — see [CONTRIBUTING](../CONTRIBUTING.md).
 
 1. **Discuss larger ideas first** in the [idea collection](https://github.com/datenschutz-individuell/twofactor_email/issues/8), so nobody builds something that will not be merged.
 2. **Branch off `main`** and keep one topic per pull request. A focused change can be reviewed properly; a mixed one usually cannot.
