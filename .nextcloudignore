@@ -12,6 +12,8 @@
 /.tx
 /build
 /.claude
+/CODE_OF_CONDUCT.md
+/CONTRIBUTING.md
 /codecov.yml
 /composer.*
 /krankerl.toml

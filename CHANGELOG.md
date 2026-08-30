@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Contributing guidelines, a code of conduct and an overview of the licences used
+
 ### Fixed
 
 - A code was reported as sent when the mail server refused the address (#202)

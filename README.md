@@ -57,22 +57,11 @@ behaviour changed or was enhanced.
 
 ## Contributions welcome
 
-This app is a community effort. Any offers to help are welcome, whether it's
-code enhancements, refactoring, better test coverage, new features, security
-audits, translations or good documentation, examples, etc.
+This app is a community effort. Help of any kind is welcome — code, tests,
+documentation, translations, bug reports and ideas.
 
-Prior to creating a PR, please discuss your idea in
-the [idea collection](https://github.com/datenschutz-individuell/twofactor_email/issues/8).
-Make sure your PR sticks to ONE change (so that we may review it cleanly), and
-that it doesn't break existing functionality. We will do our best to timely
-review and comment PRs.
-
-This app takes advantage of the transifex Nextcloud community. If the app is
-not yet available in your language, please consider creating a transifex
-account and join the [Nextcloud translators community](https://explore.transifex.com/nextcloud/).
-
-If you have any questions, please
-contact [the current maintainers](https://github.com/datenschutz-individuell/CONTRIBUTORS.md).
+[CONTRIBUTING.md](CONTRIBUTING.md) explains how to get started;
+[CONTRIBUTORS.md](CONTRIBUTORS.md) lists who to ask.
 
 ## Building yourself
 
