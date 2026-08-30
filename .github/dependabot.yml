@@ -46,3 +46,33 @@ updates:
       interval: "weekly"
       day: "saturday"
 
+  # The 3.3 line is maintained alongside main for the time being. Dependabot
+  # reads this file from the default branch only, so each ecosystem needs a
+  # second entry that targets the maintenance branch explicitly.
+  - package-ecosystem: "composer"
+    directory: "/"
+    target-branch: "release/3.3"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+
+  - package-ecosystem: "composer"
+    directory: "/vendor-bin/cs-fixer"
+    target-branch: "release/3.3"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "release/3.3"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "release/3.3"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
