@@ -80,7 +80,7 @@
     "@vitest/coverage-v8": "^4.1.11",
     "@vue/test-utils": "^2.4.11",
     "eslint": "^10.9.1",
-    "happy-dom": "^20.11.6",
+    "happy-dom": "^20.11.8",
     "vite": "^8.2.2",
     "vitest": "^4.1.11"
   },
