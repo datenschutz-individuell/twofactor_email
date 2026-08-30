@@ -8,7 +8,7 @@ We only support the latest released version of the app for any Nextcloud version
 
 ## Reporting a Vulnerability
 
-You may create an issue in GitHub to report security vulnerabilities unless you think that it is not easily fixable and would affect many users. In this case, please email Olav directly using olav at seyfarth dot de. My OpenPGP key 0x6AE1EF56 is available on [the website](https://seyfarth.de/gnupg/6AE1EF56.asc) as well as on the [OpenPGP keyserver](https://keys.openpgp.org/search?q=olav%40seyfarth.de).
+You may create an issue in GitHub to report security vulnerabilities unless you think that it is not easily fixable and would affect many users. In this case, please email Olav directly using olav at seyfarth dot de. Olav's OpenPGP key 0x6AE1EF56 is available on [the website](https://seyfarth.de/gnupg/6AE1EF56.asc) as well as on the [OpenPGP keyserver](https://keys.openpgp.org/search?q=olav%40seyfarth.de).
 
 We will timely review your report and fix it if we know how and if it's not an upstream issue. Please provide contact details so that we may get in touch with you. Once we publish the fixed code, we would like to pay credits to you. So please also include details on how we shall mention you. See [CONTRIBUTORS](https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md) for examples.
 

@@ -20,7 +20,7 @@ config, lockfiles, screenshots, translations).
 | --- | --- | --- |
 | GNU Affero General Public License v3.0 or later | [`AGPL-3.0-or-later`](LICENSES/AGPL-3.0-or-later.txt) | The project's default license: application source code and most other files, either via their own header or, where a header isn't possible, via `REUSE.toml` (docs, config, lockfiles, screenshots, translations) |
 | Apache License 2.0 | [`Apache-2.0`](LICENSES/Apache-2.0.txt) | `img/app.svg` and `img/app-dark.svg` (© Google LLC) |
-| MIT License | [`MIT`](LICENSES/MIT.txt) | The project's own GitHub Actions workflows and `codecov.yml`, kept permissive so other projects can freely reuse this CI setup |
+| MIT License | [`MIT`](LICENSES/MIT.txt) | Most GitHub Actions workflows and `codecov.yml`, kept permissive so other projects can freely reuse this CI setup. The app-specific `smoke.yml` and the remaining files under `.github` stay AGPL |
 | Creative Commons Zero v1.0 Universal | [`CC0-1.0`](LICENSES/CC0-1.0.txt) | `.github/workflows/reuse.yml`, the REUSE-compliance check template provided by the FSFE |
 
 Every file decides its own license. The table above is a quick overview, not
