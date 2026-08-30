@@ -55,4 +55,4 @@ What these mechanisms promise, and against whom, is bounded by the [threat model
 
 ## Licensing
 
-The app is licensed [AGPL-3.0-or-later](../LICENSES/) and is [REUSE](https://reuse.software/)/SPDX compliant: every file carries clear copyright and licence metadata, inline or via `REUSE.toml`, and CI verifies it. Bundled assets keep their own licences (e.g. the app icon).
+The app is licensed [AGPL-3.0-or-later](../LICENSES/AGPL-3.0-or-later.txt); bundled assets keep their own licences (e.g. the app icon). [LICENSE.md](../LICENSE.md) lists every licence used here and how the REUSE/SPDX metadata is applied. Add an SPDX header to each new file, or an entry in `REUSE.toml` where a header is impossible; CI verifies it.
