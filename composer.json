@@ -19,11 +19,11 @@
   },
   "require-dev": {
     "bamarni/composer-bin-plugin": "^1.9.1",
-    "christophwurst/nextcloud_testing": "^2.0",
+    "christophwurst/nextcloud_testing": "^3.0",
     "nextcloud/ocp": "^32 || ^33 || ^34",
     "psalm/phar": "^6.8.2",
     "roave/security-advisories": "dev-latest",
-    "symfony/console": "^6.4.43"
+    "symfony/console": "^6.4.44"
   },
   "scripts": {
     "lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
