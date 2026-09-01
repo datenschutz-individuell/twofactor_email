@@ -106,6 +106,14 @@ factor be skipped, accepted twice or brute-forced outweighs any question of styl
   Injection wins nothing there. The two `actions/cache-poisoning/poisonable-step` alerts
   on `npm-audit.yml` are dismissed for that reason and a stronger one: no workflow in
   this repository writes or restores an Actions cache, so there is nothing to poison.
+  Hardening the checkout was considered and rejected: a `sparse-checkout` does not
+  close the path. `package.json` has to stay, because the version step reads it, and
+  its `engines.npm` is what reaches `npm i -g`; keeping a root-level `.npmrc` off the
+  runner would need `sparse-checkout-cone-mode: false` on top, because cone mode always
+  materialises the repository root. Both refs are branches of this repository anyway —
+  whoever could poison one could edit this workflow instead — and the alert would stay,
+  because the rule follows the ref, not the files on disk. Revisit if this job ever
+  gains a secret, writes or restores a cache, or runs on a fork trigger.
 - **Formatting.** `php-cs-fixer` with `nextcloud/coding-standard` owns it, ESLint and
   Stylelint own the frontend. Tabs, brace placement and import order are not review
   material.
