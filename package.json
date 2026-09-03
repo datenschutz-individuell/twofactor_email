@@ -67,6 +67,7 @@
     "node": "^24.0.0 || ^26.0.0"
   },
   "overrides": {
+    "fast-uri": "^3.1.7",
     "glob": "^13"
   },
   "devDependencies": {
