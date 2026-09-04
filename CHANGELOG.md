@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- Keep email 2FA on when the only other factor is backup codes, which Nextcloud does not accept alone
 - Require the second factor for the admin settings routes while an admin is still being set up
 - Check the finished email and fall back to the default text if the one-time code ended up in a web address
 - Reject an email subject or body that puts a placeholder inside a web address

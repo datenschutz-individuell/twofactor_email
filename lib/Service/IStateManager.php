@@ -22,6 +22,8 @@ interface IStateManager {
 	/**
 	 * Whether the user has another active 2FA provider besides email, i.e.
 	 * disabling email would not leave the account without a second factor.
+	 * Backup codes do not count: Nextcloud does not accept them as the only
+	 * second factor, so an account left with nothing else is password-only.
 	 */
 	public function hasOtherActiveProvider(IUser $user): bool;
 }
