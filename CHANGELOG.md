@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Administrator documentation for occ, enforcement, email addresses and a FAQ
 - Contributing guidelines, a code of conduct and an overview of the licences used
 - Fresh screenshots in the documentation
+- The login screen names the masked address the code was sent to
 
 ### Security
 
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reject an email subject or body that puts a placeholder inside a web address
 - Report email texts that no longer work as intended, and reset one that is not valid text, on upgrade
 - A code is only accepted for the address it was sent to, whether or not Nextcloud reports the change
+- The address was not masked in rare cases
 
 ### Changed
 

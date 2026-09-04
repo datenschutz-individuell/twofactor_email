@@ -32,12 +32,16 @@ final class EMailAddressMaskerTest extends TestCase {
 		$this->assertSame('u*@*', $this->masker->maskForUI('user@localhost'));
 	}
 
-	public function testReturnsInputWithoutAnAtSignUnchanged(): void {
-		$this->assertSame('notanemail', $this->masker->maskForUI('notanemail'));
+	public function testHidesInputWithoutAnAtSignWhole(): void {
+		$this->assertSame('*@*', $this->masker->maskForUI('notanemail'));
 	}
 
-	public function testReturnsInputWithMultipleAtSignsUnchanged(): void {
-		$this->assertSame('a@b@c', $this->masker->maskForUI('a@b@c'));
+	public function testHidesInputWithMultipleAtSignsWhole(): void {
+		$this->assertSame('*@*', $this->masker->maskForUI('a@b@c'));
+	}
+
+	public function testHidesAQuotedLocalPartWhole(): void {
+		$this->assertSame('*@*', $this->masker->maskForUI('"jo hn"@example.com'));
 	}
 
 	public function testReturnsEmptyInputUnchanged(): void {

@@ -177,6 +177,15 @@ run_checks() {
 	is "challenge page" "$status" "200"
 	grep -q twofactor_email "$TMP/challenge.html" \
 		&& ok "challenge page loads the app assets" || bad "challenge page has no app assets"
+	# The page names the address, but only the masked form of it. Both halves matter:
+	# without the second, a refactor that assigns the raw address passes unnoticed.
+	# Keep the two together and in this order. The second asks for the ABSENCE of a
+	# string, which an empty or failed fetch would satisfy as well; what rules that
+	# out is the first one failing loudly on the same file just above.
+	grep -qF 'a*@*.org' "$TMP/challenge.html" \
+		&& ok "challenge page names the masked address" || bad "challenge page names no masked address"
+	grep -qF 'admin@example.org' "$TMP/challenge.html" \
+		&& bad "challenge page shows the full address" || ok "challenge page keeps the full address off the screen"
 	is "exactly one mail was sent" "$(mail_count)" "1"
 
 	echo "-- challenge/resend"
