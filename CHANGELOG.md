@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Contributing guidelines, a code of conduct and an overview of the licences used
 - The login screen names the masked address the code was sent to
+- The login screen says when it sent no new code, instead of leaving the user waiting for mail
 
 ### Changed
 

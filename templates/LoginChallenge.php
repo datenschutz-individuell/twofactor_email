@@ -56,6 +56,23 @@ $resendAvailableIn = (int)($_['resendAvailableIn'] ?? 0); // seconds left before
 				: $l->t('Enter the authentication code that was sent to you:'));
 		}
 	?></p>
+<?php
+// A sentence of its own, so the one above keeps the translations it already has.
+//
+// This covers every render that sent no code, and the most frequent one is a mistyped
+// code: the stored code is kept on purpose so it can be retried, so none goes out. The
+// sentence holds there too — it says why no new mail arrived, and its second half is a
+// condition, not a claim that nothing was received. Telling the two apart would need
+// the provider to know that the render follows a failed submission, which Nextcloud
+// does not pass on.
+if (!$newCodeWasSent): ?>
+	<p class="twofactor_email-code-age-hint">
+		<?php
+		// The link is named through a placeholder, so the sentence and the link keep
+		// saying the same thing in every translation.
+		p($l->t('No new code was sent, because an earlier one is still valid. If it did not arrive, use "%s" below.', [$l->t('Send a new code')])); ?>
+	</p>
+<?php endif; ?>
 	<form method="POST" class="twofactor_email-challenge-form">
 		<input type="text"<?= $minmax ?> name="challenge" required="required" autofocus autocomplete="one-time-code"
 			   inputmode="numeric" autocapitalize="off" placeholder="<?php p($l->t('Authentication code')) ?>">
