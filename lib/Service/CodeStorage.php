@@ -54,6 +54,19 @@ final readonly class CodeStorage implements ICodeStorage {
 	#[\Override]
 	public function deleteCode(string $userId): bool {
 		$existed = $this->config->getValueString($userId, Application::APP_ID, self::KEY_CODE) !== '';
+		// A timestamp without a code still has to go: deleteExpired() finds users by
+		// their timestamp alone, and would otherwise report a removal that never
+		// happened. Reads are cached, the two deletes below are not, and readCode()
+		// lands here for every user who has no code at all — a missing timestamp
+		// reads as 0, which always counts as expired. Asking whether the key exists is
+		// what separates that from a stored 0: deleteExpired() finds users by key
+		// existence, so a stored 0 has to be deletable or it would be counted as
+		// removed on every run and never go away.
+		$hasTimestamp = $this->config->hasKey($userId, Application::APP_ID, self::KEY_CREATED_AT);
+		if (!$existed && !$hasTimestamp) {
+			return false;
+		}
+
 		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CODE);
 		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CREATED_AT);
 		return $existed;

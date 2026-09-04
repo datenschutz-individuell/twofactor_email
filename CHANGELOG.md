@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A stored text that puts a placeholder inside a web address no longer blocks occ from setting an unrelated key
 - The admin settings page refuses to save while a stored text puts a placeholder inside a web address
 - Count the subject and body length limits in characters, not bytes
+- Skip the database writes that cleared a code no user had stored
 
 ### Fixed
 
