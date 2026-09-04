@@ -24,6 +24,13 @@ final class StateManager implements IStateManager {
 
 	private const PROVIDER_ID = 'email';
 
+	/**
+	 * Nextcloud does not accept backup codes as the only second factor: its own
+	 * check for an account being two-factor protected leaves them out. So they
+	 * cannot stand in for this provider either.
+	 */
+	private const BACKUP_CODES_PROVIDER_ID = 'backup_codes';
+
 	public function __construct(
 		private readonly IEventDispatcher $eventDispatcher,
 		private readonly IRegistry $registry,
@@ -44,7 +51,7 @@ final class StateManager implements IStateManager {
 
 	public function hasOtherActiveProvider(IUser $user): bool {
 		foreach ($this->registry->getProviderStates($user) as $providerId => $enabled) {
-			if ($enabled && $providerId !== self::PROVIDER_ID) {
+			if ($enabled && $providerId !== self::PROVIDER_ID && $providerId !== self::BACKUP_CODES_PROVIDER_ID) {
 				return true;
 			}
 		}
