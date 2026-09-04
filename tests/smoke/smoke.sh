@@ -186,6 +186,16 @@ run_checks() {
 		&& ok "challenge page names the masked address" || bad "challenge page names no masked address"
 	grep -qF 'admin@example.org' "$TMP/challenge.html" \
 		&& bad "challenge page shows the full address" || ok "challenge page keeps the full address off the screen"
+	# A reload sends no second code, and has to say so — otherwise someone whose mail
+	# is slow waits for one that is not coming. The first load must not say it, or the
+	# sentence would be there whatever happened. The mail count below is the other half
+	# of the same statement: the reload really did send nothing.
+	grep -qF 'No new code was sent' "$TMP/challenge.html" \
+		&& bad "the first challenge page already claims an earlier code" \
+		|| ok "the first challenge page reports the code it just sent"
+	curl -s -b "$TMP/jar" -c "$TMP/jar" -o "$TMP/reloaded.html" "$BASE/login/challenge/email"
+	grep -qF 'No new code was sent' "$TMP/reloaded.html" \
+		&& ok "a reload says that no new code went out" || bad "a reload leaves the user waiting for mail"
 	is "exactly one mail was sent" "$(mail_count)" "1"
 
 	echo "-- challenge/resend"

@@ -112,6 +112,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				input.value = ''
 				input.focus()
 			}
+			// The server-rendered line explaining that no new code went out is now wrong:
+			// one just did. It is removed rather than hidden, so a later render is the
+			// only thing that can bring it back.
+			document.querySelector('.twofactor_email-code-age-hint')?.remove()
 			startCountdown(cooldown, t('twofactor_email', 'A new code was sent. Only the new code is valid now.'))
 		} catch (error) {
 			/** @type {{ error?: string, retryAfter?: number } | undefined} */

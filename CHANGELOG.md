@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Count the subject and body length limits in characters, not bytes
 - Skip the database writes that cleared a code no user had stored
 - Send a new code at once when the notification address changed, instead of waiting for the old one to expire
+- The challenge page says when it sent no new code, instead of leaving the user waiting for mail
 
 ### Fixed
 
