@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\AppInfo;
 
 use OCA\TwoFactorEMail\Event\StateChanged;
+use OCA\TwoFactorEMail\Listener\EMailChanged;
 use OCA\TwoFactorEMail\Listener\EMailDeleted;
 use OCA\TwoFactorEMail\Listener\StateChangeActivity;
 use OCA\TwoFactorEMail\Listener\StateChangeNotification;
@@ -59,6 +60,9 @@ final class Application extends App implements IBootstrap {
 		$context->registerEventListener(StateChanged::class, StateChangeRegistryUpdater::class);
 		$context->registerEventListener(StateChanged::class, StateChangeActivity::class);
 		$context->registerEventListener(StateChanged::class, StateChangeNotification::class);
+		// Drop the code first: the dispatcher stops at a listener that throws, and
+		// EMailDeleted writes to the registry and notifies, so it has more to fail at.
+		$context->registerEventListener(UserChangedEvent::class, EMailChanged::class);
 		$context->registerEventListener(UserChangedEvent::class, EMailDeleted::class);
 
 		$context->registerNotifierService(Notifier::class);

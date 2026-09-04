@@ -11,10 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Contributing guidelines, a code of conduct and an overview of the licences used
 
+### Changed
+
+- Skip the database writes that cleared a code no user had stored
+
 ### Fixed
 
 - A code was reported as sent when the mail server refused the address (#202)
 - Reloading the challenge page no longer retries a failing mail server without limit
+
+### Security
+
+- Changing or clearing the account email address now drops a pending code
 
 ## 3.3.2 (2026-08-11)
 
