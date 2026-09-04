@@ -40,6 +40,17 @@ describe('LoginSetup', () => {
 		expect(wrapper.find('button').text()).toBe('Proceed')
 	})
 
+	it('names no address when the mask cannot take one apart', async () => {
+		store.maskedEmail = ''
+
+		const wrapper = mount(LoginSetup)
+		await flushPromises()
+
+		expect(wrapper.text()).toContain('Codes will be sent to your primary email address.')
+		expect(wrapper.text()).not.toContain('Codes will be sent to your primary email address:')
+		expect(wrapper.text()).not.toContain('*@*')
+	})
+
 	it('shows a spinner while enabling is still in flight', async () => {
 		let release
 		store.enable.mockReturnValue(new Promise((resolve) => {

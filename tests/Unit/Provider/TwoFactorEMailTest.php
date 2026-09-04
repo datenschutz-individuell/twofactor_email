@@ -202,6 +202,36 @@ class TwoFactorEMailTest extends TestCase {
 	/**
 	 * @throws Exception
 	 */
+	public function testGetTemplateNamesTheMaskedAddress(): void {
+		$assigns = [];
+		$user = $this->createMock(IUser::class);
+		$user->method('getEMailAddress')->willReturn('alice@example.com');
+		$this->templateManager->method('getTemplate')->willReturn($this->templateCapturing($assigns));
+		$this->masker->method('maskForUI')->with('alice@example.com')->willReturn('a*@*.com');
+
+		$this->provider->getTemplate($user);
+
+		self::assertSame('a*@*.com', $assigns['maskedEmail']);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testGetTemplateNamesNoAddressWhenTheMaskHidesItWhole(): void {
+		$assigns = [];
+		$user = $this->createMock(IUser::class);
+		$user->method('getEMailAddress')->willReturn('"jo hn"@example.com');
+		$this->templateManager->method('getTemplate')->willReturn($this->templateCapturing($assigns));
+		$this->masker->method('maskForUI')->willReturn(IEMailAddressMasker::HIDDEN);
+
+		$this->provider->getTemplate($user);
+
+		self::assertSame('', $assigns['maskedEmail']);
+	}
+
+	/**
+	 * @throws Exception
+	 */
 	public function testGetTemplateReportsNoEmailWhenTheAddressIsMissing(): void {
 		$assigns = [];
 		$user = $this->createMock(IUser::class);
@@ -240,6 +270,19 @@ class TwoFactorEMailTest extends TestCase {
 		$this->container->method('get')->with(LoginSetup::class)->willReturn($loginSetup);
 
 		self::assertSame($loginSetup, $this->provider->getLoginSetup($user));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testGetLoginSetupNamesNoAddressWhenTheMaskHidesItWhole(): void {
+		$user = $this->createMock(IUser::class);
+		$user->method('getEMailAddress')->willReturn('"jo hn"@example.com');
+		$this->masker->method('maskForUI')->willReturn(IEMailAddressMasker::HIDDEN);
+		$this->initialState->expects($this->once())->method('provideInitialState')->with('maskedEmail', '');
+		$this->container->method('get')->willReturn($this->createMock(ILoginSetupProvider::class));
+
+		$this->provider->getLoginSetup($user);
 	}
 
 	/**
