@@ -50,7 +50,7 @@ What these mechanisms promise, and against whom, is bounded by the [threat model
 
 - **Static analysis:** Psalm (errorLevel 3) plus **Psalm taint analysis** (source-to-sink SAST, added in 3.4.0) — currently **no findings**. Taint rides on the annotations shipped in [`nextcloud/ocp`](https://github.com/nextcloud-deps/ocp), so it needs no extra stubs.
 - **Tests:** PHPUnit for the PHP services, Vitest for the frontend logic and components.
-- **Frontend SAST:** CodeQL (JavaScript) via the repository's default setup.
+- **SAST beyond PHP:** CodeQL via the repository's default setup, covering the frontend JavaScript and the GitHub Actions workflows.
 - **Supply chain:** `roave/security-advisories` blocks known-vulnerable composer packages; Dependabot tracks npm/composer updates; the release package ships only runtime files.
 
 ## Licensing
