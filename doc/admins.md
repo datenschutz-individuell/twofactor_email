@@ -79,7 +79,9 @@ An account can hold a **second** address, though: users may add further addresse
 
 **An address that disappears switches the factor off — but only when that is safe.** Every path that clears the *system* address tells the app: the personal settings, the users page, the provisioning API and `occ user:setting`. (A directory sync never clears it: the LDAP backend ignores an empty or missing attribute rather than writing it through.) If the account still has another second factor, the app switches email 2FA off. If email was the only one, it stays on and every login fails until the address is back or you run `occ twofactorauth:disable <uid> email`.
 
-Two cases get past this. Deleting the *additional* address a user had picked as their primary one fires no event at all, so the app learns nothing: delivery falls back to the system address, or stops when the account has none. And the app counts backup codes as another second factor, while the login does not accept them as the only one — an account whose sole other factor is backup codes therefore ends up password-only once its address is gone.
+One case gets past this: deleting the *additional* address a user had picked as their primary one fires no event at all, so the app learns nothing — delivery falls back to the system address, or stops when the account has none.
+
+Backup codes do not count as the other factor here. Nextcloud does not accept them as the only one, so an account that holds nothing else keeps email 2FA enabled, and its user logs in with a backup code.
 
 ## Settings
 
