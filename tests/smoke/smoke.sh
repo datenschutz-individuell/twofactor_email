@@ -86,10 +86,15 @@ tfa_enabled() { occ twofactorauth:state admin | grep -q '^Two-factor authenticat
 seed_code() {
 	occ user:setting "$1" twofactor_email code 'not-a-real-hash' >/dev/null
 	occ user:setting "$1" twofactor_email code_created_at 0 >/dev/null
+	# Every key a real code writes, or "nothing left behind" would also be true of a
+	# key that was never there.
+	occ user:setting "$1" twofactor_email code_address_hash 'not-a-real-hash' >/dev/null
 }
 
-# How many of the two keys a stored code consists of are present.
-code_keys() { occ user:setting "$1" twofactor_email | grep -cE '^ +- code(_created_at)?: '; }
+# How many of the keys a stored code consists of are present. Every key a code
+# writes belongs in here: a key missing from the pattern would let "no code behind"
+# pass while that key is still there.
+code_keys() { occ user:setting "$1" twofactor_email | grep -cE '^ +- code(_created_at|_address_hash)?: '; }
 
 # The request token is in every rendered page.
 page_token() { curl -s -b "$TMP/jar" -c "$TMP/jar" "$1" | grep -oP 'data-requesttoken="\K[^"]+' | head -1; }
@@ -123,6 +128,12 @@ mails() { curl -s "$MAILBOX/api/v1/messages?limit=20"; }
 # and the image is pinned by digest so a rename cannot arrive unnoticed. (mailpit's
 # `total` is not a synonym — it counts the whole mailbox, not the current query.)
 mail_count() { mails | python3 -c 'import json,sys; print(json.load(sys.stdin)["messages_count"])'; }
+newest_recipient() {
+	mails | python3 -c '
+import json, sys
+m = json.load(sys.stdin)["messages"]
+print(",".join(t["Address"] for t in m[0]["To"]) if m else "")'
+}
 newest_code() {
 	local id
 	id=$(mails | python3 -c 'import json,sys; m=json.load(sys.stdin)["messages"]; print(m[0]["ID"] if m else "")')
@@ -266,7 +277,7 @@ run_checks() {
 		|| bad "creating the user $digits: $(tr '\n' ' ' <"$TMP/adduser")"
 	occ twofactor_email:delete-codes --all >/dev/null
 	seed_code "$digits"
-	is "both keys of the seeded code are stored" "$(code_keys "$digits")" "2"
+	is "every key of the seeded code is stored" "$(code_keys "$digits")" "3"
 	is "cleanup removes the expired code" \
 		"$(occ twofactor_email:cleanup | grep -c 'Removed 1 expired code')" "1"
 	# The display name proves the listing came from a user that exists. Without it,
@@ -295,6 +306,101 @@ run_checks() {
 	elif [ "$broken" = 0 ]; then
 		ok "all $count assets of the challenge page were served"
 	fi
+
+	# A code is mailed to the address in force at the time. Once that address changes,
+	# the mailbox holding the code may belong to someone else, so the code has to stop
+	# being accepted (lib/Service/CodeStorage.php). This runs after every check that
+	# needs a logged-in session, because it ends with one that deliberately is not.
+	# The section "submitting the code" is the control: the same sequence without the
+	# address change does log in, so the change is what makes the difference here.
+	echo "-- a code the address change invalidated"
+	rm -f "$TMP/jar"
+	local ntok ncode before submitted
+	# The mailbox already holds mail from the sections above, so "there is a code" would
+	# also be true of the one already consumed there. Count first and demand one more:
+	# without that, a login that never reached the challenge would read the stale code,
+	# get it rejected for being stale, and this section would report a pass for nothing.
+	before=$(mail_count)
+	# Remember what the address is now instead of assuming setup.sh's value: with
+	# KEEP=1 someone may have pointed the account at their own mailbox for a manual
+	# test, and a later section reads this address back and restores whatever it
+	# finds — so writing a guess here would make the change permanent.
+	local address_before primary_before
+	address_before=$(occ user:setting admin settings email | tr -d ' \r')
+	# A notification address left behind by the section below, or by a KEEP=1 session,
+	# would make the change here move nothing at all — and the failure would read as the
+	# app accepting a code it should have dropped. It is remembered for the same reason
+	# the address is: a later section reads it back, and a KEEP=1 instance keeps it.
+	primary_before=$(occ user:setting admin settings primary_email --default-value= | tr -d ' \r')
+	occ user:setting --delete admin settings primary_email >/dev/null 2>&1
+	ntok=$(page_token "$BASE/login")
+	curl -s -b "$TMP/jar" -c "$TMP/jar" -H "Origin: $BASE" -H "requesttoken: $ntok" \
+		-o /dev/null -d "user=admin" -d "password=$PW" -d "timezone=Europe/Berlin" "$BASE/login"
+	# Loading the challenge page is what issues the code, so the token has to come from
+	# that same page: the login page above was fetched before the code existed.
+	ntok=$(page_token "$BASE/login/challenge/email")
+	is "a fresh code was mailed" "$(mail_count)" "$((before + 1))"
+	ncode=$(newest_code)
+	[ -n "$ncode" ] && ok "read the fresh code from the mail ($ncode)" || bad "no code in the mail"
+	occ user:setting admin settings email smoke-changed@example.org >/dev/null
+	# The status matters as much as the outcome: a 303 back to the challenge means the
+	# controller rejected the code, while a 303 from the two-factor gate or a CSRF
+	# rejection would leave the session logged out too — and read as a pass.
+	submitted=$(curl -s -X POST -b "$TMP/jar" -c "$TMP/jar" -H "Origin: $BASE" -H "requesttoken: $ntok" \
+		-o /dev/null -w '%{http_code} %{redirect_url}' -d "challenge=$ncode" "$BASE/login/challenge/email")
+	is "the submission reached the challenge controller" "$submitted" "303 $BASE/login/challenge/email"
+	ocs=$(curl -s -b "$TMP/jar" -c "$TMP/jar" -H 'OCS-APIRequest: true' -o /dev/null \
+		-w '%{http_code}' "$BASE/ocs/v2.php/cloud/user?format=json")
+	[ "$ocs" = "200" ] && bad "the code was still accepted after the address changed" \
+		|| ok "the code was rejected after the address changed (OCS $ocs)"
+	# Put the address back: a later run of these checks starts from the same instance.
+	case $address_before in *@*) occ user:setting admin settings email "$address_before" >/dev/null ;;
+		*) bad "could not read the address back, leaving it as it is: $address_before" ;;
+	esac
+
+	# The same question for the address change Nextcloud announces to nobody:
+	# picking a notification address writes settings/primary_email and fires no
+	# event, while getEMailAddress() prefers exactly that value. No listener can
+	# see it, so this is what the code being bound to its address is for
+	# (lib/Service/CodeStorage.php). Two things have to follow from it: the code
+	# that went to the old mailbox stops working, and a fresh one goes out to the
+	# new one without the user having to ask.
+	echo "-- an address change that fires no event"
+	rm -f "$TMP/jar"
+	before=$(mail_count)
+	ntok=$(page_token "$BASE/login")
+	curl -s -b "$TMP/jar" -c "$TMP/jar" -H "Origin: $BASE" -H "requesttoken: $ntok" \
+		-o /dev/null -d "user=admin" -d "password=$PW" -d "timezone=Europe/Berlin" "$BASE/login"
+	ntok=$(page_token "$BASE/login/challenge/email")
+	is "a code was mailed to the account address" "$(mail_count)" "$((before + 1))"
+	ncode=$(newest_code)
+	# Without this an unreadable mail would submit an empty code, which is refused just
+	# the same — and the binding under test would never be exercised.
+	[ -n "$ncode" ] && ok "read the code for the old mailbox ($ncode)" || bad "no code in the mail"
+	occ user:setting admin settings primary_email smoke-primary@example.org >/dev/null
+	# Submit before reloading the page, or this proves nothing: a reload issues a fresh
+	# code, and the old one would then be refused by a plain hash mismatch — which a
+	# build without any binding would do just as well.
+	submitted=$(curl -s -X POST -b "$TMP/jar" -c "$TMP/jar" -H "Origin: $BASE" -H "requesttoken: $ntok" \
+		-o /dev/null -w '%{http_code} %{redirect_url}' -d "challenge=$ncode" "$BASE/login/challenge/email")
+	is "the submission reached the challenge controller" "$submitted" "303 $BASE/login/challenge/email"
+	ocs=$(curl -s -b "$TMP/jar" -c "$TMP/jar" -H 'OCS-APIRequest: true' -o /dev/null \
+		-w '%{http_code}' "$BASE/ocs/v2.php/cloud/user?format=json")
+	[ "$ocs" = "200" ] && bad "the code for the old mailbox was still accepted" \
+		|| ok "the code for the old mailbox was rejected (OCS $ocs)"
+	# And the page hands out a code the user can actually receive: at the new address,
+	# without anyone asking for it.
+	page_token "$BASE/login/challenge/email" >/dev/null
+	is "a fresh code went out although no event fired" "$(mail_count)" "$((before + 2))"
+	is "it went to the new notification address" "$(newest_recipient)" "smoke-primary@example.org"
+	# Only an address goes back: occ writes its errors to stdout, so a diagnostic line
+	# would otherwise be stored as the address the account delivers to.
+	case $primary_before in
+		*@*) occ user:setting admin settings primary_email "$primary_before" >/dev/null ;;
+		'') occ user:setting --delete admin settings primary_email >/dev/null ;;
+		*) occ user:setting --delete admin settings primary_email >/dev/null
+			bad "could not read the notification address back, leaving none: $primary_before" ;;
+	esac
 
 	echo "-- server log"
 	server_log >"$TMP/nclog"
@@ -352,9 +458,13 @@ run_checks() {
 	# A send that fails stores no code, and the challenge page has no rate limit of its
 	# own, so every reload would open another connection to the mail server. The app
 	# caps that at ten in five minutes through Nextcloud's limiter, and a whole run
-	# stays inside that window: the sections above spend at most three of the ten, so
+	# stays inside that window: the sections above spend at most six of the ten, so
 	# twelve reloads reach the cap, and then the log has to show the app refusing by
-	# itself instead of another mailer error.
+	# itself instead of another mailer error. Count the sends again when adding a
+	# section that issues a code — that budget is what makes this check provable.
+	# A second budget runs alongside: solveChallenge() carries UserRateLimit(5, 100), and
+	# the run submits a code four times. A fifth submission would be refused by that limit,
+	# and the failure would read as "the submission did not reach the controller".
 	echo "-- the reload cap"
 	local i
 	for i in $(seq 12); do

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Controller;
 
+use OCA\TwoFactorEMail\Service\EMailAddressSource;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\FrontpageRoute;
@@ -30,6 +31,7 @@ final class StateController extends ALoginSetupController {
 		IRequest $request,
 		private readonly IUserSession $userSession,
 		private readonly IStateManager $stateManager,
+		private readonly EMailAddressSource $addressSource,
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -55,7 +57,7 @@ final class StateController extends ALoginSetupController {
 		}
 
 		if ($state) {
-			if ($user->getEMailAddress() === null) {
+			if ($this->addressSource->getAddress($user) === null) {
 				return new JSONResponse([
 					'enabled' => false,
 					'error' => 'no-email',

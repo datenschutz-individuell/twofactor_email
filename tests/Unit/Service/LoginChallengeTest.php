@@ -13,6 +13,7 @@ use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\ResendTooSoon;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
 use OCA\TwoFactorEMail\Exception\SendRateLimited;
+use OCA\TwoFactorEMail\Service\EMailAddressSource;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Service\ICodeGenerator;
 use OCA\TwoFactorEMail\Service\ICodeStorage;
@@ -53,6 +54,9 @@ final class LoginChallengeTest extends TestCase {
 			$this->codeGenerator,
 			$this->codeStorage,
 			$this->emailSender,
+			// Pure delegation to IUser: the real class ties these tests to the same
+			// address the sender would deliver to.
+			new EMailAddressSource(),
 			$this->hasher,
 			$this->settings,
 			$this->logger,
@@ -62,10 +66,60 @@ final class LoginChallengeTest extends TestCase {
 	/**
 	 * @throws Exception
 	 */
-	private function mockUser(): IUser&MockObject {
+	private function mockUser(?string $address = 'alice@example.org'): IUser&MockObject {
 		$user = $this->createMock(IUser::class);
 		$user->method('getUID')->willReturn('alice');
+		$user->method('getEMailAddress')->willReturn($address);
 		return $user;
+	}
+
+	/**
+	 * The storage decides whether a stored code still counts, and it can only do that
+	 * if it is told where delivery would go now. These two check that it is told —
+	 * without them the binding would sit in CodeStorage and never be reached.
+	 *
+	 * @throws SendEMailFailed
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testSendChallengeAsksTheStorageForACodeForTheCurrentAddress(): void {
+		$this->codeStorage->expects($this->once())->method('readCode')
+			->with('alice', 'alice@example.org')->willReturn('stored-hash');
+		$this->emailSender->expects($this->never())->method('sendChallengeEMail');
+
+		$this->assertFalse($this->challenge->sendChallenge($this->mockUser()));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function testVerifyChallengeAsksTheStorageForACodeForTheCurrentAddress(): void {
+		$this->codeStorage->expects($this->once())->method('readCode')
+			->with('alice', 'alice@example.org')->willReturn(null);
+
+		$this->assertFalse($this->challenge->verifyChallenge($this->mockUser(), '123456'));
+	}
+
+	/**
+	 * Read, send and store are answered by one address, asked once per request: the
+	 * stored code is bound to the mailbox the mail went to, and a later change of the
+	 * address cannot move that binding.
+	 *
+	 * @throws SendEMailFailed
+	 * @throws EMailNotSet
+	 * @throws Exception
+	 */
+	public function testTheStoredCodeIsBoundToTheAddressTheMailWentTo(): void {
+		$this->codeGenerator->method('generateChallengeCode')->willReturn('654321');
+		$this->hasher->method('hash')->willReturn('hashed');
+
+		$this->codeStorage->expects($this->once())->method('readCode')
+			->with('alice', 'sent-to@example.org')->willReturn(null);
+		$this->emailSender->expects($this->once())->method('sendChallengeEMail');
+		$this->codeStorage->expects($this->once())->method('writeCode')
+			->with('alice', 'hashed', 'sent-to@example.org');
+
+		$this->assertTrue($this->challenge->sendChallenge($this->mockUser('sent-to@example.org')));
 	}
 
 	/**
@@ -99,8 +153,9 @@ final class LoginChallengeTest extends TestCase {
 		$this->hasher->method('hash')->willReturn('hashed');
 
 		$this->codeStorage->expects($this->never())->method('deleteCode');
-		$this->emailSender->expects($this->once())->method('sendChallengeEMail')->with($this->anything(), '654321');
-		$this->codeStorage->expects($this->once())->method('writeCode')->with('alice', 'hashed');
+		$this->emailSender->expects($this->once())->method('sendChallengeEMail')
+			->with($this->anything(), '654321');
+		$this->codeStorage->expects($this->once())->method('writeCode')->with('alice', 'hashed', 'alice@example.org');
 
 		$this->challenge->resendChallenge($this->mockUser());
 	}
@@ -113,8 +168,9 @@ final class LoginChallengeTest extends TestCase {
 	public function testResendPropagatesEMailNotSet(): void {
 		$this->codeStorage->method('secondsSinceLastCode')->willReturn(null);
 		$this->codeGenerator->method('generateChallengeCode')->willReturn('654321');
-		$user = $this->mockUser();
-		$this->emailSender->method('sendChallengeEMail')->willThrowException(new EMailNotSet($user));
+		$user = $this->mockUser(null);
+		// An account without an address never reaches the mail server.
+		$this->emailSender->expects($this->never())->method('sendChallengeEMail');
 
 		// A failed sending must not touch the stored code, so the previous one stays valid.
 		$this->codeStorage->expects($this->never())->method('writeCode');
@@ -207,12 +263,10 @@ final class LoginChallengeTest extends TestCase {
 	public function testNeverLogsTheCodeWhenTheAddressIsMissing(): void {
 		$logged = [];
 		$this->collectLogCalls($logged);
-		$user = $this->mockUser();
+		$user = $this->mockUser(null);
 		$this->codeStorage->method('readCode')->willReturn(null);
 		$this->codeGenerator->method('generateChallengeCode')->willReturn('123456');
-		$this->emailSender->method('sendChallengeEMail')->willReturnCallback(
-			static fn (IUser $sendTo): never => throw new EMailNotSet($sendTo),
-		);
+		$this->emailSender->expects($this->never())->method('sendChallengeEMail');
 
 		try {
 			$this->challenge->sendChallenge($user);
@@ -253,11 +307,12 @@ final class LoginChallengeTest extends TestCase {
 	 */
 	public function testSendChallengeIssuesAndStoresACodeWhenNoneIsStored(): void {
 		$user = $this->mockUser();
-		$this->codeStorage->method('readCode')->with('alice')->willReturn(null);
+		$this->codeStorage->method('readCode')->with('alice', 'alice@example.org')->willReturn(null);
 		$this->codeGenerator->method('generateChallengeCode')->willReturn('123456');
-		$this->emailSender->expects($this->once())->method('sendChallengeEMail')->with($user, '123456');
+		$this->emailSender->expects($this->once())->method('sendChallengeEMail')
+			->with($user, '123456');
 		$this->hasher->method('hash')->with('123456')->willReturn('hashed');
-		$this->codeStorage->expects($this->once())->method('writeCode')->with('alice', 'hashed');
+		$this->codeStorage->expects($this->once())->method('writeCode')->with('alice', 'hashed', 'alice@example.org');
 
 		$this->assertTrue($this->challenge->sendChallenge($user));
 	}
@@ -268,7 +323,7 @@ final class LoginChallengeTest extends TestCase {
 	 */
 	public function testSendChallengeStoresNoCodeWhenSendingFails(): void {
 		$user = $this->mockUser();
-		$this->codeStorage->method('readCode')->with('alice')->willReturn(null);
+		$this->codeStorage->method('readCode')->with('alice', 'alice@example.org')->willReturn(null);
 		$this->codeGenerator->method('generateChallengeCode')->willReturn('123456');
 		$this->emailSender->method('sendChallengeEMail')->willThrowException(new SendEMailFailed());
 		$this->codeStorage->expects($this->never())->method('writeCode');
@@ -285,7 +340,7 @@ final class LoginChallengeTest extends TestCase {
 	 */
 	public function testSendChallengeSkipsWhileAValidCodeStillExists(): void {
 		$user = $this->mockUser();
-		$this->codeStorage->method('readCode')->with('alice')->willReturn('existing-hash');
+		$this->codeStorage->method('readCode')->with('alice', 'alice@example.org')->willReturn('existing-hash');
 		$this->emailSender->expects($this->never())->method('sendChallengeEMail');
 		$this->codeStorage->expects($this->never())->method('writeCode');
 
@@ -318,7 +373,7 @@ final class LoginChallengeTest extends TestCase {
 	 */
 	public function testVerifyChallengeAcceptsAValidCodeAndDeletesIt(): void {
 		$user = $this->mockUser();
-		$this->codeStorage->method('readCode')->with('alice')->willReturn('stored-hash');
+		$this->codeStorage->method('readCode')->with('alice', 'alice@example.org')->willReturn('stored-hash');
 		$this->hasher->method('verify')->with('123456', 'stored-hash')->willReturn(true);
 		$this->codeStorage->expects($this->once())->method('deleteCode')->with('alice');
 
@@ -330,7 +385,7 @@ final class LoginChallengeTest extends TestCase {
 	 */
 	public function testVerifyChallengeRejectsAWrongCodeAndKeepsItForRetry(): void {
 		$user = $this->mockUser();
-		$this->codeStorage->method('readCode')->with('alice')->willReturn('stored-hash');
+		$this->codeStorage->method('readCode')->with('alice', 'alice@example.org')->willReturn('stored-hash');
 		$this->hasher->method('verify')->with('123456', 'stored-hash')->willReturn(false);
 		$this->codeStorage->expects($this->never())->method('deleteCode');
 
@@ -342,7 +397,7 @@ final class LoginChallengeTest extends TestCase {
 	 */
 	public function testVerifyChallengeRejectsWhenNoCodeIsStored(): void {
 		$user = $this->mockUser();
-		$this->codeStorage->method('readCode')->with('alice')->willReturn(null);
+		$this->codeStorage->method('readCode')->with('alice', 'alice@example.org')->willReturn(null);
 		$this->hasher->expects($this->never())->method('verify');
 		$this->codeStorage->expects($this->never())->method('deleteCode');
 
@@ -354,7 +409,7 @@ final class LoginChallengeTest extends TestCase {
 	 */
 	public function testVerifyChallengeTrimsTheSubmittedCode(): void {
 		$user = $this->mockUser();
-		$this->codeStorage->method('readCode')->with('alice')->willReturn('stored-hash');
+		$this->codeStorage->method('readCode')->with('alice', 'alice@example.org')->willReturn('stored-hash');
 		// Surrounding whitespace must be stripped before verifying
 		$this->hasher->expects($this->once())->method('verify')->with('123456', 'stored-hash')->willReturn(true);
 

@@ -10,15 +10,30 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Service;
 
 interface ICodeStorage {
-	public function readCode(string $userId): ?string;
+	/**
+	 * The stored code, or null if none is valid for this address.
+	 *
+	 * A code counts as valid only while its validity period has not elapsed *and*
+	 * the address it was sent to is still the one delivery would use. Passing the
+	 * address the caller would deliver to now is therefore not optional — it is
+	 * what keeps a code from outliving the mailbox it went to. Whatever fails
+	 * either test is deleted on the way out.
+	 *
+	 * @param string|null $address the address delivery would use now, null when
+	 *                             the account has none
+	 */
+	public function readCode(string $userId, ?string $address): ?string;
 
 	/**
 	 * Seconds elapsed since the currently valid code was stored, or null if no
-	 * valid code exists. Used to enforce the resend cooldown.
+	 * valid code exists for this address. Used to enforce the resend cooldown.
 	 */
-	public function secondsSinceLastCode(string $userId): ?int;
+	public function secondsSinceLastCode(string $userId, ?string $address): ?int;
 
-	public function writeCode(string $userId, string $code, ?int $createdAt = null): void;
+	/**
+	 * @param string $address the address the code was sent to
+	 */
+	public function writeCode(string $userId, string $code, string $address, ?int $createdAt = null): void;
 
 	/**
 	 * Deletes the user's stored code.

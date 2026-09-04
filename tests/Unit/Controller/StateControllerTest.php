@@ -11,6 +11,7 @@ namespace OCA\TwoFactorEMail\Test\Unit\Controller;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Controller\StateController;
+use OCA\TwoFactorEMail\Service\EMailAddressSource;
 use OCA\TwoFactorEMail\Service\IStateManager;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\JSONResponse;
@@ -153,6 +154,7 @@ final class StateControllerTest extends TestCase {
 			$request,
 			$this->userSession,
 			$this->stateManager,
+			new EMailAddressSource(),
 		);
 	}
 }

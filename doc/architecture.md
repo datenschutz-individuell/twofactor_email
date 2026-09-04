@@ -22,6 +22,7 @@ The building blocks and the interface each one implements:
 | Code generation               | `Service\ICodeGenerator`      | `Service\NumericalCodeGenerator`                                          |
 | Code storage                  | `Service\ICodeStorage`        | `Service\CodeStorage`                                                     |
 | Email delivery                | `Service\IEMailSender`        | `Service\EMailSender` (+ `Mail\TemplateRenderer`, `Mail\LinkScanner`)     |
+| Delivery address              | — (concrete)                  | `Service\EMailAddressSource`                                              |
 | Address masking               | `Service\IEMailAddressMasker` | `Service\EMailAddressMasker`                                              |
 | Enable/disable state          | `Service\IStateManager`       | `Service\StateManager`                                                    |
 | Settings                      | `Service\IAppSettings`        | `Service\AppSettings` (+ `Service\SettingsValidator`, `Service\WarnOnce`) |
@@ -30,4 +31,4 @@ Around these services sit the HTTP controllers, event listeners (activity/notifi
 
 ## Data footprint
 
-The app introduces no database table. Per user, it stores only the hashed current code and its timestamp (transient, expired-out and deleted on use). App-wide settings live in the app config. It does not store any personal data beyond the email address Nextcloud already holds.
+The app introduces no database table. Per user, it stores only the hashed current code, its timestamp and a hash of the address the code was mailed to (transient, expired-out and deleted on use). App-wide settings live in the app config. The address hash is a comparison value: it tells the app that delivery has moved away from the mailbox a code went to, and it can never name a destination. Beyond it, the app keeps no personal data of its own — the address itself stays where Nextcloud already holds it.

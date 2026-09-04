@@ -13,6 +13,7 @@ use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Event\StateChangeActor;
 use OCA\TwoFactorEMail\Exception\EMailNotSet;
 use OCA\TwoFactorEMail\Exception\SendEMailFailed;
+use OCA\TwoFactorEMail\Service\EMailAddressSource;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Service\IEMailAddressMasker;
 use OCA\TwoFactorEMail\Service\ILoginChallenge;
@@ -46,6 +47,7 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 
 	public function __construct(
 		private readonly IEMailAddressMasker $emailAddressMasker,
+		private readonly EMailAddressSource $addressSource,
 		private readonly ITemplateManager $templateManager,
 		private readonly IL10N $l10n,
 		private readonly IInitialState $initialStateService,
@@ -135,7 +137,7 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 
 	#[\Override]
 	public function getPersonalSettings(IUser $user): IPersonalProviderSettings {
-		$email = $user->getEMailAddress() ?? '';
+		$email = $this->addressSource->getAddress($user) ?? '';
 		$this->initialStateService->provideInitialState('enabled', $this->stateManager->isEnabled($user));
 		$this->initialStateService->provideInitialState('hasEmail', $email !== '');
 		$this->initialStateService->provideInitialState('email', $email);
@@ -160,7 +162,7 @@ class TwoFactorEMail implements IProvider, IProvidesIcons, IProvidesPersonalSett
 	 */
 	#[\Override]
 	public function getLoginSetup(IUser $user): ILoginSetupProvider {
-		$maskedEmail = $this->emailAddressMasker->maskForUI($user->getEMailAddress() ?? '');
+		$maskedEmail = $this->emailAddressMasker->maskForUI($this->addressSource->getAddress($user) ?? '');
 		$this->initialStateService->provideInitialState('maskedEmail', $maskedEmail);
 		return $this->container->get(LoginSetup::class);
 	}
