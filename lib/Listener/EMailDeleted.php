@@ -21,10 +21,29 @@ use OCP\User\Events\UserChangedEvent;
  * password-only.
  *
  * Trigger: UserChangedEvent for the 'eMailAddress' feature. Every path that
- * clears the address used for delivery goes through IUser::setSystemEMailAddress()
+ * clears the *system* address goes through IUser::setSystemEMailAddress()
  * (personal settings, the users page, the provisioning API, `occ user:setting`),
- * which fires this event. Account-only changes (additional emails,
- * `occ user:profile`) leave getEMailAddress() intact and are correctly ignored.
+ * which fires this event. Changes to an account's additional emails, and
+ * `occ user:profile`, do not fire it — they normally leave getEMailAddress()
+ * intact, and are then correctly ignored.
+ *
+ * Delivery can still change without a usable event, in two shapes. Deleting the
+ * additional address a user had picked as their notification address calls
+ * IUser::setPrimaryEMailAddress(''), which drops 'settings/primary_email', so
+ * getEMailAddress() falls back to the system address — or returns null, when the
+ * account has none. Writing that user value instead, as `occ user:setting <uid>
+ * settings primary_email` does, redirects delivery to another address just as
+ * silently. Neither dispatches anything the app could use: the delete does emit
+ * UserUpdatedEvent from the account data, but before the reset, so
+ * getEMailAddress() still reads the old address there — EMailDeletedTest pins that
+ * this listener ignores that event.
+ *
+ * Only the drop to null concerns this listener, and missing it is never a downgrade:
+ * the listener does not run, so the provider stays enabled — stricter than the
+ * disable below while another factor remains, and the same fail-closed state when
+ * email is the sole factor. A silent redirect is a different risk, and the one
+ * doc/threat-model.md carries where it states what the app promises, and does not
+ * promise, about the notification address.
  *
  * Once the address is gone and the provider is still enabled:
  *   - another active provider remains → disable, no protection is lost;
