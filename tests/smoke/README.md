@@ -25,7 +25,7 @@ Linux, or macOS with GNU coreutils and grep ahead of the stock ones in `PATH`.
 
 ```bash
 cd tests/smoke
-./smoke.sh                   # both ends of the supported server range
+./smoke.sh                   # every version in the supported server range
 NC_TAG=33-apache ./smoke.sh  # one specific server version
 SLOW=0 ./smoke.sh            # skip the successful resend, saving 65 s per version
 KEEP=1 ./smoke.sh            # leave the instance up to look at it

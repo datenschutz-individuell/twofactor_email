@@ -6,12 +6,12 @@
 # the mail, and a full login with the code from it. Runs against a disposable
 # Nextcloud built from the packaged app.
 #
-# By default it tests BOTH ends of the supported server range, taken from
+# By default it tests EVERY version of the supported server range, taken from
 # appinfo/info.xml. That is not thoroughness for its own sake: a route that was
 # exempt from the two-factor gate on the newest server only, and dead on the oldest,
 # shipped in 3.4.0 and was found exactly this way.
 #
-#   ./smoke.sh                   # min and max supported Nextcloud version
+#   ./smoke.sh                   # every supported Nextcloud version
 #   NC_TAG=33-apache ./smoke.sh  # one specific server version
 #   SLOW=0 ./smoke.sh            # skip the successful resend, saving 65 s per version
 #   KEEP=1 ./smoke.sh            # leave the instance running afterwards
@@ -505,15 +505,45 @@ run_checks() {
 	is "the address was restored" "$(occ user:setting admin settings email | tr -d ' \r')" "$address"
 }
 
-# Which server versions? Default: both ends of the declared range, because that is
-# where the differences bite.
+# Which server versions? Default: every version in the declared range. A version the
+# app claims to support but Docker Hub has not published yet is skipped with a notice —
+# that happens while support was verified by hand on a real instance instead, and the
+# image closes the gap by itself on release day. The oldest declared version is the
+# exception: no image there means the declared range is wrong.
 if [ -n "${NC_TAG:-}" ]; then
 	TAGS=("$NC_TAG")
 else
 	spec=$(grep -oP '<nextcloud[^>]*' "$ROOT/appinfo/info.xml")
 	min=$(printf '%s' "$spec" | grep -oP 'min-version="\K[0-9]+')
 	max=$(printf '%s' "$spec" | grep -oP 'max-version="\K[0-9]+')
-	if [ "$min" = "$max" ]; then TAGS=("$min-apache"); else TAGS=("$min-apache" "$max-apache"); fi
+	# Without this, a range that failed to parse leaves seq with nothing to do, the
+	# loop below never runs, and the script reports a clean pass over no versions.
+	if ! [ "${min:-}" -ge 1 ] 2>/dev/null || ! [ "${max:-}" -ge "$min" ] 2>/dev/null; then
+		echo "appinfo/info.xml does not declare a usable server range (min='$min', max='$max')." >&2
+		exit 1
+	fi
+	# 404 means the tag does not exist. Anything else — Docker Hub rate-limiting this
+	# address, a timeout, a 5xx — says nothing about the image and must not be read as
+	# an answer.
+	TAGS=()
+	for v in $(seq "$min" "$max"); do
+		code=$(curl -s -o /dev/null -m 20 -w '%{http_code}' \
+			"https://hub.docker.com/v2/repositories/library/nextcloud/tags/$v-apache")
+		case "$code" in
+			200) TAGS+=("$v-apache") ;;
+			404)
+				if [ "$v" = "$min" ]; then
+					echo "Nextcloud $min is the oldest version the app declares, and there is no $min-apache image." >&2
+					exit 1
+				fi
+				note "Nextcloud $v has no image yet and was not tested"
+				;;
+			*)
+				echo "Docker Hub answered $code for $v-apache, so whether the image exists is unknown." >&2
+				exit 1
+				;;
+		esac
+	done
 fi
 
 # Refuse to test a package that cannot contain the current work. krankerl packages the

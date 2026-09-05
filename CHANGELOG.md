@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support Nextcloud 35
 - Administrator documentation for occ, enforcement, email addresses and a FAQ
 - Contributing guidelines, a code of conduct and an overview of the licences used
 - Fresh screenshots in the documentation

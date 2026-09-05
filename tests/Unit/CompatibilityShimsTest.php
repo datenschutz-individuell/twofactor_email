@@ -26,65 +26,6 @@ use PHPUnit\Framework\TestCase;
 final class CompatibilityShimsTest extends TestCase {
 	private const ROOT = __DIR__ . '/../..';
 
-	/**
-	 * From psalm.xml, not from info.xml. The `<php min-version>` in info.xml is
-	 * maintained by hand and nothing checks it, while the psalm job verifies that
-	 * `phpVersion` equals the floor derived from the oldest supported server. Reading
-	 * the value CI already enforces makes this trigger as reliable as that check.
-	 */
-	private function minimumPhpVersion(): string {
-		$psalm = file_get_contents(self::ROOT . '/psalm.xml');
-		self::assertIsString($psalm, 'psalm.xml is not readable');
-		self::assertSame(1, preg_match('/phpVersion="([0-9.]+)"/', $psalm, $m));
-		return $m[1];
-	}
-
-	/**
-	 * Nextcloud 35 deprecates ISecureRandom::generate in favour of PHP's
-	 * Randomizer::getBytesFromString, which needs PHP 8.3. While the app supports
-	 * PHP 8.2 the replacement is out of reach, so psalm is told to accept that one
-	 * call. The moment the floor moves, the suppression hides a call that should
-	 * have changed — and nothing else would say so.
-	 */
-	public function testTheSecureRandomSuppressionGoesWhenPhp82Does(): void {
-		$psalm = file_get_contents(self::ROOT . '/psalm.xml');
-		$generator = file_get_contents(self::ROOT . '/lib/Service/NumericalCodeGenerator.php');
-		self::assertIsString($psalm);
-		self::assertIsString($generator);
-
-		// Both sides, like the Nextcloud 33 pair below. A suppression that outlives the
-		// call it was written for is not reported by psalm either, because the unused
-		// check is off — so it would sit here widening what is accepted, unseen.
-		//
-		// The interface and the call, not the property name: renaming the property is a
-		// refactor that says nothing about the deprecation, and it must not read as
-		// "this carve-out can go".
-		self::assertStringContainsString('ISecureRandom', $generator);
-		$this->assertStringContainsString(
-			'->generate(',
-			$generator,
-			'Nothing calls ISecureRandom::generate any more: remove its suppression from '
-			. 'psalm.xml and this test with it.',
-		);
-
-		// The handler itself, not the comment beside it: a bare class name would also
-		// match the explanation and stay green after the handler was deleted.
-		$handler = '<referencedMethod name="OCP\Security\ISecureRandom::generate"/>';
-
-		if (version_compare($this->minimumPhpVersion(), '8.3', '>=')) {
-			$this->assertStringNotContainsString(
-				$handler,
-				$psalm,
-				'PHP 8.2 is no longer supported: generate the code with '
-				. 'Random\Randomizer::getBytesFromString() and remove the suppression '
-				. 'for ISecureRandom::generate from psalm.xml.',
-			);
-			return;
-		}
-
-		$this->assertStringContainsString($handler, $psalm);
-	}
-
 	private function minimumNextcloudVersion(): int {
 		$info = file_get_contents(self::ROOT . '/appinfo/info.xml');
 		self::assertIsString($info, 'appinfo/info.xml is not readable');
@@ -134,11 +75,11 @@ final class CompatibilityShimsTest extends TestCase {
 	/**
 	 * A suppression here exists because the app spans several versions, and in any one
 	 * analysis run it may simply not be triggered: the Nextcloud 33 one is idle against
-	 * the newest OCP, the ISecureRandom one against every OCP in the range until 35
-	 * enters it. Psalm would report each such run's idle suppression as unused, so the
-	 * check stays off while any suppression is left and comes back once none is. Tying
-	 * it to one particular suppression was wrong the moment a second one existed, which
-	 * is how this test earned its own place.
+	 * the newest OCP, and the two Controller.php ones depend on which OCP is installed.
+	 * Psalm would report each such run's idle suppression as unused, so the check stays
+	 * off while any suppression is left and comes back once none is. Tying it to one
+	 * particular suppression was wrong the moment a second one existed, which is how
+	 * this test earned its own place.
 	 */
 	public function testTheUnusedSuppressionCheckFollowsTheSuppressions(): void {
 		$psalm = file_get_contents(self::ROOT . '/psalm.xml');

@@ -16,7 +16,7 @@ only. [`doc/architecture.md`](doc/architecture.md) explains how the pieces fit;
 
 | | |
 |---|---|
-| Nextcloud | 33–34 (`appinfo/info.xml`) |
+| Nextcloud | 33–35 (`appinfo/info.xml`) |
 | PHP | 8.2–8.5 |
 | Node | `^24 \|\| ^26` |
 
@@ -26,7 +26,15 @@ the oldest supported server. Raising the PHP floor therefore means dropping the
 Nextcloud versions that still allow the older PHP. When you touch the range, change
 `info.xml` (both), `composer.json` (`require.php`, `config.platform.php`,
 `nextcloud/ocp`) and `psalm.xml` together, then check that CI agrees. Nextcloud 35
-requires PHP 8.3, so supporting it means dropping every server that still allows 8.2.
+requires PHP 8.3 **on the server**, which says nothing about the app's own floor: the
+app supports 33 to 35 at once because its code runs on 8.2.
+
+**`nextcloud/ocp` cannot follow `info.xml` past 34.** Its `v35` requires
+`~8.3 || ~8.4 || ~8.5`, and `config.platform.php` here is 8.2, so `^35` will not resolve
+for as long as the app supports PHP 8.2 — which is for as long as it supports Nextcloud
+33. That is not a problem: it is a development dependency, and psalm analyses against
+the *oldest* supported OCP anyway. The CI's `ocp max` job installs the newest branch
+separately.
 
 ## Layout
 

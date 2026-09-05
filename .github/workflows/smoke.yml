@@ -1,17 +1,9 @@
 # SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# UNTESTED. Read this before trusting a green or a red result.
-#
-# The script it drives is exercised locally against both supported server versions, but
-# THIS WORKFLOW HAS NEVER RUN: a workflow can only be proven by pushing it, so its
-# first run is the one on the pull request that adds it. Expect one or two rounds of
-# adjustment — the likely candidates are the krankerl download, the PHP extensions
-# needed by the build, and how long the image pull takes on a runner.
-#
-# What it does: runs the smoke test against every Nextcloud version the app declares
-# support for. The version list comes from appinfo/info.xml, so it cannot drift from
-# what info.xml claims. Roughly 5 minutes per version.
+# Runs the smoke test against every Nextcloud version the app declares support for.
+# The version list comes from appinfo/info.xml, so it cannot drift from what info.xml
+# claims. Roughly 5 minutes per version.
 
 name: Smoke test
 
@@ -42,14 +34,47 @@ jobs:
       - name: Read the supported server range from info.xml
         id: read
         run: |
+          # 404 means the tag does not exist. Anything else — Docker Hub rate-limiting
+          # the shared runner IPs, a timeout, a 5xx — is a broken answer, not an
+          # absent image, and must not be read as one: that would either skip a
+          # version the app promises or fail the range on a network hiccup.
+          has_image() {
+            code=$(curl -s -o /dev/null -m 20 -w '%{http_code}' \
+              "https://hub.docker.com/v2/repositories/library/nextcloud/tags/$1")
+            case "$code" in
+              200) return 0 ;;
+              404) return 1 ;;
+              *) echo "::error::Docker Hub answered $code for $1, so whether the image exists is unknown."
+                 exit 1 ;;
+            esac
+          }
+
           spec=$(grep -oP '<nextcloud[^>]*' appinfo/info.xml)
           min=$(printf '%s' "$spec" | grep -oP 'min-version="\K[0-9]+')
           max=$(printf '%s' "$spec" | grep -oP 'max-version="\K[0-9]+')
-          if [ "$min" = "$max" ]; then
-            tags="\"$min-apache\""
-          else
-            tags="\"$min-apache\", \"$max-apache\""
-          fi
+
+          # Every version in the declared range, not only its ends: a range of three
+          # would otherwise leave the middle one — usually the most widely installed
+          # server — untested.
+          #
+          # A declared version without an official image cannot be tested here. That
+          # happens while the app already supports a server that Docker Hub has not
+          # published yet, which is a deliberate state: the version was then verified
+          # by hand instead. The image appears on release day and the gate closes
+          # again by itself, so this weakens nothing for any released server. The
+          # oldest declared version is the exception — no image there means the range
+          # itself is wrong.
+          tags=""
+          for v in $(seq "$min" "$max"); do
+            if has_image "$v-apache"; then
+              tags="${tags:+$tags, }\"$v-apache\""
+            elif [ "$v" = "$min" ]; then
+              echo "::error::Nextcloud $min is the oldest version the app declares, and there is no $min-apache image."
+              exit 1
+            else
+              echo "::warning::No image for Nextcloud $v yet, so the smoke test skips it. Verify that version by hand until the image is published."
+            fi
+          done
 
           # The server after the declared range, if the official image already has
           # it. Nextcloud publishes a tag when a version is released, so this stays
@@ -57,7 +82,7 @@ jobs:
           # edit needed here when 35, then 36, then 37 appears. Nothing depends on
           # it: the run is allowed to fail, see continue-on-error below.
           next=$((max + 1))
-          if curl -sf "https://hub.docker.com/v2/repositories/library/nextcloud/tags/$next-apache" > /dev/null; then
+          if has_image "$next-apache"; then
             echo "next-tag=$next-apache" >> "$GITHUB_OUTPUT"
             tags="$tags, \"$next-apache\""
             echo "the next server already has an image: $next-apache"
