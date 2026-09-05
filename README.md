@@ -18,12 +18,12 @@ The [user guide](doc/users.md) and the [administrator guide](doc/admins.md) cove
 
 ## Versions
 
-Every Nextcloud version that Nextcloud itself still supports is served by a line of this app that gets security fixes. An older Nextcloud keeps the last line that ran on it, for as long as maintaining it stays reasonable — that is an offer, not a promise. New features go into the line built for the newest released Nextcloud.
+Every Nextcloud version that Nextcloud itself still supports is served by a line of this app that gets security fixes. An older Nextcloud keeps the last line that ran on it, for as long as maintaining it stays reasonable — that is an offer, not a promise. New features go first into the line built for the newest released Nextcloud; an older 3.x line gets them where that is easy.
 
 | Line | Use it on | Security fixes | New features |
 |---|---|---|---|
 | **3.5** | Nextcloud 33–35 | yes | yes |
-| 3.3 | Nextcloud 32 | while reasonable | no |
+| 3.3 | Nextcloud 32 | while reasonable | best effort |
 | [2.8](https://github.com/nursoda/twofactor_email/) | Nextcloud 30–31 | while reasonable | no |
 
 Version 3 is a refactored successor of version 2 and started out from [twofactor_totp](https://github.com/nextcloud/twofactor_totp/). An upgrade from 2 to 3 keeps the provider switched on for each user; stored codes are not carried over, as they expire within minutes anyway.
