@@ -40,7 +40,8 @@
 * Contributors may use AI to refactor or verify code snippets. This led to more robust code!
 * All code proposed by an AI is thoroughly manually verified and adjusted by the maintainers.
 * Major AI contributions are commented in the source code near the AI enhanced code parts.
-* Many thanks to both DuckDuckGo and OpenAI. It is fun using duck.ai with GPT-5 mini.
+* Many thanks to Anthropic, whose Claude Code does most of that work today, and to
+  DuckDuckGo and OpenAI for duck.ai with GPT-5 mini.
 
 ____
 
