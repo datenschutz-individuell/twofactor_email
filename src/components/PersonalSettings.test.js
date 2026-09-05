@@ -5,7 +5,7 @@
  */
 
 import { flushPromises, mount } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { reactive } from 'vue'
 
 // t() returns the raw source string so we can assert on the English text.
@@ -40,8 +40,6 @@ beforeEach(() => {
 	})
 	confirmPassword.mockReset().mockResolvedValue()
 })
-
-afterEach(() => vi.clearAllMocks())
 
 const ncSwitch = (wrapper) => wrapper.findComponent({ name: 'NcSwitch' })
 
