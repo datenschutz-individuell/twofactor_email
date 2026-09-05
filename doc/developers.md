@@ -53,6 +53,32 @@ What these mechanisms promise, and against whom, is bounded by the [threat model
 - **SAST beyond PHP:** CodeQL via the repository's default setup, covering the frontend JavaScript and the GitHub Actions workflows.
 - **Supply chain:** `roave/security-advisories` blocks known-vulnerable composer packages; Dependabot tracks npm/composer updates; the release package ships only runtime files.
 
+## When an OCP method the app needs is deprecated
+
+Nextcloud marks a public interface deprecated long before it removes it, and `psalm.xml` files every `Deprecated*` issue as an error so that window is not missed. Sometimes the replacement is out of reach — typically because it needs a newer PHP than the app's floor, which follows the oldest supported server. The path taken in that case, once, in August 2026:
+
+1. **Show the annotation and name its source.** The `@deprecated` tag in [`nextcloud-deps/ocp`](https://github.com/nextcloud-deps/ocp) or in the server's `lib/public/`, plus the pull request that added it, and **which branch carries it**. The pull request number goes into the commit message: an upstream decision can be reversed, and the next reader must be able to check it without repeating the search.
+2. **Suppress the one method by name** in `psalm.xml`, never the whole issue type, so every other deprecated call stays an error:
+
+   ```xml
+   <DeprecatedMethod errorLevel="error">
+       <errorLevel type="suppress">
+           <referencedMethod name="OCP\Some\IInterface::method"/>
+       </errorLevel>
+   </DeprecatedMethod>
+   ```
+
+3. **Register it in `CompatibilityShimsTest`** with the condition that ends it, and assert both sides: that the call still exists and that the suppression is gone once the condition is met. A suppression that outlives its call is not reported by psalm either, because `findUnusedIssueHandlerSuppression` is off while any suppression exists.
+4. **Watch the branch the suppression is actually needed for.** This is the step that went wrong the first time. The guard was tied to the app's PHP floor — a number this repository controls — while the real condition was an upstream decision, so it could not notice when Nextcloud reversed it. Reading the installed `vendor/nextcloud/ocp` instead is no fix and would have been wrong here too: the annotation only ever lived on the server's `master`, which is the non-blocking "Nextcloud next" run, and no stable OCP the app installs ever carried it. A vendor-reading guard would have demanded the suppression's removal from day one, and its verdict would change with the OCP version of each matrix job. Check the source the suppression exists for — `master` when that is where the annotation is.
+5. **Record it in [`REVIEW.md`](../REVIEW.md)** so a reviewer does not raise it again, and remove that entry with the carve-out.
+
+A missing annotation does not mean there never was one. Before deleting a carve-out, look for the reversal:
+
+```bash
+gh api "search/issues?q=repo:nextcloud/server+<Symbol>+is:pull-request&sort=created&order=desc" \
+  --jq '.items[] | "#\(.number) \(.created_at[0:10]) \(.title)"'
+```
+
 ## Licensing
 
 The app is licensed [AGPL-3.0-or-later](../LICENSES/AGPL-3.0-or-later.txt); bundled assets keep their own licences (e.g. the app icon). [LICENSE.md](../LICENSE.md) lists every licence used here and how the REUSE/SPDX metadata is applied. Add an SPDX header to each new file, or an entry in `REUSE.toml` where a header is impossible; CI verifies it.
