@@ -20,10 +20,17 @@ only. [`doc/architecture.md`](doc/architecture.md) explains how the pieces fit;
 | PHP | 8.2–8.5 |
 | Node | `^24 \|\| ^26` |
 
-**The CI's PHP floor is derived from the Nextcloud `min-version`**, not from
-`<php min-version>`: `icewind1991/nextcloud-version-matrix` takes the minimum PHP of
-the oldest supported server. Raising the PHP floor therefore means dropping the
-Nextcloud versions that still allow the older PHP. When you touch the range, change
+**The CI's PHP range comes from `icewind1991/nextcloud-version-matrix`**, which reads
+both dependencies. Per supported server it narrows that server's PHP range with
+`<php min-version>`/`<max-version>` — the higher minimum, the lower maximum — and drops a
+server whose range no longer intersects. The workflows then read the `php-min` and
+`php-max` outputs, which are the minimum and maximum **over all** servers. So the CI
+floor is the higher of two numbers: the PHP minimum of the oldest supported server, and
+`<php min-version>`. Raising the latter does move the floor, but bluntly — it raises it
+for every server at once, and Nextcloud then refuses to install the app below that
+version at all. Up to v1.3.2 the action did not read `<php>` at all, so the floor came
+from the oldest server alone; since v1.3.3 the older servers stay in the matrix and are
+tested from the app's PHP version up. When you touch the range, change
 `info.xml` (both), `composer.json` (`require.php`, `config.platform.php`,
 `nextcloud/ocp`) and `psalm.xml` together, then check that CI agrees. Nextcloud 35
 requires PHP 8.3 **on the server**, which says nothing about the app's own floor: the
