@@ -70,9 +70,12 @@ at the bottom of "Personal Settings/Security").]]></description>
         <job>OCA\TwoFactorEMail\BackgroundJob\CleanUpExpiredCodes</job>
     </background-jobs>
     <repair-steps>
-        <post-migration>
+        <!-- The step uses classes of this app, so it must not run in the process that
+             performed the update: that process still has the previous version's classes
+             loaded. A live migration runs as a background job, in a fresh process. -->
+        <live-migration>
             <step>OCA\TwoFactorEMail\Migration\RemovePersistedDefaultTemplate</step>
-        </post-migration>
+        </live-migration>
     </repair-steps>
     <two-factor-providers>
         <provider>OCA\TwoFactorEMail\Provider\TwoFactorEMail</provider>
