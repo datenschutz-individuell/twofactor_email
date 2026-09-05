@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Migration;
 
+use OCA\TwoFactorEMail\AppInfo\Application;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
+use Psr\Log\LoggerInterface;
 
 /**
  * In 3.1.x the admin UI showed the default email body as the field value and
@@ -23,6 +25,11 @@ use OCP\Migration\IRepairStep;
  * This step deletes the stored template if and only if it is byte-identical
  * to the 3.1 default text (which was never localized), so the current
  * default applies again. Real customizations are left untouched.
+ *
+ * Registered as a live migration, so it runs as a background job rather than inside
+ * the process that updated the app — that process still holds the classes of the
+ * previous version. Nothing listens to a background job's IOutput, so what was
+ * changed goes to the log as well.
  */
 final class RemovePersistedDefaultTemplate implements IRepairStep {
 
@@ -35,6 +42,7 @@ final class RemovePersistedDefaultTemplate implements IRepairStep {
 
 	public function __construct(
 		private readonly IAppSettings $appSettings,
+		private readonly LoggerInterface $logger,
 	) {
 	}
 
@@ -48,6 +56,8 @@ final class RemovePersistedDefaultTemplate implements IRepairStep {
 		}
 		// Empty means: use the localized default (which contains {logo})
 		$this->appSettings->setEMailTemplate('');
-		$output->info('Removed the persisted 3.1 default email template; the current default (with {logo}) applies again.');
+		$message = 'Removed the persisted 3.1 default email template; the current default (with {logo}) applies again.';
+		$output->info($message);
+		$this->logger->info($message, ['app' => Application::APP_ID]);
 	}
 }
