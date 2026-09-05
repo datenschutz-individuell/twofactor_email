@@ -6,7 +6,7 @@
 <template>
 	<div id="twofactor_email-admin_settings">
 		<NcSettingsSection
-			:name="t('twofactor_email', 'Two-Factor email provider')"
+			:name="t('twofactor_email', 'Two-Factor Email')"
 			:description="t('twofactor_email', 'These system wide settings are saved automatically shortly after the last keypress.')">
 			<!-- Group: authentication code -->
 			<fieldset class="settings-group">
