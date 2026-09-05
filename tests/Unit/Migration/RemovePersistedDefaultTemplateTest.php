@@ -15,6 +15,7 @@ use OCP\Migration\IOutput;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 final class RemovePersistedDefaultTemplateTest extends TestCase {
 	private const OLD_DEFAULT_TEMPLATE
@@ -24,6 +25,8 @@ final class RemovePersistedDefaultTemplateTest extends TestCase {
 		. 'or username – and your password!';
 
 	private IAppSettings&MockObject $appSettings;
+
+	private LoggerInterface&MockObject $logger;
 
 	private RemovePersistedDefaultTemplate $step;
 
@@ -35,15 +38,23 @@ final class RemovePersistedDefaultTemplateTest extends TestCase {
 
 		$this->appSettings = $this->createMock(IAppSettings::class);
 
-		$this->step = new RemovePersistedDefaultTemplate($this->appSettings);
+		$this->logger = $this->createMock(LoggerInterface::class);
+
+		$this->step = new RemovePersistedDefaultTemplate($this->appSettings, $this->logger);
 	}
 
 	/**
+	 * Nothing listens to the IOutput of a live migration, so the log is the only record
+	 * that the stored template was deleted.
+	 *
 	 * @throws Exception
 	 */
-	public function testRemovesThePersistedOldDefault(): void {
+	public function testRemovesThePersistedOldDefaultAndLogsIt(): void {
 		$this->appSettings->method('getEMailTemplate')->willReturn(self::OLD_DEFAULT_TEMPLATE);
 		$this->appSettings->expects($this->once())->method('setEMailTemplate')->with('');
+		$this->logger->expects($this->once())
+			->method('info')
+			->with($this->stringContains('Removed the persisted 3.1 default email template'), ['app' => 'twofactor_email']);
 
 		$this->step->run($this->createMock(IOutput::class));
 	}

@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.5.1 (2026-09-05)
+
+### Changed
+
+- The checks on the stored email texts run on the next cron run after an update, and report to the log
+
+### Fixed
+
+- The update to 3.5.0 aborted with a fatal error: a repair step ran against the classes of the version it replaced
+
 ## 3.5.0 (2026-09-05)
 
 ### Added

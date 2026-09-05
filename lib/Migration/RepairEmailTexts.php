@@ -16,6 +16,7 @@ use OCA\TwoFactorEMail\Service\SettingsValidator;
 use OCP\IAppConfig;
 use OCP\Migration\IOutput;
 use OCP\Migration\IRepairStep;
+use Psr\Log\LoggerInterface;
 
 /**
  * Names the settings that do not do what their admin intended, and removes the one
@@ -33,11 +34,18 @@ use OCP\Migration\IRepairStep;
  * irrecoverably, and there is no backup key.
  *
  * Reads the raw values, since AppSettings already hides an unusable one.
+ *
+ * Registered as a live migration, so it runs as a background job rather than inside
+ * the process that updated the app — that process still holds the classes of the
+ * previous version. Nothing listens to a background job's IOutput, so every message
+ * goes to the log as well; that is where an admin finds it after an update nobody
+ * watched.
  */
 final readonly class RepairEmailTexts implements IRepairStep {
 
 	public function __construct(
 		private IAppConfig $appConfig,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -58,6 +66,11 @@ final readonly class RepairEmailTexts implements IRepairStep {
 			AppSettings::DEFAULT_RESEND_MIN_MINUTES, SettingsValidator::MIN_RESEND_MINUTES, SettingsValidator::MAX_RESEND_MINUTES);
 	}
 
+	private function warn(IOutput $output, string $message): void {
+		$output->warning($message);
+		$this->logger->warning($message, ['app' => Application::APP_ID]);
+	}
+
 	/**
 	 * A value outside its range is corrected on every read, so the app works — but it
 	 * does not do what the admin wrote, and every reading of it shows the corrected
@@ -66,7 +79,7 @@ final readonly class RepairEmailTexts implements IRepairStep {
 	private function checkNumber(IOutput $output, string $key, string $name, int $default, int $min, int $max): void {
 		$stored = $this->appConfig->getValueInt(Application::APP_ID, $key, $default);
 		if ($stored < $min || $stored > $max) {
-			$output->warning(
+			$this->warn($output,
 				'The stored ' . $name . ' (' . $stored . ') is outside the allowed range of ' . $min . ' to '
 				. $max . '. The nearest allowed value is used instead. Set it with occ twofactor_email:settings.',
 			);
@@ -81,7 +94,7 @@ final readonly class RepairEmailTexts implements IRepairStep {
 
 		if (!mb_check_encoding($stored, 'UTF-8')) {
 			$this->appConfig->deleteKey(Application::APP_ID, $key);
-			$output->warning('The email ' . $part . ' was not valid text and has been reset to the default.');
+			$this->warn($output, 'The email ' . $part . ' was not valid text and has been reset to the default.');
 			return;
 		}
 
@@ -89,7 +102,7 @@ final readonly class RepairEmailTexts implements IRepairStep {
 		// messages ask for different repairs, and an admin who fixes one and hears
 		// about the next only at the following upgrade has been told half the story.
 		if ($needsCode && !str_contains($stored, '{code}')) {
-			$output->warning(
+			$this->warn($output,
 				'The email ' . $part . ' does not contain {code}. No mail delivers a code in the ' . $part . ', '
 				. 'and no settings can be saved until this is fixed. Edit it with occ twofactor_email:settings.',
 			);
@@ -98,21 +111,21 @@ final readonly class RepairEmailTexts implements IRepairStep {
 		// The same conditions SettingsValidator refuses, because each one blocks every
 		// settings change until it is fixed — and this output is where an admin looks.
 		if (mb_strlen($stored) > ($needsCode ? SettingsValidator::MAX_EMAIL_TEMPLATE_LENGTH : SettingsValidator::MAX_EMAIL_SUBJECT_LENGTH)) {
-			$output->warning(
+			$this->warn($output,
 				'The email ' . $part . ' is longer than allowed. No settings can be saved until this is '
 				. 'fixed. Edit it with occ twofactor_email:settings.',
 			);
 		}
 
 		if (!$needsCode && preg_match('/[\r\n]/', $stored) === 1) {
-			$output->warning(
+			$this->warn($output,
 				'The email ' . $part . ' contains a line break, which is not allowed in a mail header. '
 				. 'No settings can be saved until this is fixed. Edit it with occ twofactor_email:settings.',
 			);
 		}
 
 		if (LinkScanner::hasPlaceholderInUrl($stored)) {
-			$output->warning(
+			$this->warn($output,
 				'The email ' . $part . ' puts a placeholder inside a web address. Such a mail would carry the '
 				. 'code in a link, so the default text is sent instead. No settings can be saved in the '
 				. 'web interface until this is fixed. Edit it with occ twofactor_email:settings.',
