@@ -52,6 +52,10 @@ every line number below can still be found:
 Adding a server version to the supported range means checking these against the commit
 that version ships, and pinning it here, rather than assuming they still hold.
 
+**Nextcloud 35 is in the supported range and not yet checked here.** As of 2026-09-05
+its stable branch carries no released commit, so there is nothing to pin. Check the five
+invariants against the commit 35.0.0 ships and add its row.
+
 **1. Every route of this app requires a completed first factor.** None of them carries
 `#[PublicPage]`, and `SecurityMiddleware` answers a request to a non-public route from
 a session without a user with `NotLoggedInException`

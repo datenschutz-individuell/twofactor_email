@@ -1,18 +1,32 @@
 # Two-Factor Email Provider for Nextcloud
 
-[Nextcloud](https://nextcloud.com/) supports web logins with a second factor ([two-factor authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication#Factors), 2FA). To support a certain type of 2FA, a "2FA provider" (server-)app must be installed. 2FA kicks in after the primary authentication stage (typically username and password) were successful. This provider challenges the user to enter a randomly generated authentication code (aka one-time password, OTP, currently six digits). It sends that code to the user's primary email address and expects the user to enter it on an additional second step web login page.
+[Nextcloud](https://nextcloud.com/) can ask for a second factor after the password ([two-factor authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication#Factors), 2FA). Each kind of second factor comes from a provider app that a server admin installs. This one emails a one-time code (OTP) — six digits by default — and asks for it on a second login page.
 
 ![The code entry screen, showing the masked address the code went to and when a new one can be requested](doc/img/challenge-initial.webp)
 
-## Installation, activation and usage
+## Installation and setup
 
-As with any 2FA provider, two-factor email must be installed from the [Nextcloud app store](https://apps.nextcloud.com/apps/twofactor_email) and enabled by a Nextcloud server admin. Additionally, the Nextcloud must have a working email server configured.
+An admin installs **Two-Factor Email** from the [Nextcloud app store](https://apps.nextcloud.com/apps/twofactor_email) and enables it. The server needs a working mail setup — the code travels by email.
 
-The user may set up any of the installed providers or even multiple. This provider uses email to send the code and thus can only be enabled if an email address is set in 'Personal info'. Mind that a user may not be able to log in if that email address is invalid (or email server setup of the Nextcloud is not working properly).
+A user then switches it on under *Personal settings › Security*, which needs an email address in *Personal info*. An admin can switch it on for someone instead: `occ twofactorauth:enable <uid> email`.
 
-Admins with console access may enable and disable this provider for specified users via OCC command (`occ twofactorauth:enable <uid> email`, see the [administrator guide](doc/admins.md)). Admins may also enforce 2FA for all users (or specific groups) via Admin Settings. This is a Nextcloud feature and not specific to this provider. If enforced, users with no 2FA are prompted to enable any installed provider (that supports AtLogin setup – this provider supports it since v3). If the admin installs this provider and enforces 2FA, it should be ensured that each user does have a valid email address.
+Nextcloud can also enforce a second factor for everyone or per group, though never one particular method. Email is a low-friction choice there: the user confirms one code and is done, with no device to enrol. Check first that every account has a working address — a user whose address does not work cannot log in.
 
-Mind that, once a user enabled any 2FA provider, they can no longer use their password in applications that don't support the web-based 2FA login flow. For such applications, the user needs to create and use [app passwords](https://docs.nextcloud.com/server/stable/user_manual/en/session_management.html#managing-devices) (to be found at the bottom of Personal Settings/Security).
+Any second factor stops desktop and mobile clients from signing in with the normal password. Each of them needs an [app password](https://docs.nextcloud.com/server/stable/user_manual/en/session_management.html) instead.
+
+The [user guide](doc/users.md) and the [administrator guide](doc/admins.md) cover all of this in detail.
+
+## Versions
+
+Every Nextcloud version that Nextcloud itself still supports is served by a line of this app that gets security fixes. An older Nextcloud keeps the last line that ran on it, for as long as maintaining it stays reasonable — that is an offer, not a promise. New features go into the line built for the newest released Nextcloud.
+
+| Line | Use it on | Security fixes | New features |
+|---|---|---|---|
+| **3.5** | Nextcloud 33–35 | yes | yes |
+| 3.3 | Nextcloud 32 | while reasonable | no |
+| [2.8](https://github.com/nursoda/twofactor_email/) | Nextcloud 30–31 | while reasonable | no |
+
+Version 3 is a refactored successor of version 2 and started out from [twofactor_totp](https://github.com/nextcloud/twofactor_totp/). An upgrade from 2 to 3 keeps the provider switched on for each user; stored codes are not carried over, as they expire within minutes anyway.
 
 ## Documentation
 
@@ -21,17 +35,11 @@ Mind that, once a user enabled any 2FA provider, they can no longer use their pa
 
 To report a security vulnerability, see [SECURITY.md](SECURITY.md).
 
-## State of the app
-
-This version 3.x.x ("v3") is the successor of the deprecated [twofactor_email](https://github.com/nursoda/twofactor_email/) app 2.x.x ("v2"). v2 will remain in the [Nextcloud App Store](https://apps.nextcloud.com/apps/twofactor_email) alongside v3 as long as upcoming security issues may be fixed with reasonable effort. After that, or after all supported Nextcloud versions may use v3, it will be pulled from the App Store. v3 is based on [twofactor_totp](https://github.com/nextcloud/twofactor_totp/) but has been refactored. v2 is installable on NC ≤33, v3 on NC ≥33 (v3.0–3.3 also ran on NC 32).
-
-The code is stable now. There are plans for further enhancements. See open tasks in the [roadmap](https://github.com/datenschutz-individuell/twofactor_email/issues/7). It keeps the status of whether this provider is enabled for a specific user or not when migrating from v2 to v3. However, from 3.1.1 onwards, v2 codes are no longer migrated to v3 since most of them were obsolete. Mind that the look and some behaviour changed or was enhanced.
-
 ## Contributions welcome
 
 This app is a community effort. Help of any kind is welcome — code, tests, documentation, translations, bug reports and ideas.
 
-[CONTRIBUTING.md](CONTRIBUTING.md) explains how to get started; [CONTRIBUTORS.md](CONTRIBUTORS.md) lists who to ask.
+[CONTRIBUTING.md](CONTRIBUTING.md) explains how to get started; [CONTRIBUTORS.md](CONTRIBUTORS.md) lists who to ask. Planned work is in the [roadmap](https://github.com/datenschutz-individuell/twofactor_email/issues/7), open ideas in the [idea collection](https://github.com/datenschutz-individuell/twofactor_email/issues/8).
 
 ## Building yourself
 

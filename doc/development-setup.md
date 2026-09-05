@@ -124,10 +124,10 @@ unlike the tools above it is not part of the checkout, and a check only one user
 is one the next person does not know about.
 
 `reuse lint` in the repository root then answers what the CI job answers: does every file
-carry copyright and licence information, in an SPDX header or through an entry in
+carry copyright and license information, in an SPDX header or through an entry in
 `REUSE.toml`. A file with neither is the usual reason that job turns red. Watch the
-entries that are globbed — `doc/**`, `screenshots/**`, `vendor-bin/*/composer.json` and
-`.lock`, and under `l10n/` only `**.js`, `**.json` and `**.php`. Anything outside those
+entries that are globbed — `doc/**` (the screenshots live there), `vendor-bin/*/composer.json`
+and `.lock`, and under `l10n/` only `**.js`, `**.json` and `**.php`. Anything outside those
 patterns, a new file at the root above all, needs a **named** entry or a header of its
 own.
 

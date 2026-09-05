@@ -85,9 +85,11 @@ quick succession, some get `429 Too Many Requests`. Nextcloud catches that excep
 and returns an empty list, so a throttled instance reports "All apps are up-to-date"
 — indistinguishable from "nothing to do". That is why, after a release, a seemingly
 arbitrary subset of instances updates, and a different subset the next time. If you
-run more than one or two instances from the same address, put a caching proxy in front
-of the store (Nextcloud's `appstoreurl` can point at it) and serve stale content on
-`429`; then a throttle can no longer masquerade as "up to date".
+run more than one or two instances from the same address, a caching proxy in front of
+the store that serves stale content on `429` would stop a throttle masquerading as "up
+to date" — but it must be a host the instances treat as external. Pointing
+`appstoreurl` at a proxy on the instance's own machine does not work: Nextcloud's SSRF
+protection refuses a loopback address, and the store is simply never asked.
 
 **Silent blockers worth knowing:** an app directory that is a git checkout is never
 updated, and `appstoreenabled=false` stops the store being asked at all. Neither says

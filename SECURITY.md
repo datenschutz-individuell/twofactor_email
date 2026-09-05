@@ -4,14 +4,18 @@ The security model is documented by audience — [users](doc/users.md), [adminis
 
 ## Supported Versions
 
-We only support the latest released version of the app for any Nextcloud version that still has official (not extended) support.
+**What we promise:** every Nextcloud version that Nextcloud itself still supports is served by a line of this app that gets security fixes. Today that is the **3.5** line, for Nextcloud 33 to 35.
+
+**What we offer beyond it:** an older Nextcloud keeps the last line that ran on it — **3.3** for Nextcloud 32, version **2.8** below that — for as long as fixing it stays reasonable. We judge that per case, and nothing here commits us to it.
+
+Within a line only its latest release is fixed, so update to that one before reporting.
 
 ## Reporting a Vulnerability
 
-You may create an issue in GitHub to report security vulnerabilities unless you think that it is not easily fixable and would affect many users. In this case, please email Olav directly using olav at seyfarth dot de. Olav's OpenPGP key 0x6AE1EF56 is available on [the website](https://seyfarth.de/gnupg/6AE1EF56.asc) as well as on the [OpenPGP keyserver](https://keys.openpgp.org/search?q=olav%40seyfarth.de).
+Report a vulnerability as a GitHub issue unless **both** of these apply: you see no easy fix, and many users would be affected. In that case email Olav directly at olav at seyfarth dot de. Olav's OpenPGP key 0x6AE1EF56 is available on [the website](https://seyfarth.de/gnupg/6AE1EF56.asc) as well as on the [OpenPGP keyserver](https://keys.openpgp.org/search?q=olav%40seyfarth.de).
 
-We will timely review your report and fix it if we know how and if it's not an upstream issue. Please provide contact details so that we may get in touch with you. Once we publish the fixed code, we would like to pay credits to you. So please also include details on how we shall mention you. See [CONTRIBUTORS](https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md) for examples.
+We review reports promptly and fix what we can, unless the cause is upstream. Please give us contact details so we can reach you. When the fix is published we would like to credit you, so tell us how you want to be named. See [CONTRIBUTORS](https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md) for examples.
 
 ## Bounty
 
-We cannot provide any bounty for reporting. But if you feel that it would affect many users or Nextcloud as a platform, you may use their channel to report it, see the [security](https://nextcloud.com/security/) on the Nextcloud website. They used to use Hacker One as a reporting platform and provide a bounty if the report met their criteria. Due to too many AI generated reports, they abandoned it.
+We cannot provide any bounty for reporting. But if you feel that it would affect many users or Nextcloud as a platform, you may use their channel to report it, see the [security](https://nextcloud.com/security/) on the Nextcloud website. They used to use Hacker One as a reporting platform and provide a bounty if the report met their criteria. They abandoned it after too many AI-generated reports.
