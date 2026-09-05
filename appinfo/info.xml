@@ -8,40 +8,33 @@
     <id>twofactor_email</id>
     <name>Two-Factor email provider</name>
     <summary>Email two-factor provider</summary>
-    <description><![CDATA[### A Two-Factor-Auth Provider using email
+    <description><![CDATA[### A two-factor provider using email
 
-Nextcloud supports web logins with a second factor (two-factor authentication,
-2FA). To support a certain type of 2FA, a "2FA provider" server app must be
-installed. 2FA kicks in after the primary authentication stage (typically
-username and password) were successful. This provider challenges the user to
-enter a randomly generated authentication code (aka one-time password, OTP,
-default: six digits). It sends that code to the user's primary email address
-and expects the user to enter it on an additional second step web login page.
+Nextcloud can ask for a second factor after the password (two-factor
+authentication, 2FA). Each kind of second factor comes from a provider app
+that a server admin installs. This one emails a one-time code (OTP) - six
+digits by default - and asks for it on a second login page.
 
-### Installation, activation and usage
+### Installation and setup
 
-As with any 2FA provider, two-factor email must be installed and enabled by a
-Nextcloud server admin. Additionally, the Nextcloud must have a working email
-server configured.
+An admin installs and enables this app. The server needs a working mail
+setup, because the code travels by email.
 
-The user may set up any of the installed providers or even multiple. This
-provider uses email to send the code and thus can only be enabled if an email
-address is set in "Personal info". Mind that a user may not be able to log in
-if that email address is invalid (or email server setup of the Nextcloud is
-not working properly).
+A user then switches it on under "Personal settings / Security", which needs
+an email address in "Personal info". An admin can switch it on for someone
+instead: "occ twofactorauth:enable USERID email".
 
-Admins with console access may enable and disable this provider for specified
-users via "occ" command. Admins may also enforce 2FA for all users (or specific
-groups) via "Admin Settings". This is a Nextcloud feature and not specific to
-this provider. If enforced, users with no 2FA are prompted to enable any
-installed provider (if they support that feature). This provider supports it
-since v3. If the admin installs this provider and enforces 2FA, it should be
-ensured that each user does have a valid email address.
+Nextcloud can also enforce a second factor for everyone or per group, though
+never one particular method. Email is a low-friction choice there: the user
+confirms one code and is done, with no device to enrol. Check first that
+every account has a working address - a user whose address does not work
+cannot log in.
 
-Mind that, once a user enabled any 2FA provider, they can no longer use their
-password in applications that don't support the web-based 2FA login flow. For
-such applications, the user needs to create and use app passwords (to be found
-at the bottom of "Personal Settings/Security").]]></description>
+Any second factor stops desktop and mobile clients from signing in with the
+normal password. Each of them needs an app password instead, created under
+"Personal settings / Security".
+
+The user and administrator guides cover all of this in detail.]]></description>
     <version>3.5.1</version>
     <licence>agpl</licence>
     <author mail="twofactor-email@datenschutz-individuell.de">

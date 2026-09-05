@@ -69,7 +69,7 @@ Nextcloud marks a public interface deprecated long before it removes it, and `ps
    ```
 
 3. **Register it in `CompatibilityShimsTest`** with the condition that ends it, and assert both sides: that the call still exists and that the suppression is gone once the condition is met. A suppression that outlives its call is not reported by psalm either, because `findUnusedIssueHandlerSuppression` is off while any suppression exists.
-4. **Watch the branch the suppression is actually needed for.** This is the step that went wrong the first time. The guard was tied to the app's PHP floor — a number this repository controls — while the real condition was an upstream decision, so it could not notice when Nextcloud reversed it. Reading the installed `vendor/nextcloud/ocp` instead is no fix and would have been wrong here too: the annotation only ever lived on the server's `master`, which is the non-blocking "Nextcloud next" run, and no stable OCP the app installs ever carried it. A vendor-reading guard would have demanded the suppression's removal from day one, and its verdict would change with the OCP version of each matrix job. Check the source the suppression exists for — `master` when that is where the annotation is.
+4. **Watch the branch the suppression is actually needed for.** Tie the guard to the upstream condition, never to a number this repository controls: a guard on the app's PHP floor cannot notice that Nextcloud reversed its decision. Reading the installed `vendor/nextcloud/ocp` is not the fix either — its verdict changes with the OCP version of each matrix job, and an annotation living only on the server's `master` reaches no stable OCP the app installs. Check the source the suppression exists for: `master` when that is where the annotation is.
 5. **Record it in [`REVIEW.md`](../REVIEW.md)** so a reviewer does not raise it again, and remove that entry with the carve-out.
 
 A missing annotation does not mean there never was one. Before deleting a carve-out, look for the reversal:
@@ -81,4 +81,4 @@ gh api "search/issues?q=repo:nextcloud/server+<Symbol>+is:pull-request&sort=crea
 
 ## Licensing
 
-The app is licensed [AGPL-3.0-or-later](../LICENSES/AGPL-3.0-or-later.txt); bundled assets keep their own licences (e.g. the app icon). [LICENSE.md](../LICENSE.md) lists every licence used here and how the REUSE/SPDX metadata is applied. Add an SPDX header to each new file, or an entry in `REUSE.toml` where a header is impossible; CI verifies it.
+The app is licensed [AGPL-3.0-or-later](../LICENSES/AGPL-3.0-or-later.txt); bundled assets keep their own licenses (e.g. the app icon). [LICENSE.md](../LICENSE.md) lists every license used here and how the REUSE/SPDX metadata is applied. Add an SPDX header to each new file, or an entry in `REUSE.toml` where a header is impossible; CI verifies it.
