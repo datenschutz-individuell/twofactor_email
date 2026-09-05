@@ -5,7 +5,7 @@
  */
 
 import { flushPromises, mount } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { reactive, ref } from 'vue'
 
 vi.mock('@mdi/js', () => ({ mdiUndo: 'M0 0' }))
@@ -49,8 +49,6 @@ beforeEach(() => {
 	})
 	inputValues = reactive({ codeLength: 99, codeValidMinutes: 99, codeResendMinutes: 99, eMailSubject: 'x', eMailTemplate: 'x' })
 })
-
-afterEach(() => vi.clearAllMocks())
 
 async function clickReset(wrapper) {
 	await wrapper.find('button').trigger('click')

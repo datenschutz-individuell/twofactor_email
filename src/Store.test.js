@@ -17,7 +17,6 @@ vi.mock('./services/StateManager.js', () => ({
 
 beforeEach(() => {
 	setActivePinia(createPinia())
-	vi.clearAllMocks()
 })
 
 describe('usePersonalSettingsStore.save', () => {

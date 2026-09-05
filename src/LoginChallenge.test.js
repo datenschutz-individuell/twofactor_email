@@ -39,7 +39,6 @@ function render({ cooldown = 60, availableIn = 0 } = {}) {
 
 beforeEach(() => {
 	vi.useFakeTimers()
-	vi.clearAllMocks()
 })
 
 afterEach(() => {
