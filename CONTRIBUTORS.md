@@ -37,9 +37,9 @@
 
 ### AI usage to enhance code
 
-* Contributors may use AI to refactor or verify code snippets. This led to more robust code!
+* Contributors may use AI to refactor or verify code snippets, which made the code more robust.
 * All code proposed by an AI is thoroughly manually verified and adjusted by the maintainers.
-* Major AI contributions are commented in the source code near the AI enhanced code parts.
+* Major AI contributions are commented in the source code next to the AI-enhanced parts.
 * Many thanks to Anthropic, whose Claude Code does most of that work today, and to
   DuckDuckGo and OpenAI for duck.ai with GPT-5 mini.
 
