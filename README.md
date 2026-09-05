@@ -2,6 +2,8 @@
 
 [Nextcloud](https://nextcloud.com/) supports web logins with a second factor ([two-factor authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication#Factors), 2FA). To support a certain type of 2FA, a "2FA provider" (server-)app must be installed. 2FA kicks in after the primary authentication stage (typically username and password) were successful. This provider challenges the user to enter a randomly generated authentication code (aka one-time password, OTP, currently six digits). It sends that code to the user's primary email address and expects the user to enter it on an additional second step web login page.
 
+![The code entry screen, showing the masked address the code went to and when a new one can be requested](doc/img/challenge-initial.webp)
+
 ## Installation, activation and usage
 
 As with any 2FA provider, two-factor email must be installed from the [Nextcloud app store](https://apps.nextcloud.com/apps/twofactor_email) and enabled by a Nextcloud server admin. Additionally, the Nextcloud must have a working email server configured.
