@@ -46,9 +46,9 @@ This app uses Transifex. If it's not yet available in your language, join the
 
 ## Security issues
 
-Please don't report security vulnerabilities as public issues if they could
-affect many users — see [SECURITY.md](SECURITY.md) for how to report them
-responsibly.
+[SECURITY.md](SECURITY.md) says when a vulnerability may be reported as a
+public issue and when it should reach the maintainers privately. Please
+follow it rather than guessing.
 
 ## Questions
 
