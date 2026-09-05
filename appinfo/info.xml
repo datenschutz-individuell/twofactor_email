@@ -6,8 +6,8 @@
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>twofactor_email</id>
-    <name>Two-Factor email provider</name>
-    <summary>Email two-factor provider</summary>
+    <name>Two-Factor Email</name>
+    <summary>A login code sent to the user's email address</summary>
     <description><![CDATA[### A two-factor provider using email
 
 Nextcloud can ask for a second factor after the password (two-factor
