@@ -103,6 +103,14 @@ treating them as background noise, and re-check whether the existing pins and
   **both** version fields in `package-lock.json` — plus a `CHANGELOG.md` section with
   the release date. Change the values in place; do not re-resolve the lock file during
   a release.
+- **A repair step that names a class of this app is a `<live-migration>`.** Pre- and
+  post-migration steps run inside the process that updated the app, and that process
+  still holds the previous version's classes — `<commands>` alone makes Nextcloud load
+  `AppSettings` and `SettingsValidator` before the update starts. A live migration runs
+  as a background job in a fresh process. Nothing reads a background job's output, so
+  such a step logs what it found. A **schema migration** has no such escape —
+  `MigrationService` always runs it in that same process — so it names nothing from this
+  app at all and spells the values out. `RepairStepProcessTest` enforces both rules.
 - **Decide for every new file whether it belongs in the release package.**
   `.nextcloudignore` keeps the package to runtime files; a new file at the root ships
   unless it is listed there.

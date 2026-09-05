@@ -15,11 +15,14 @@ use OCP\Migration\IOutput;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 final class RepairEmailTextsTest extends TestCase {
 	private IAppConfig&MockObject $appConfig;
 
 	private IOutput&MockObject $output;
+
+	private LoggerInterface&MockObject $logger;
 
 	private RepairEmailTexts $step;
 
@@ -30,7 +33,8 @@ final class RepairEmailTextsTest extends TestCase {
 		parent::setUp();
 		$this->appConfig = $this->createMock(IAppConfig::class);
 		$this->output = $this->createMock(IOutput::class);
-		$this->step = new RepairEmailTexts($this->appConfig);
+		$this->logger = $this->createMock(LoggerInterface::class);
+		$this->step = new RepairEmailTexts($this->appConfig, $this->logger);
 	}
 
 	private function stored(string $subject, string $template): void {
@@ -48,6 +52,19 @@ final class RepairEmailTextsTest extends TestCase {
 			['twofactor_email', 'code_valid_minutes', 10, false, $validMinutes],
 			['twofactor_email', 'resend_min_minutes', 1, false, $resendMinutes],
 		]);
+	}
+
+	/**
+	 * Nothing listens to the IOutput of a live migration, so the log is where an admin
+	 * reads what was found — every message has to go there too.
+	 */
+	public function testLogsEveryMessageItReports(): void {
+		$this->logger->expects($this->once())
+			->method('warning')
+			->with($this->stringContains('does not contain {code}'), ['app' => 'twofactor_email']);
+
+		$this->stored('', 'No code here');
+		$this->step->run($this->output);
 	}
 
 	/** Corrected on every read, so this output is the only place it is visible. */
