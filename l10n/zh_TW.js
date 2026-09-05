@@ -61,7 +61,7 @@ OC.L10N.register(
     "The verification email could not be sent. Please try again later or contact your administrator." : "無法寄送驗證電子郵件。請稍後再試，或聯絡您的系統管理員。",
     "A new authentication code was just sent. Please enter it:" : "已寄送新的驗證碼。請輸入：",
     "Enter the authentication code that was sent to you:" : "請輸入已寄送給您的驗證碼：",
-    "Submit" : "提交",
-    "Send a new code" : "傳送新驗證碼"
+    "Send a new code" : "傳送新驗證碼",
+    "Submit" : "提交"
 },
 "nplurals=1; plural=0;");

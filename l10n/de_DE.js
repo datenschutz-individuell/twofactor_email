@@ -61,7 +61,7 @@ OC.L10N.register(
     "The verification email could not be sent. Please try again later or contact your administrator." : "Die Bestätigungs-E-Mail konnte nicht versendet werden. Bitte später erneut versuchen oder an die Administration wenden.",
     "A new authentication code was just sent. Please enter it:" : "Gerade wurde ein neuer Bestätigungscode gesendet. Bitte diesen eingeben:",
     "Enter the authentication code that was sent to you:" : "Geben Sie den Bestätigungscode ein, den Sie erhalten haben:",
-    "Submit" : "Übermitteln",
-    "Send a new code" : "Einen neuen Code senden"
+    "Send a new code" : "Einen neuen Code senden",
+    "Submit" : "Übermitteln"
 },
 "nplurals=2; plural=(n != 1);");

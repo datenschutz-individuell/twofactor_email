@@ -59,7 +59,7 @@
     "The verification email could not be sent. Please try again later or contact your administrator." : "Viga kinnituskirja saatmisel. Palun proovi hiljem uuesti või võta ühendust peakasutajaga.",
     "A new authentication code was just sent. Please enter it:" : "Just saatsime sulle uue autentimiskoodi. Palun sisesta ta siia:",
     "Enter the authentication code that was sent to you:" : "Sisesta sulle saadetud autentimiskood:",
-    "Submit" : "Saada",
-    "Send a new code" : "Saada uus autentimiskood"
+    "Send a new code" : "Saada uus autentimiskood",
+    "Submit" : "Saada"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -61,7 +61,7 @@ OC.L10N.register(
     "The verification email could not be sent. Please try again later or contact your administrator." : "Doğrulama e-postası gönderilemedi. Lütfen bir süre sonra yeniden deneyin veya yöneticiniz ile görüşün.",
     "A new authentication code was just sent. Please enter it:" : "Az önce yeni bir doğrulama kodu gönderildi. Lütfen kodu yazın:",
     "Enter the authentication code that was sent to you:" : "Size gönderilen doğrulama kodunu yazın:",
-    "Submit" : "Gönder",
-    "Send a new code" : "Yeni bir kod gönder"
+    "Send a new code" : "Yeni bir kod gönder",
+    "Submit" : "Gönder"
 },
 "nplurals=2; plural=(n > 1);");

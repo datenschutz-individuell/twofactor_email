@@ -16,9 +16,11 @@
     "### A Two-Factor-Auth Provider using email\n\nNextcloud supports web logins with a second factor (two-factor authentication,\n2FA). To support a certain type of 2FA, a \"2FA provider\" server app must be\ninstalled. 2FA kicks in after the primary authentication stage (typically\nusername and password) were successful. This provider challenges the user to\nenter a randomly generated authentication code (aka one-time password, OTP,\ndefault: six digits). It sends that code to the user's primary email address\nand expects the user to enter it on an additional second step web login page.\n\n### Installation, activation and usage\n\nAs with any 2FA provider, two-factor email must be installed and enabled by a\nNextcloud server admin. Additionally, the Nextcloud must have a working email\nserver configured.\n\nThe user may set up any of the installed providers or even multiple. This\nprovider uses email to send the code and thus can only be enabled if an email\naddress is set in \"Personal info\". Mind that a user may not be able to log in\nif that email address is invalid (or email server setup of the Nextcloud is\nnot working properly).\n\nAdmins with console access may enable and disable this provider for specified\nusers via \"occ\" command. Admins may also enforce 2FA for all users (or specific\ngroups) via \"Admin Settings\". This is a Nextcloud feature and not specific to\nthis provider. If enforced, users with no 2FA are prompted to enable any\ninstalled provider (if they support that feature). This provider supports it\nsince v3. If the admin installs this provider and enforces 2FA, it should be\nensured that each user does have a valid email address.\n\nMind that, once a user enabled any 2FA provider, they can no longer use their\npassword in applications that don't support the web-based 2FA login flow. For\nsuch applications, the user needs to create and use app passwords (to be found\nat the bottom of \"Personal Settings/Security\")." : "### 使用電郵的雙重驗證提供者\n\nNextcloud 支援使用第二驗證因素（雙重驗證，2FA）進行網頁登入。為支援特定類型的雙重驗證，必須安裝相應的「2FA 提供者」伺服器應用程式。\n\n此提供者會在主要驗證程序（通常為使用者名稱及密碼）成功後，要求使用者輸入隨機產生的一次性驗證碼（OTP，預設為六位數字），並將該驗證碼傳送至使用者的主要電郵地址。\n\n### 安裝、啟用及使用\n\n與其他雙重驗證提供者一樣，電郵雙重驗證必須由 Nextcloud 系統管理員安裝及啟用。此外，Nextcloud 必須已正確設定可運作的電郵伺服器。\n\n使用者可設定任何已安裝的驗證提供者，甚至同時使用多個提供者。由於此提供者使用電郵傳送驗證碼，因此只有在「個人資料」中已設定電郵地址時才能啟用。\n\n請注意，如果電郵地址無效，或 Nextcloud 的電郵設定無法正常運作，使用者可能無法登入。\n\n擁有主控台存取權限的管理員可透過「occ」指令為指定使用者啟用或停用此提供者。管理員亦可透過「管理設定」強制所有使用者（或指定群組）使用雙重驗證。\n\n若系統管理員強制啟用雙重驗證，請確保每位使用者均已設定有效的電郵地址。\n\n一旦使用者啟用任何雙重驗證提供者，便不能再於不支援網頁式雙重驗證流程的應用程式中直接使用帳戶密碼。此類應用程式必須改用應用程式密碼，可於「個人設定／安全性」頁面底部建立。",
     "Placeholders: {code}, {user}, {cloud}, {validity}." : "可用佔位符：{code}、{user}、{cloud}、{validity}。",
     "A {code} here may show up in notification previews on lock screens." : "此處的 {code} 可能會顯示於鎖定畫面的通知預覽中。",
+    "A placeholder must not be part of a web address." : "預留位置不得作為網址的一部分。",
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "可用佔位符：{code}、{user}、{cloud}、{validity}、{logo}。本文內容必須包含 {code}。",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "預設值：空欄位會使用在地化的預設文字，並以提示形式顯示在欄位內。",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "格式設定：空行會開始一個新段落，單行換行則會產生換行。",
+    "Links: URLs are detected and rendered as linked URL text. A placeholder must not be part of a web address." : "連結：系統會偵測網址，並將其顯示為可點按的網址文字。預留位置不得作為網址的一部分。",
     "These system wide settings are saved automatically shortly after the last keypress." : "這些系統全域設定會於你停止輸入後不久自動儲存。",
     "Authentication code" : "驗證碼",
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "設定透過電郵傳送的一次性驗證碼長度、有效期，以及使用者再次要求新驗證碼的等待時間。",
@@ -52,10 +54,12 @@
     "The subject must be a single line." : "主旨必須為單一行文字。",
     "The body must not exceed {max} characters." : "本文不得超過 {max} 個字元。",
     "The body must contain the {code} placeholder." : "本文必須包含 {code} 佔位符。",
+    "The text must be valid UTF-8." : "文字必須為有效的 UTF-8。",
+    "A placeholder must not be part of a web address: the value would be sent to whoever the address belongs to." : "預留位置不得作為網址的一部分：其值會傳送給該網址的擁有者。",
     "The verification email could not be sent. Please try again later or contact your administrator." : "無法傳送驗證電郵。請稍後再試或聯絡系統管理員。",
     "A new authentication code was just sent. Please enter it:" : "新的驗證碼已經發送。請輸入該驗證碼：",
     "Enter the authentication code that was sent to you:" : "請輸入已發送給你的驗證碼：",
-    "Submit" : "遞交",
-    "Send a new code" : "傳送新的驗證碼"
+    "Send a new code" : "傳送新的驗證碼",
+    "Submit" : "遞交"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

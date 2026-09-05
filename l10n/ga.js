@@ -61,7 +61,7 @@ OC.L10N.register(
     "The verification email could not be sent. Please try again later or contact your administrator." : "Níorbh fhéidir an ríomhphost fíoraithe a sheoladh. Déan iarracht eile ar ball nó déan teagmháil le do riarthóir.",
     "A new authentication code was just sent. Please enter it:" : "Seoladh cód fíordheimhnithe nua díreach. Cuir isteach é le do thoil:",
     "Enter the authentication code that was sent to you:" : "Cuir isteach an cód fíordheimhnithe a seoladh chugat:",
-    "Submit" : "Cuir isteach",
-    "Send a new code" : "Seol cód nua"
+    "Send a new code" : "Seol cód nua",
+    "Submit" : "Cuir isteach"
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

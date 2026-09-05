@@ -56,7 +56,7 @@ OC.L10N.register(
     "The verification email could not be sent. Please try again later or contact your administrator." : "Δεν ήταν δυνατή η αποστολή του email επαλήθευσης. Παρακαλούμε δοκιμάστε ξανά αργότερα ή επικοινωνήστε με τον διαχειριστή σας.",
     "A new authentication code was just sent. Please enter it:" : "Μόλις στάλθηκε ένας νέος κωδικός πιστοποίησης. Παρακαλούμε εισαγάγετέ τον:",
     "Enter the authentication code that was sent to you:" : "Εισαγάγετε τον κωδικό πιστοποίησης που σας στάλθηκε:",
-    "Submit" : "Υποβολή",
-    "Send a new code" : "Αποστολή νέου κωδικού"
+    "Send a new code" : "Αποστολή νέου κωδικού",
+    "Submit" : "Υποβολή"
 },
 "nplurals=2; plural=(n != 1);");

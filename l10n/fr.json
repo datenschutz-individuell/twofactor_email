@@ -20,6 +20,7 @@
     "Placeholders: {code}, {user}, {cloud}, {validity}, {logo}. {code} must be part of the body." : "Variables disponibles : {code}, {user}, {cloud}, {validity}, {logo}. La variable {code} doit obligatoirement figurer dans le corps du message.",
     "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "Valeurs par défaut : les champs laissés vides utilisent le texte localisé par défaut, affiché comme indication dans le champ.",
     "Formatting: a blank line starts a new paragraph, a single line break becomes a line break." : "Mise en forme : une ligne vide commence un nouveau paragraphe ; un simple retour à la ligne est conservé comme saut de ligne.",
+    "Links: URLs are detected and rendered as linked URL text. A placeholder must not be part of a web address." : "Liens : les URL sont détectées et affichées comme le texte des URL liées. Une adresse web ne doit pas contenir de variable.",
     "These system wide settings are saved automatically shortly after the last keypress." : "Ces paramètres globaux sont enregistrés automatiquement quelques instants après la dernière saisie.",
     "Authentication code" : "Code d’authentification",
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Définissez la longueur et la durée de validité des codes à usage unique envoyés par e-mail, ainsi que le délai avant qu'un utilisateur puisse demander un nouveau code.",
@@ -58,7 +59,7 @@
     "The verification email could not be sent. Please try again later or contact your administrator." : "L'e-mail de vérification n'a pas pu être envoyé. Veuillez réessayer plus tard ou contacter votre administrateur.",
     "A new authentication code was just sent. Please enter it:" : "Un nouveau code d'authentification vient de vous être envoyé. Veuillez le saisir :",
     "Enter the authentication code that was sent to you:" : "Saisissez le code d'authentification qui vous a été envoyé :",
-    "Submit" : "Envoyer",
-    "Send a new code" : "Envoyer un nouveau code"
+    "Send a new code" : "Envoyer un nouveau code",
+    "Submit" : "Envoyer"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

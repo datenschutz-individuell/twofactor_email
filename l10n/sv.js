@@ -61,7 +61,7 @@ OC.L10N.register(
     "The verification email could not be sent. Please try again later or contact your administrator." : "Det gick inte att skicka verifieringsmeddelandet. Försök igen senare eller kontakta administratören.",
     "A new authentication code was just sent. Please enter it:" : "En ny verifieringskod har just skickats. Ange den här:",
     "Enter the authentication code that was sent to you:" : "Ange den verifieringskod som du har fått:",
-    "Submit" : "Skicka",
-    "Send a new code" : "Skicka en ny kod"
+    "Send a new code" : "Skicka en ny kod",
+    "Submit" : "Skicka"
 },
 "nplurals=2; plural=(n != 1);");

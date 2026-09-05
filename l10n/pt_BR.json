@@ -59,7 +59,7 @@
     "The verification email could not be sent. Please try again later or contact your administrator." : "Não foi possível enviar o e-mail de verificação. Tente novamente mais tarde ou entre em contato com o administrador.",
     "A new authentication code was just sent. Please enter it:" : "Acabamos de enviar um novo código de autenticação. Digite-o:",
     "Enter the authentication code that was sent to you:" : "Digite o código de autenticação que lhe foi enviado:",
-    "Submit" : "Enviar",
-    "Send a new code" : "Enviar um novo código"
+    "Send a new code" : "Enviar um novo código",
+    "Submit" : "Enviar"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }
