@@ -4,7 +4,7 @@
  */
 
 import Axios from '@nextcloud/axios'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { persistAdminSettings, persistState, resetAdminSettings } from './StateManager.js'
 
 vi.mock('@nextcloud/router', () => ({ generateUrl: (path) => path }))
@@ -20,10 +20,6 @@ const malformedBodies = [
 	{ case: 'a numeric body', body: 42 },
 	{ case: 'a boolean body', body: true },
 ]
-
-beforeEach(() => {
-	vi.clearAllMocks()
-})
 
 describe('persistAdminSettings', () => {
 	it('returns the saved settings on success', async () => {

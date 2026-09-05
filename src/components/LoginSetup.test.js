@@ -5,7 +5,7 @@
  */
 
 import { flushPromises, mount } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { reactive } from 'vue'
 
 vi.mock('@nextcloud/l10n', () => ({ t: (app, text) => text }))
@@ -26,8 +26,6 @@ beforeEach(() => {
 		$patch(patch) { Object.assign(this, patch) },
 	})
 })
-
-afterEach(() => vi.clearAllMocks())
 
 describe('LoginSetup', () => {
 	it('enables 2FA on mount and shows the success view with the masked email', async () => {
