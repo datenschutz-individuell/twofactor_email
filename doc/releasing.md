@@ -47,7 +47,7 @@ change it was meant to verify.
 
 ## Testing before publishing
 
-Run `tests/smoke/smoke.sh` against the built package. It covers **both ends of the
+Run `tests/smoke/smoke.sh` against the built package. It covers **every version in the
 supported server range**, which is not pedantry: 3.4.0 shipped a resend endpoint that
 was dead on Nextcloud 33 and fine on 34, because the exemption from the two-factor
 gate is taken from the docblock on 33 and from the PHP attribute on 34, and that
