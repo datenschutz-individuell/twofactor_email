@@ -2,39 +2,37 @@
 
 ### Sponsor
 
-* [Datenschutz Individuell](mailto:Datenschutz
-  Individuell <kontakt@datenschutz-individuell.de>) (https://www.datenschutz-individuell.de)
+* [Datenschutz Individuell](mailto:kontakt@datenschutz-individuell.de) ([datenschutz-individuell.de](https://www.datenschutz-individuell.de))
   Development sponsor for twofactor_email ≥3.0.0
 
 ### Current Maintainer
 
-* [Olav Seyfarth](mailto:Olav Seyfarth <olav@seyfarth.de>) ([nursoda](https://github.com/nursoda))
-* [Niklas Seyfarth](mailto:Niklas Seyfarth <niklas@seyfarth.de>) ([seyfahni](https://github.com/seyfahni))
+* [Olav Seyfarth](mailto:olav@seyfarth.de) ([nursoda](https://github.com/nursoda))
+* [Niklas Seyfarth](mailto:niklas@seyfarth.de) ([seyfahni](https://github.com/seyfahni))
 
 ### Previous Authors
 
-* [Nico Kluge](mailto:Nico Kluge <nico.kluge@klugecoded.com>) ([KlugeNico](https://github.com/KlugeNico))
+* [Nico Kluge](mailto:nico.kluge@klugecoded.com) ([KlugeNico](https://github.com/KlugeNico))
   New author of twofactor_email ≥3.0.0. Cloned and adjusted twofactor_totp project
 
 ### Original Authors
 
-* [Christoph Wurst](mailto:Christoph
-  Wurst <christoph@winzerhof-wurst.at>) ([christophwurst](https://github.com/christophwurst))
+* [Christoph Wurst](mailto:christoph@winzerhof-wurst.at) ([christophwurst](https://github.com/christophwurst))
   Author of [twofactor_totp](https://github.com/nextcloud/twofactor_totp) that ≥3.0.0 was cloned from
-* [Roeland Jago Douma](mailto:Roeland Jago Douma <roeland@famdouma.nl>) ([rullzer](https://github.com/rullzer))
-  Original author of twofactor_email ≤3.0.0
+* [Roeland Jago Douma](mailto:roeland@famdouma.nl) ([rullzer](https://github.com/rullzer))
+  Original author of twofactor_email ≤2.8.11
 
 ### Code, Automation, Reviews, Tests, Documentation, Discussion/Input
 
-* [Florian Doersch](mailto:Florian Doersch <sf-team@siedler25.org>) ([Flow86](https://github.com/Flow86))
+* [Florian Doersch](mailto:sf-team@siedler25.org) ([Flow86](https://github.com/Flow86))
 * Stanislav Zapolsky ([stszap](https://github.com/stszap))
-* [Sascha Wiswedel](mailto:Sascha Wiswedel <sascha.wiswedel@nextcloud.com>) ([wiswedel](https://github.com/wiswedel))
+* [Sascha Wiswedel](mailto:sascha.wiswedel@nextcloud.com) ([wiswedel](https://github.com/wiswedel))
 * Morris Jobke ([MorrisJobke](https://github.com/MorrisJobke))
-* [Andy Xheli](mailto:Andy Xheli <axheli@axtsolutions.com>) ([andyxheli](https://github.com/andyxheli))
-* [Niklas Seyfarth](mailto:Niklas Seyfarth  <niklas@seyfarth.de>) ([seyfahni](https://github.com/seyfahni))
-* [Barbara Seyfarth](mailto:Barbara Seyfarth <barbara@seyfarth.de>) ([firlefunke](https://github.com/firlefunke))
-* [Anna Larch](mailto:Anna Larch <anna@nextcloud.com>) ([miaulalala](https://github.com/miaulalala))
-* [Felix Pütsch](mailto:Felix Pütsch <felix@puetsch.net>) ([puetsch](https://github.com/puetschs))
+* [Andy Xheli](mailto:axheli@axtsolutions.com) ([andyxheli](https://github.com/andyxheli))
+* [Niklas Seyfarth](mailto:niklas@seyfarth.de) ([seyfahni](https://github.com/seyfahni))
+* [Barbara Seyfarth](mailto:barbara@seyfarth.de) ([firlefunke](https://github.com/firlefunke))
+* [Anna Larch](mailto:anna@nextcloud.com) ([miaulalala](https://github.com/miaulalala))
+* [Felix Pütsch](mailto:felix@puetsch.net) ([puetsch](https://github.com/puetsch))
 * ElonSmokes ([ElonSmokes](https://github.com/ElonSmokes))
 
 ### AI usage to enhance code
@@ -42,9 +40,10 @@
 * Contributors may use AI to refactor or verify code snippets. This led to more robust code!
 * All code proposed by an AI is thoroughly manually verified and adjusted by the maintainers.
 * Major AI contributions are commented in the source code near the AI enhanced code parts.
-* Many thanks to both DuckDuckGo and OpenAI. It is fun using duck.ai with GPT-5 mini.
+* Many thanks to Anthropic, whose Claude Code does most of that work today, and to
+  DuckDuckGo and OpenAI for duck.ai with GPT-5 mini.
 
 ____
 
-*Please [tell me](mailto:Olav Seyfarth <olav@seyfarth.de>?subject=[twofactor_email] CONTRIBUTORS.md) if I forgot to
+*Please [tell me](mailto:olav@seyfarth.de?subject=%5Btwofactor_email%5D%20CONTRIBUTORS.md) if I forgot to
 include you or somebody or if I shall correct or delete contact details.*
