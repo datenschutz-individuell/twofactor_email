@@ -4,8 +4,6 @@ OC.L10N.register(
     "Email" : "Электронная почта",
     "Authenticate by email" : "Аутентификация через email",
     "Login attempt for %s" : "Попытка входа %s",
-    "Two-Factor email provider" : "Второй фактор поставщик электронной почты",
-    "Email two-factor provider" : "Email поставщик второй фактор",
     "Authentication code" : "Код аутентификации",
     "Subject" : "Тема",
     "Body" : "Тело",

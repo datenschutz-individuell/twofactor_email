@@ -4,8 +4,6 @@ OC.L10N.register(
     "Email" : "E-pochta",
     "Authenticate by email" : "Elektron pochta orqali tasdiqlash",
     "Login attempt for %s" : "%s uchun kirishga urinish",
-    "Two-Factor email provider" : "Ikki faktorli elektron pochta provayderi",
-    "Email two-factor provider" : "Ikki faktorli elektron pochta provayderi",
     "Authentication code" : "Autentifikatsiya kodi",
     "Could not enable/disable two-factor authentication via email." : "Elektron pochta orqali ikki faktorli autentifikatsiyani yoqib/o'chirib bo'lmadi.",
     "Unhandled error!" : "Ishlov berilmagan xato!",

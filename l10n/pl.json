@@ -2,8 +2,6 @@
     "Email" : "E-mail",
     "Authenticate by email" : "Uwierzytelnianie przez e-mail",
     "Login attempt for %s" : "Próba logowania dla %s",
-    "Two-Factor email provider" : "Dostawca e-mail dla uwierzytelniania dwuskładnikowego",
-    "Email two-factor provider" : "Dostawca e-mail 2FA",
     "Authentication code" : "Kod uwierzytelnienia",
     "Subject" : "Temat",
     "Body" : "Treść",
