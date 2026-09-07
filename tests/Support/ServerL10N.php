@@ -28,7 +28,7 @@ use OCP\IL10N;
  *
  * Left out on purpose: the plural and %n handling of L10NString, and everything
  * around locales. The mail texts use none of it, so the methods below refuse
- * instead of guessing — copy the server's behaviour here when a test needs one.
+ * instead of guessing — copy the server's behavior here when a test needs one.
  */
 final readonly class ServerL10N implements IL10N {
 

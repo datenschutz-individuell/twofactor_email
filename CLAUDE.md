@@ -23,7 +23,7 @@ A two-factor provider for Nextcloud that mails a one-time code. It plugs into Ne
 
 - `lib/` — PHP, namespace `OCA\TwoFactorEMail`. Controllers use routing attributes (`#[FrontpageRoute]`); there is no `appinfo/routes.php` any more.
 - `src/` — Vue 3 with Pinia, tested with Vitest.
-- `templates/` — four templates: the login challenge, the enrolment step shown during login (`LoginSetup`, an `ILoginSetupProvider`), and the admin and personal settings.
+- `templates/` — four templates: the login challenge, the enrollment step shown during login (`LoginSetup`, an `ILoginSetupProvider`), and the admin and personal settings.
 - `tests/Unit/` — PHPUnit, mirrors `lib/`.
 - `tests/smoke/` — the app running in a disposable Nextcloud; use it for anything touching routes, controllers or the challenge flow. See its [README](tests/smoke/README.md).
 
@@ -74,4 +74,4 @@ Each of these was decided. [`REVIEW.md`](REVIEW.md) carries the reasoning, what 
 
 ## Releasing
 
-`krankerl package` packages the **committed** state, not the working tree — an uncommitted fix is not in the package, and a test against it proves the old behaviour. The rest, including why a published release stays invisible to instances for a while, is in [`doc/releasing.md`](doc/releasing.md).
+`krankerl package` packages the **committed** state, not the working tree — an uncommitted fix is not in the package, and a test against it proves the old behavior. The rest, including why a published release stays invisible to instances for a while, is in [`doc/releasing.md`](doc/releasing.md).

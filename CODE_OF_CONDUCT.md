@@ -10,10 +10,10 @@ This is a community effort, maintained by volunteers. We want everyone to feel c
 - **Value different opinions.** People have different backgrounds, needs, and perspectives. Listen to other viewpoints and give them fair consideration.
 - **Be constructive.** Suggestions, questions, and answers should aim to move things forward — offer reasoning, be specific, and focus on the issue rather than the person.
 - **De-escalate.** If a discussion gets heated or the tone turns harsh, take a step back, stay calm, and help bring the conversation back to a constructive level.
-- **Own your mistakes.** Everyone makes mistakes. If you get something wrong or cause offence, acknowledge it, apologise, and aim to avoid making the same mistake again.
+- **Own your mistakes.** Everyone makes mistakes. If you get something wrong or cause offense, acknowledge it, apologize, and aim to avoid making the same mistake again.
 - **Accept decisions.** In any project, decisions have to be made. Maintainers listen to concerns but have the final say. Respect that. Feel free to fork if you don't agree.
 
-## Unacceptable behaviour
+## Unacceptable behavior
 
 - Personal attacks, insults, or demeaning comments
 - Harassment, intimidation, or discrimination in any form
@@ -26,4 +26,4 @@ This Code of Conduct applies to all project-related communication and publicatio
 
 ## Enforcement
 
-Instances of unacceptable behaviour may be reported to the project maintainers. All complaints will be reviewed and handled fairly and with discretion. In response to violations of this Code of Conduct, maintainers may take any action they deem appropriate.
+Instances of unacceptable behavior may be reported to the project maintainers. All complaints will be reviewed and handled fairly and with discretion. In response to violations of this Code of Conduct, maintainers may take any action they deem appropriate.

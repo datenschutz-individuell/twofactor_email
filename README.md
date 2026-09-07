@@ -10,7 +10,7 @@ An admin installs **Two-Factor Email** from the [Nextcloud app store](https://ap
 
 A user then switches it on under *Personal settings › Security*, which needs an email address in *Personal info*. An admin can switch it on for someone instead: `occ twofactorauth:enable <uid> email`.
 
-Nextcloud can also enforce a second factor for everyone or per group, though never one particular method. Email is a low-friction choice there: the user confirms one code and is done, with no device to enrol. Check first that every account has a working address — a user whose address does not work cannot log in.
+Nextcloud can also enforce a second factor for everyone or per group, though never one particular method. Email is a low-friction choice there: the user confirms one code and is done, with no device to enroll. Check first that every account has a working address — a user whose address does not work cannot log in.
 
 Any second factor stops desktop and mobile clients from signing in with the normal password. Each of them needs an [app password](https://docs.nextcloud.com/server/stable/user_manual/en/session_management.html) instead.
 
