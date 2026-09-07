@@ -1,8 +1,3 @@
-<!--
-  - SPDX-FileCopyrightText: 2026 Olav and Niklas Seyfarth, Contributors <https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md>
-  - SPDX-License-Identifier: AGPL-3.0-or-later
--->
-
 # Releasing
 
 Notes for whoever publishes a release. The concrete infrastructure — which host signs, where the key lives, how the instances are updated — is deliberately not part of this document; it is specific to the maintainer's setup. What is here is the part that is true for anyone publishing a Nextcloud app, and most of it was learned the hard way.
@@ -15,7 +10,7 @@ Notes for whoever publishes a release. The concrete infrastructure — which hos
 npm version <version> --no-git-tag-version
 ```
 
-That updates `package.json` and **both** version fields in `package-lock.json` (the top-level one and `packages[""]`) and touches nothing else — verified on a release bump: two changed lines in the lock file, all 855 dependency entries byte-identical, integrity hashes included. Do not re-resolve the tree during a release, and do not hand-edit the lock file either: the second version field is easy to miss, and editing by hand is how you end up with a lock whose checksums no longer match what it describes.
+That updates `package.json` and **both** version fields in `package-lock.json` (the top-level one and `packages[""]`) and touches nothing else — verified on a release bump: in the lock file only those two lines changed, every dependency entry byte-identical, integrity hashes included. Do not re-resolve the tree during a release, and do not hand-edit the lock file either: the second version field is easy to miss, and editing by hand is how you end up with a lock whose checksums no longer match what it describes.
 
 `appinfo/info.xml` and the `CHANGELOG.md` section stay manual.
 

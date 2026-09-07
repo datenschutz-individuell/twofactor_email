@@ -12,10 +12,8 @@ Within a line only its latest release is fixed, so update to that one before rep
 
 ## Reporting a Vulnerability
 
-Report a vulnerability as a GitHub issue unless **both** of these apply: you see no easy fix, and many users would be affected. In that case email Olav directly at olav at seyfarth dot de. Olav's OpenPGP key 0x6AE1EF56 is available on [the website](https://seyfarth.de/gnupg/6AE1EF56.asc) as well as on the [OpenPGP keyserver](https://keys.openpgp.org/search?q=olav%40seyfarth.de).
+Report a bug, an easy-to-fix flaw, or one that only hits rare cases as a GitHub issue. If you see no easy fix *and* many users would be affected, email Olav directly at <olav@seyfarth.de>, ideally encrypted — his OpenPGP key 0x6AE1EF56 and the other channels he reads are on his [website](https://olav.seyfarth.de/).
 
 We review reports promptly and fix what we can, unless the cause is upstream. Please give us contact details so we can reach you. When the fix is published we would like to credit you, so tell us how you want to be named. See [CONTRIBUTORS](https://github.com/datenschutz-individuell/twofactor_email/blob/main/CONTRIBUTORS.md) for examples.
 
-## Bounty
-
-We cannot provide any bounty for reporting. But if you feel that it would affect many users or Nextcloud as a platform, you may use their channel to report it, see the [security](https://nextcloud.com/security/) on the Nextcloud website. They used to use Hacker One as a reporting platform and provide a bounty if the report met their criteria. They abandoned it after too many AI-generated reports.
+We cannot pay a bounty. If the flaw would affect many users or Nextcloud as a platform, report it to the [Nextcloud security team](https://nextcloud.com/security/) as well.
