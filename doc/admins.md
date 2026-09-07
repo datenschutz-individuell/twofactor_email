@@ -7,7 +7,7 @@ This page covers installing, configuring, and running the provider.
 - Install **Two-Factor Email** from the [Nextcloud app store](https://apps.nextcloud.com/apps/twofactor_email). The server needs a working mail setup: the second factor travels that path, so use TLS to the mail server and treat it as part of your security perimeter.
 - Users can enable it themselves in their security settings, or you can enable/disable it per user via `occ` — see [From the command line](#from-the-command-line).
 - You can also **enforce 2FA** server-wide or per group (a Nextcloud feature) — see [Enforcing two-factor authentication](#enforcing-two-factor-authentication).
-- **Keep it updated.** Only the newest release of a line carries the fixes, so install app updates as they appear — in *Administration settings › Apps*, or with `occ app:update twofactor_email`. Which line belongs to your server is in the [README](../README.md#versions).
+- **Keep it updated.** Only the newest release of a line carries the fixes, so install app updates as they appear — in *Administration settings › Apps*, or with `occ app:update twofactor_email`. Which line belongs to your server is in the [README](../README.md#supported-versions).
 
 ## From the command line
 
