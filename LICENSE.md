@@ -1,10 +1,8 @@
 # License
 
-This project is [REUSE](https://reuse.software/) compliant: every file carries clear copyright and license metadata, either inline (in its own header) or via [`REUSE.toml`](REUSE.toml) for files that cannot carry a header (e.g. binaries, lockfiles). This is verified in CI. Full license texts are in [`/LICENSES`](LICENSES).
+Unless a file's own header or [`REUSE.toml`](REUSE.toml) says otherwise, this project is licensed under the **GNU Affero General Public License v3.0 or later ([AGPL-3.0-or-later](LICENSES/AGPL-3.0-or-later.txt))**.
 
-## Code
-
-Unless stated otherwise in a file's own header, the application is licensed under the **GNU Affero General Public License v3.0 or later ([AGPL-3.0-or-later](LICENSES/AGPL-3.0-or-later.txt))**. This is also the default applied via `REUSE.toml` to files that cannot carry a header (docs, config, lockfiles, screenshots, translations).
+It is [REUSE](https://reuse.software/) compliant: every file carries clear copyright and license metadata, either inline (in its own header) or via [`REUSE.toml`](REUSE.toml) for files that cannot carry a header (docs, config, lockfiles, screenshots, translations). This is verified in CI. Full license texts are in [`/LICENSES`](LICENSES).
 
 ## Other licenses used in this repository
 
