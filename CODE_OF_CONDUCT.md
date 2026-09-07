@@ -27,7 +27,3 @@ This Code of Conduct applies to all project-related communication and publicatio
 ## Enforcement
 
 Instances of unacceptable behaviour may be reported to the project maintainers. All complaints will be reviewed and handled fairly and with discretion. In response to violations of this Code of Conduct, maintainers may take any action they deem appropriate.
-
-## Attribution
-
-This Code of Conduct was written for this project and kept intentionally short and practical. It draws inspiration from common open-source community guidelines.

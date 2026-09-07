@@ -2,21 +2,25 @@
 
 ### Sponsor
 
-* [Datenschutz Individuell](mailto:kontakt@datenschutz-individuell.de) ([datenschutz-individuell.de](https://www.datenschutz-individuell.de)) Development sponsor for twofactor_email ≥3.0.0
+* [Datenschutz Individuell](mailto:kontakt@datenschutz-individuell.de) ([datenschutz-individuell.de](https://www.datenschutz-individuell.de))<br>
+  Commissioned and funded twofactor_email 3.0.0 and later
 
-### Current Maintainer
+### Current Maintainers
 
 * [Olav Seyfarth](mailto:olav@seyfarth.de) ([nursoda](https://github.com/nursoda))
 * [Niklas Seyfarth](mailto:niklas@seyfarth.de) ([seyfahni](https://github.com/seyfahni))
 
-### Previous Authors
+### Authors
 
-* [Nico Kluge](mailto:nico.kluge@klugecoded.com) ([KlugeNico](https://github.com/KlugeNico)) New author of twofactor_email ≥3.0.0. Cloned and adjusted twofactor_totp project
+* [Nico Kluge](mailto:nico.kluge@klugecoded.com) ([KlugeNico](https://github.com/KlugeNico))<br>
+  Was commissioned to write twofactor_email 3.0.0, starting from twofactor_totp
 
-### Original Authors
+### Where the code came from
 
-* [Christoph Wurst](mailto:christoph@winzerhof-wurst.at) ([christophwurst](https://github.com/christophwurst)) Author of [twofactor_totp](https://github.com/nextcloud/twofactor_totp) that ≥3.0.0 was cloned from
-* [Roeland Jago Douma](mailto:roeland@famdouma.nl) ([rullzer](https://github.com/rullzer)) Original author of twofactor_email ≤2.8.11
+* [Christoph Wurst](mailto:christoph@winzerhof-wurst.at) ([christophwurst](https://github.com/christophwurst))<br>
+  Author of [twofactor_totp](https://github.com/nextcloud/twofactor_totp), which version 3.0.0 started from
+* [Roeland Jago Douma](mailto:roeland@famdouma.nl) ([rullzer](https://github.com/rullzer))<br>
+  Author of twofactor_email up to 2.8.11 — version 3 continues the name, not that code
 
 ### Code, Automation, Reviews, Tests, Documentation, Discussion/Input
 
@@ -31,13 +35,10 @@
 * [Felix Pütsch](mailto:felix@puetsch.net) ([puetsch](https://github.com/puetsch))
 * ElonSmokes ([ElonSmokes](https://github.com/ElonSmokes))
 
-### AI usage to enhance code
+### Use of AI and human oversight
 
-* Contributors may use AI to refactor or verify code snippets, which made the code more robust.
-* All code proposed by an AI is thoroughly verified and adjusted by the maintainers by hand.
-* Major AI contributions are commented in the source code next to the AI-enhanced parts.
-* Many thanks to Anthropic, whose Claude Code does most of that work today, and to DuckDuckGo and OpenAI for duck.ai with GPT-5 mini.
+Contributors may use AI to refactor or verify code, and AI code reviews have made this code more robust. Where an AI contributed a substantial part, a comment in the source says so. Today Olav works with Anthropic's Claude Code; before that it was duck.ai with GPT-5 mini. The maintainers review every change by hand before merging it.
 
 ____
 
-*Please [tell me](mailto:olav@seyfarth.de?subject=%5Btwofactor_email%5D%20CONTRIBUTORS.md) if I forgot to include you or somebody or if I shall correct or delete contact details.*
+*Please [tell us](mailto:olav@seyfarth.de?subject=%5Btwofactor_email%5D%20CONTRIBUTORS.md) if we missed you or somebody else, or if you want your contact details changed or removed.*
