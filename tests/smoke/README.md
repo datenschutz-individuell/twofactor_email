@@ -101,6 +101,6 @@ It also covers what no HTTP route reaches: `admin-delegation:show`, which is whe
 - **`curl` needs an `Origin` header for `POST /login`.** Nextcloud rejects the request before it looks at the password, and answers with a redirect to `?direct=1&user=…` plus a misleading `Logging out` in the log. It looks exactly like a wrong password.
 - **`curl` sends a GET when no `-d` is given**, so a POST-only route answers 405 and it reads like the route is missing.
 - **After a wrong code the redirect target contains the dashboard path** (`/login/selectchallenge?redirect_url=/apps/dashboard/`). Checking the URL for "dashboard" therefore reports a success that never happened — ask the session instead.
-- **`krankerl package` packages the committed state.** An uncommitted fix is not in the package, and the test will keep proving the old behaviour.
+- **`krankerl package` packages the committed state.** An uncommitted fix is not in the package, and the test will keep proving the old behavior.
 - **"The token expired" on the first login attempt.** Nextcloud's login form is only valid for five minutes (`login_form_timeout`). Opening the page while the instance is still installing and submitting afterwards therefore fails once; reloading is enough. `occ config:system:set login_form_timeout --value=3600 --type=integer` if you want to take your time.
 - **The admin password cannot be changed to a weak one afterwards.** `password_policy` is active in the image; it does not apply during installation, which is why `admin/admin` works at all. Throw the instance away instead.

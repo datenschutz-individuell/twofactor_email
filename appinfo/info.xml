@@ -26,7 +26,7 @@ instead: "occ twofactorauth:enable USERID email".
 
 Nextcloud can also enforce a second factor for everyone or per group, though
 never one particular method. Email is a low-friction choice there: the user
-confirms one code and is done, with no device to enrol. Check first that
+confirms one code and is done, with no device to enroll. Check first that
 every account has a working address - a user whose address does not work
 cannot log in.
 
