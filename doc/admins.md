@@ -103,26 +103,18 @@ If the page instead says a code was sent and none arrives, the mail left Nextclo
 
 ## Frequently asked questions
 
-**Can I enforce email 2FA specifically?**
-Not directly — Nextcloud enforces *a* second factor, never a particular one, and no provider can change that. Installing this provider and no other gets you the same result — see [Enforcing two-factor authentication](#enforcing-two-factor-authentication).
+**Can I enforce email 2FA specifically?** Not directly — Nextcloud enforces *a* second factor, never a particular one, and no provider can change that. Installing this provider and no other gets you the same result — see [Enforcing two-factor authentication](#enforcing-two-factor-authentication).
 
-**Can I switch the provider on for everyone, or for every new account?**
-For everyone, loop over `occ user:list` and call `occ twofactorauth:enable` — see [Scripting](#scripting). For new accounts Nextcloud has no setting for it, and this app deliberately does not switch itself on: at that moment the address is usually unverified, and the invitation mail and the codes travel the same path anyway, so it would add no security.
+**Can I switch the provider on for everyone, or for every new account?** For everyone, loop over `occ user:list` and call `occ twofactorauth:enable` — see [Scripting](#scripting). For new accounts Nextcloud has no setting for it, and this app deliberately does not switch itself on: at that moment the address is usually unverified, and the invitation mail and the codes travel the same path anyway, so it would add no security.
 
-**Can a user receive their codes at some other address than their Nextcloud one?**
-No, and that is a decision, not an omission. A second address is one more value to validate, store and keep in sync, and whoever reads a mailbox can also request a password reset there. If email is not a safe enough channel for an account, use another provider for it.
+**Can a user receive their codes at some other address than their Nextcloud one?** No, and that is a decision, not an omission. A second address is one more value to validate, store and keep in sync, and whoever reads a mailbox can also request a password reset there. If email is not a safe enough channel for an account, use another provider for it.
 
-**A user cannot reach their mailbox any more. How do I let them in?**
-Put the codes where the user can read them: `occ user:setting <uid> settings email <address>`. `occ twofactorauth:disable <uid> email` looks like the shorter way and is the wrong one where 2FA is enforced — the next login sends the user through the setup step, and this provider is usually the only one offering it, so they are asked for a code at the same unreachable mailbox. Switching the factor off also removes the *Use backup code* link, which the login screen shows only while a second factor is enabled. So if the account has backup codes, leave the factor on and let the user log in with one. If the factor really has to go, take the account out of enforcement first. The [Two-Factor Admin Support](https://apps.nextcloud.com/apps/twofactor_admin) app is another way to help such a user.
+**A user cannot reach their mailbox any more. How do I let them in?** Put the codes where the user can read them: `occ user:setting <uid> settings email <address>`. `occ twofactorauth:disable <uid> email` looks like the shorter way and is the wrong one where 2FA is enforced — the next login sends the user through the setup step, and this provider is usually the only one offering it, so they are asked for a code at the same unreachable mailbox. Switching the factor off also removes the *Use backup code* link, which the login screen shows only while a second factor is enabled. So if the account has backup codes, leave the factor on and let the user log in with one. If the factor really has to go, take the account out of enforcement first. The [Two-Factor Admin Support](https://apps.nextcloud.com/apps/twofactor_admin) app is another way to help such a user.
 
-**Do users have to confirm a code at every login?**
-Yes, once per login — but not for every action afterwards: the session stays valid. *Stay logged in* is the exception: Nextcloud then keeps a cookie, valid for 15 days unless `remember_login_cookie_lifetime` says otherwise, and a session restored from that cookie asks for no second factor. Logging out drops it. What Nextcloud does not have is a *trusted device* a user can register; that would be a server feature, not something a provider can add.
+**Do users have to confirm a code at every login?** Yes, once per login — but not for every action afterwards: the session stays valid. *Stay logged in* is the exception: Nextcloud then keeps a cookie, valid for 15 days unless `remember_login_cookie_lifetime` says otherwise, and a session restored from that cookie asks for no second factor. Logging out drops it. What Nextcloud does not have is a *trusted device* a user can register; that would be a server feature, not something a provider can add.
 
-**Our desktop and mobile clients stopped working.**
-That happens with any second factor: those apps cannot show the web login. Each of them needs an app password, created under *Personal settings › Security › Devices & sessions*.
+**Our desktop and mobile clients stopped working.** That happens with any second factor: those apps cannot show the web login. Each of them needs an app password, created under *Personal settings › Security › Devices & sessions*.
 
-**After an update the mail lost its logo or its line breaks.**
-An older version saved the default text into the settings like a text of your own, so later improvements to the default never reached those instances. Clear the field in the admin settings, or run `occ twofactor_email:settings email_template ""`; the same works for `email_subject`.
+**After an update the mail lost its logo or its line breaks.** An older version saved the default text into the settings like a text of your own, so later improvements to the default never reached those instances. Clear the field in the admin settings, or run `occ twofactor_email:settings email_template ""`; the same works for `email_subject`.
 
-**Should I put `{code}` in the subject?**
-Better not. Mail clients show subjects in system notifications, which are readable on a locked screen — a code in the subject can be read there without unlocking the device.
+**Should I put `{code}` in the subject?** Better not. Mail clients show subjects in system notifications, which are readable on a locked screen — a code in the subject can be read there without unlocking the device.

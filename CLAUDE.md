@@ -1,16 +1,10 @@
 # Working on this app
 
-Notes for AI agents. Facts and conventions only — the reasoning lives in
-[`doc/`](doc/), and this file should stay short enough that reading it is never a
-detour. [`REVIEW.md`](REVIEW.md) says what review pays attention to here and which
-questions are already settled.
+Notes for AI agents. Facts and conventions only — the reasoning lives in [`doc/`](doc/), and this file should stay short enough that reading it is never a detour. [`REVIEW.md`](REVIEW.md) says what review pays attention to here and which questions are already settled.
 
 ## What it is
 
-A two-factor provider for Nextcloud that mails a one-time code. It plugs into
-Nextcloud's two-factor framework and is built against the public `OCP` interfaces
-only. [`doc/architecture.md`](doc/architecture.md) explains how the pieces fit;
-[`doc/threat-model.md`](doc/threat-model.md) states what the app defends against.
+A two-factor provider for Nextcloud that mails a one-time code. It plugs into Nextcloud's two-factor framework and is built against the public `OCP` interfaces only. [`doc/architecture.md`](doc/architecture.md) explains how the pieces fit; [`doc/threat-model.md`](doc/threat-model.md) states what the app defends against.
 
 ## Supported versions
 
@@ -20,40 +14,18 @@ only. [`doc/architecture.md`](doc/architecture.md) explains how the pieces fit;
 | PHP | 8.2–8.5 |
 | Node | `^24 \|\| ^26` |
 
-**The CI's PHP range comes from `icewind1991/nextcloud-version-matrix`**, which reads
-both dependencies. Per supported server it narrows that server's PHP range with
-`<php min-version>`/`<max-version>` — the higher minimum, the lower maximum — and drops a
-server whose range no longer intersects. The workflows then read the `php-min` and
-`php-max` outputs, which are the minimum and maximum **over all** servers. So the CI
-floor is the higher of two numbers: the PHP minimum of the oldest supported server, and
-`<php min-version>`. Raising the latter does move the floor, but bluntly — it raises it
-for every server at once, and Nextcloud then refuses to install the app below that
-version at all. Up to v1.3.2 the action did not read `<php>` at all, so the floor came
-from the oldest server alone; since v1.3.3 the older servers stay in the matrix and are
-tested from the app's PHP version up. When you touch the range, change
-`info.xml` (both), `composer.json` (`require.php`, `config.platform.php`,
-`nextcloud/ocp`) and `psalm.xml` together, then check that CI agrees. Nextcloud 35
-requires PHP 8.3 **on the server**, which says nothing about the app's own floor: the
-app supports 33 to 35 at once because its code runs on 8.2.
+**The CI's PHP range comes from `icewind1991/nextcloud-version-matrix`**, which reads both dependencies. Per supported server it narrows that server's PHP range with `<php min-version>`/`<max-version>` — the higher minimum, the lower maximum — and drops a server whose range no longer intersects. The workflows then read the `php-min` and `php-max` outputs, which are the minimum and maximum **over all** servers. So the CI floor is the higher of two numbers: the PHP minimum of the oldest supported server, and `<php min-version>`. Raising the latter does move the floor, but bluntly — it raises it for every server at once, and Nextcloud then refuses to install the app below that version at all. Up to v1.3.2 the action did not read `<php>` at all, so the floor came from the oldest server alone; since v1.3.3 the older servers stay in the matrix and are tested from the app's PHP version up. When you touch the range, change `info.xml` (both), `composer.json` (`require.php`, `config.platform.php`, `nextcloud/ocp`) and `psalm.xml` together, then check that CI agrees. Nextcloud 35 requires PHP 8.3 **on the server**, which says nothing about the app's own floor: the app supports 33 to 35 at once because its code runs on 8.2.
 
-**`nextcloud/ocp` cannot follow `info.xml` past 34.** Its `v35` requires
-`~8.3 || ~8.4 || ~8.5`, and `config.platform.php` here is 8.2, so `^35` will not resolve
-for as long as the app supports PHP 8.2 — which is for as long as it supports Nextcloud
-33. That is not a problem: it is a development dependency, and psalm analyses against
-the *oldest* supported OCP anyway. The CI's `ocp max` job installs the newest branch
-separately.
+**`nextcloud/ocp` cannot follow `info.xml` past 34.** Its `v35` requires `~8.3 || ~8.4 || ~8.5`, and `config.platform.php` here is 8.2, so `^35` will not resolve for as long as the app supports PHP 8.2 — which is for as long as it supports Nextcloud
+33. That is not a problem: it is a development dependency, and psalm analyses against the *oldest* supported OCP anyway. The CI's `ocp max` job installs the newest branch separately.
 
 ## Layout
 
-- `lib/` — PHP, namespace `OCA\TwoFactorEMail`. Controllers use routing attributes
-  (`#[FrontpageRoute]`); there is no `appinfo/routes.php` any more.
+- `lib/` — PHP, namespace `OCA\TwoFactorEMail`. Controllers use routing attributes (`#[FrontpageRoute]`); there is no `appinfo/routes.php` any more.
 - `src/` — Vue 3 with Pinia, tested with Vitest.
-- `templates/` — four templates: the login challenge, the enrolment step shown during
-  login (`LoginSetup`, an `ILoginSetupProvider`), and the admin and personal settings.
+- `templates/` — four templates: the login challenge, the enrolment step shown during login (`LoginSetup`, an `ILoginSetupProvider`), and the admin and personal settings.
 - `tests/Unit/` — PHPUnit, mirrors `lib/`.
-- `tests/smoke/` — the app running in a disposable Nextcloud; use it for anything
-  touching routes, controllers or the challenge flow. See its
-  [README](tests/smoke/README.md).
+- `tests/smoke/` — the app running in a disposable Nextcloud; use it for anything touching routes, controllers or the challenge flow. See its [README](tests/smoke/README.md).
 
 ## Commands
 
@@ -66,105 +38,38 @@ npm run lint && npm run stylelint && npm test && npm run build
 krankerl package                  # release package
 ```
 
-Psalm **analyses** against the app's minimum PHP version — `phpVersion` in `psalm.xml`,
-and the CI checks that the two agree. That is independent of the interpreter it **runs**
-on: Psalm 6.16.1 runs fine on PHP 8.5, verified on 8.5.9 for both the normal and the
-taint pass. If a future version does cap the runtime, the error says so; do not reach
-for an older interpreter without one.
+Psalm **analyses** against the app's minimum PHP version — `phpVersion` in `psalm.xml`, and the CI checks that the two agree. That is independent of the interpreter it **runs** on: Psalm 6.16.1 runs fine on PHP 8.5, verified on 8.5.9 for both the normal and the taint pass. If a future version does cap the runtime, the error says so; do not reach for an older interpreter without one.
 
-Run the checks that match your diff **before** opening a pull request. CI is the gate,
-but finding it locally is cheaper for everyone.
+Run the checks that match your diff **before** opening a pull request. CI is the gate, but finding it locally is cheaper for everyone.
 
-**`composer outdated` in the root does not see `vendor-bin/*`.** The bamarni plugin
-gives those their own projects — use `composer bin all outdated`.
+**`composer outdated` in the root does not see `vendor-bin/*`.** The bamarni plugin gives those their own projects — use `composer bin all outdated`.
 
-**A root `composer install` also installs `vendor-bin/*`**, through a hook that exists
-so working in the repo takes one command instead of two. CI and the package build do
-not need the tooling and pass `--no-scripts`; the only job that keeps it is the one
-running `cs:check`. A new workflow that installs dependencies should pass
-`--no-scripts` too.
+**A root `composer install` also installs `vendor-bin/*`**, through a hook that exists so working in the repo takes one command instead of two. CI and the package build do not need the tooling and pass `--no-scripts`; the only job that keeps it is the one running `cs:check`. A new workflow that installs dependencies should pass `--no-scripts` too.
 
-**Query npm with `--all`.** `npm ls <package>` and friends traverse shallowly without
-it and silently miss deeper paths, which is how a dependency once looked dev-only when
-it was not. After an update, read the warnings and remove their cause rather than
-treating them as background noise, and re-check whether the existing pins and
-`overrides` still change anything — every one of them is debt.
+**Query npm with `--all`.** `npm ls <package>` and friends traverse shallowly without it and silently miss deeper paths, which is how a dependency once looked dev-only when it was not. After an update, read the warnings and remove their cause rather than treating them as background noise, and re-check whether the existing pins and `overrides` still change anything — every one of them is debt.
 
 ## Conventions
 
-- **Every new file needs licensing.** Either an SPDX header or an entry in
-  `REUSE.toml`; the `reuse` CI job fails otherwise. Root-level Markdown is licensed
-  through an **explicit filename entry** in `REUSE.toml` — only `doc/**` and `l10n/**`
-  are globbed, so a new root file has to be added there by hand.
-- **GitHub Actions are pinned to a commit SHA** with a version comment, and every
-  checkout sets `persist-credentials: false`. Follow the existing workflows.
-- **A `pull_request` trigger carries no branch filter.** A pull request based on
-  another pull request's branch is still a change that has to be tested, and it is the
-  one where a missing check goes unnoticed.
-- **A method that overrides or implements anything carries `#[\Override]`** — an
-  interface, an abstract class, a parent method, whether from OCP, Symfony or this app.
-  Psalm requires it (`ensureOverrideAttribute`) and names every method missing one. It
-  is what turns a method Nextcloud has renamed into an analysis error instead of code
-  that is quietly never called again.
-- **A version bump touches four places:** `appinfo/info.xml`, `package.json`, and
-  **both** version fields in `package-lock.json` — plus a `CHANGELOG.md` section with
-  the release date. Change the values in place; do not re-resolve the lock file during
-  a release.
-- **A repair step that names a class of this app is a `<live-migration>`.** Pre- and
-  post-migration steps run inside the process that updated the app, and that process
-  still holds the previous version's classes — `<commands>` alone makes Nextcloud load
-  `AppSettings` and `SettingsValidator` before the update starts. A live migration runs
-  as a background job in a fresh process. Nothing reads a background job's output, so
-  such a step logs what it found. A **schema migration** has no such escape —
-  `MigrationService` always runs it in that same process — so it names nothing from this
-  app at all and spells the values out. `RepairStepProcessTest` enforces both rules.
-- **Decide for every new file whether it belongs in the release package.**
-  `.nextcloudignore` keeps the package to runtime files; a new file at the root ships
-  unless it is listed there.
-- **Write texts for translation.** Comments, docblocks and user-facing strings in
-  plain, simple English — short sentences, no idioms, nothing that only makes sense in
-  German. Translators and non-native readers both benefit.
-- **Changelog entries are one terse line each**; the reasoning belongs in the commit
-  message, not in `CHANGELOG.md`.
-- **Parametrise a test only when setup *and* expected result are identical** across the
-  cases. Differing expectations, or a different mock mechanism per case, mean separate
-  tests — a parametrised test with a branch inside it hides what it checks.
-- **SOLID pragmatically, not dogmatically.** Single-purpose classes, no abstraction
-  introduced for a second implementation that does not exist yet. Maintainability first.
+- **Every new file needs licensing.** Either an SPDX header or an entry in `REUSE.toml`; the `reuse` CI job fails otherwise. Root-level Markdown is licensed through an **explicit filename entry** in `REUSE.toml` — only `doc/**` and `l10n/**` are globbed, so a new root file has to be added there by hand.
+- **GitHub Actions are pinned to a commit SHA** with a version comment, and every checkout sets `persist-credentials: false`. Follow the existing workflows.
+- **A `pull_request` trigger carries no branch filter.** A pull request based on another pull request's branch is still a change that has to be tested, and it is the one where a missing check goes unnoticed.
+- **A method that overrides or implements anything carries `#[\Override]`** — an interface, an abstract class, a parent method, whether from OCP, Symfony or this app. Psalm requires it (`ensureOverrideAttribute`) and names every method missing one. It is what turns a method Nextcloud has renamed into an analysis error instead of code that is quietly never called again.
+- **A version bump touches four places:** `appinfo/info.xml`, `package.json`, and **both** version fields in `package-lock.json` — plus a `CHANGELOG.md` section with the release date. Change the values in place; do not re-resolve the lock file during a release.
+- **A repair step that names a class of this app is a `<live-migration>`.** Pre- and post-migration steps run inside the process that updated the app, and that process still holds the previous version's classes — `<commands>` alone makes Nextcloud load `AppSettings` and `SettingsValidator` before the update starts. A live migration runs as a background job in a fresh process. Nothing reads a background job's output, so such a step logs what it found. A **schema migration** has no such escape — `MigrationService` always runs it in that same process — so it names nothing from this app at all and spells the values out. `RepairStepProcessTest` enforces both rules.
+- **Decide for every new file whether it belongs in the release package.** `.nextcloudignore` keeps the package to runtime files; a new file at the root ships unless it is listed there.
+- **Write texts for translation.** Comments, docblocks and user-facing strings in plain, simple English — short sentences, no idioms, nothing that only makes sense in German. Translators and non-native readers both benefit.
+- **Changelog entries are one terse line each**; the reasoning belongs in the commit message, not in `CHANGELOG.md`.
+- **Parametrise a test only when setup *and* expected result are identical** across the cases. Differing expectations, or a different mock mechanism per case, mean separate tests — a parametrised test with a branch inside it hides what it checks.
+- **SOLID pragmatically, not dogmatically.** Single-purpose classes, no abstraction introduced for a second implementation that does not exist yet. Maintainability first.
 - Do not reformat code you are not otherwise changing.
 
 ## Things that look wrong and are not
 
-- **`ChallengeController::resend()` carries both `#[NoTwoFactorRequired]` and a
-  `@NoTwoFactorRequired` docblock annotation.** Nextcloud 33 reads the exemption from
-  the docblock only; the attribute is `@since 34`. Removing either one breaks a
-  supported server. Nextcloud 35 still reads both, so this is never urgent —
-  `CompatibilityShimsTest` fails as soon as `min-version` reaches 34 and names the two
-  pieces that go together: the annotation and the `UndefinedAttributeClass` handler in
-  `psalm.xml`. **That test is the register of every such carve-out**, each with the
-  condition that ends it. A new workaround the app carries only because it spans
-  several server or PHP versions belongs there, so that dropping a version is a sweep
-  and not a search.
-- **`symfony/console` is held at `^6.4.42`.** Nextcloud bundles Symfony 6.4, and `occ`
-  commands must build against the same major.
-- **`allowScripts` in `package.json` lists `fsevents`, which is never installed here.**
-  It is darwin-only; the entry exists for macOS machines, where npm would otherwise
-  warn about its install script. `npm install-scripts prune` reports it as unused and
-  removes it on Linux — do not run that blindly, and note that
-  `npm install-scripts deny fsevents` cannot recreate it here (`ENOMATCH`).
-- **`@nextcloud/vite-config` is pinned to a pre-release.** Only that version allows
-  Vite 8; the stable line is still on Vite 7. **This one expires:** switch as soon as a
-  stable release supports Vite 8, and treat the pin as a finding from then on. Two
-  things ride along with it and were accepted deliberately. It pulls the `yuku-*`
-  parser family, young and single-maintainer, through `rolldown-plugin-dts` — dev-only,
-  no install script, and only `libConfig` ever imports the plugin, so an app built
-  through `createAppConfig` never loads it. And its chunk splitting is overridden in
-  `vite.config.js`, which keeps the login challenge off the settings bundle; that file
-  says when to compare the groups against upstream again.
+- **`ChallengeController::resend()` carries both `#[NoTwoFactorRequired]` and a `@NoTwoFactorRequired` docblock annotation.** Nextcloud 33 reads the exemption from the docblock only; the attribute is `@since 34`. Removing either one breaks a supported server. Nextcloud 35 still reads both, so this is never urgent — `CompatibilityShimsTest` fails as soon as `min-version` reaches 34 and names the two pieces that go together: the annotation and the `UndefinedAttributeClass` handler in `psalm.xml`. **That test is the register of every such carve-out**, each with the condition that ends it. A new workaround the app carries only because it spans several server or PHP versions belongs there, so that dropping a version is a sweep and not a search.
+- **`symfony/console` is held at `^6.4.42`.** Nextcloud bundles Symfony 6.4, and `occ` commands must build against the same major.
+- **`allowScripts` in `package.json` lists `fsevents`, which is never installed here.** It is darwin-only; the entry exists for macOS machines, where npm would otherwise warn about its install script. `npm install-scripts prune` reports it as unused and removes it on Linux — do not run that blindly, and note that `npm install-scripts deny fsevents` cannot recreate it here (`ENOMATCH`).
+- **`@nextcloud/vite-config` is pinned to a pre-release.** Only that version allows Vite 8; the stable line is still on Vite 7. **This one expires:** switch as soon as a stable release supports Vite 8, and treat the pin as a finding from then on. Two things ride along with it and were accepted deliberately. It pulls the `yuku-*` parser family, young and single-maintainer, through `rolldown-plugin-dts` — dev-only, no install script, and only `libConfig` ever imports the plugin, so an app built through `createAppConfig` never loads it. And its chunk splitting is overridden in `vite.config.js`, which keeps the login challenge off the settings bundle; that file says when to compare the groups against upstream again.
 
 ## Releasing
 
-`krankerl package` packages the **committed** state, not the working tree — an
-uncommitted fix is not in the package, and a test against it proves the old behaviour.
-The rest, including why a published release stays invisible to instances for a while,
-is in [`doc/releasing.md`](doc/releasing.md).
+`krankerl package` packages the **committed** state, not the working tree — an uncommitted fix is not in the package, and a test against it proves the old behaviour. The rest, including why a published release stays invisible to instances for a while, is in [`doc/releasing.md`](doc/releasing.md).

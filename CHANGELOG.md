@@ -2,8 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
@@ -134,8 +133,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- When updating the app from v2 to v3, authentication codes are no longer migrated, see
-  https://github.com/datenschutz-individuell/twofactor_email/issues/69#issuecomment-4588492017
+- When updating the app from v2 to v3, authentication codes are no longer migrated, see https://github.com/datenschutz-individuell/twofactor_email/issues/69#issuecomment-4588492017
 
 ## 3.1.0 (2026-05-31)
 
@@ -148,17 +146,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- First non-beta release of v3. Please note that there still are translations
-  missing and that there still are tasks that you may want to help out with,
-  see https://github.com/datenschutz-individuell/twofactor_email/issues/7
+- First non-beta release of v3. Please note that there still are translations missing and that there still are tasks that you may want to help out with, see https://github.com/datenschutz-individuell/twofactor_email/issues/7
 
 ## 3.0.9-beta.2 (2026-05-10)
 
 ### Added
 
 - Support for Nextcloud 34
-- New translations: de, de_DE, en_GB, et_EE, ga, lt_LT, pl, pt_BR, ru, sv, uz, zh_HK, zh_TW – a BIG "Thank you!" to all
-  translators on transifex!
+- New translations: de, de_DE, en_GB, et_EE, ga, lt_LT, pl, pt_BR, ru, sv, uz, zh_HK, zh_TW – a BIG "Thank you!" to all translators on transifex!
 
 ## 3.0.8-beta.1 (2026-04-22)
 
@@ -225,8 +220,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- twofactor_email versions 3.0.0-dev - 3.0.2-dev used their own database table.
-  This table is dropped. When updating from these dev versions, pending codes are lost.
+- twofactor_email versions 3.0.0-dev - 3.0.2-dev used their own database table. This table is dropped. When updating from these dev versions, pending codes are lost.
 
 ### Removed
 

@@ -2,8 +2,7 @@
 
 ### Sponsor
 
-* [Datenschutz Individuell](mailto:kontakt@datenschutz-individuell.de) ([datenschutz-individuell.de](https://www.datenschutz-individuell.de))
-  Development sponsor for twofactor_email ≥3.0.0
+* [Datenschutz Individuell](mailto:kontakt@datenschutz-individuell.de) ([datenschutz-individuell.de](https://www.datenschutz-individuell.de)) Development sponsor for twofactor_email ≥3.0.0
 
 ### Current Maintainer
 
@@ -12,15 +11,12 @@
 
 ### Previous Authors
 
-* [Nico Kluge](mailto:nico.kluge@klugecoded.com) ([KlugeNico](https://github.com/KlugeNico))
-  New author of twofactor_email ≥3.0.0. Cloned and adjusted twofactor_totp project
+* [Nico Kluge](mailto:nico.kluge@klugecoded.com) ([KlugeNico](https://github.com/KlugeNico)) New author of twofactor_email ≥3.0.0. Cloned and adjusted twofactor_totp project
 
 ### Original Authors
 
-* [Christoph Wurst](mailto:christoph@winzerhof-wurst.at) ([christophwurst](https://github.com/christophwurst))
-  Author of [twofactor_totp](https://github.com/nextcloud/twofactor_totp) that ≥3.0.0 was cloned from
-* [Roeland Jago Douma](mailto:roeland@famdouma.nl) ([rullzer](https://github.com/rullzer))
-  Original author of twofactor_email ≤2.8.11
+* [Christoph Wurst](mailto:christoph@winzerhof-wurst.at) ([christophwurst](https://github.com/christophwurst)) Author of [twofactor_totp](https://github.com/nextcloud/twofactor_totp) that ≥3.0.0 was cloned from
+* [Roeland Jago Douma](mailto:roeland@famdouma.nl) ([rullzer](https://github.com/rullzer)) Original author of twofactor_email ≤2.8.11
 
 ### Code, Automation, Reviews, Tests, Documentation, Discussion/Input
 
@@ -40,10 +36,8 @@
 * Contributors may use AI to refactor or verify code snippets, which made the code more robust.
 * All code proposed by an AI is thoroughly verified and adjusted by the maintainers by hand.
 * Major AI contributions are commented in the source code next to the AI-enhanced parts.
-* Many thanks to Anthropic, whose Claude Code does most of that work today, and to
-  DuckDuckGo and OpenAI for duck.ai with GPT-5 mini.
+* Many thanks to Anthropic, whose Claude Code does most of that work today, and to DuckDuckGo and OpenAI for duck.ai with GPT-5 mini.
 
 ____
 
-*Please [tell me](mailto:olav@seyfarth.de?subject=%5Btwofactor_email%5D%20CONTRIBUTORS.md) if I forgot to
-include you or somebody or if I shall correct or delete contact details.*
+*Please [tell me](mailto:olav@seyfarth.de?subject=%5Btwofactor_email%5D%20CONTRIBUTORS.md) if I forgot to include you or somebody or if I shall correct or delete contact details.*
