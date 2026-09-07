@@ -101,7 +101,7 @@ describe('LoginChallenge resend', () => {
 		await vi.advanceTimersByTimeAsync(0)
 		expect(status.textContent).toContain('new code was sent')
 
-		// Six seconds in it must still be there — one second was the old behaviour.
+		// Six seconds in it must still be there — one second was the old behavior.
 		await vi.advanceTimersByTimeAsync(6000)
 		expect(status.textContent).toContain('new code was sent')
 

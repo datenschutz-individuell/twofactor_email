@@ -27,7 +27,7 @@ use OCP\IRequest;
  * Not an ALoginSetupController, although its two siblings are. That base class is
  * empty: its whole effect is that Nextcloud skips the two-factor gate for it while
  * a user who needs a second factor has no provider to complete it with. The
- * enrolment step needs that, the admin settings never do — and with it these routes
+ * enrollment step needs that, the admin settings never do — and with it these routes
  * would be reachable with the password alone while an admin is still being set up.
  */
 final class AdminSettingsController extends Controller {

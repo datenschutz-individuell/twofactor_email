@@ -22,7 +22,7 @@ That updates `package.json` and **both** version fields in `package-lock.json` (
 
 ## Building
 
-`krankerl package` packages the **committed** state, not the working tree. An uncommitted fix is not in the package, and any test you then run proves the old behaviour. This has bitten us: a smoke test once passed on a package that predated the change it was meant to verify.
+`krankerl package` packages the **committed** state, not the working tree. An uncommitted fix is not in the package, and any test you then run proves the old behavior. This has bitten us: a smoke test once passed on a package that predated the change it was meant to verify.
 
 ## Testing before publishing
 

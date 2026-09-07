@@ -73,7 +73,7 @@ occ twofactorauth:enforce --off
 
 Both options can be repeated for several groups. Naming groups with `--group` makes `--exclude` pointless: once a list of enforced groups exists, the exclusions are no longer looked at, and a user in both lists has to use 2FA. The [admin manual](https://docs.nextcloud.com/server/stable/admin_manual/configuration_user/two_factor-auth.html#enforcing-two-factor-authentication) explains the group logic.
 
-Nextcloud cannot enforce one **specific** method. But **if this app is the only provider that offers setup at login, enforcing 2FA does enforce email 2FA**: a user without a second factor meets a setup step at the next login, and this provider supports it — one code, no device to enrol, nothing to install. Backup codes do not count here: every server has them, and they offer no setup step.
+Nextcloud cannot enforce one **specific** method. But **if this app is the only provider that offers setup at login, enforcing 2FA does enforce email 2FA**: a user without a second factor meets a setup step at the next login, and this provider supports it — one code, no device to enroll, nothing to install. Backup codes do not count here: every server has them, and they offer no setup step.
 
 The condition is an address on every account. A user whose only factor is email and whose address does not work is locked out. Where that is a risk, keep [another provider](https://docs.nextcloud.com/server/stable/user_manual/en/user_2fa.html) installed — enforcement is then no longer email-specific.
 

@@ -22,7 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 - Support Nextcloud 35
 - Administrator documentation for occ, enforcement, email addresses and a FAQ
-- Contributing guidelines, a code of conduct and an overview of the licences used
+- Contributing guidelines, a code of conduct and an overview of the licenses used
 - Fresh screenshots in the documentation
 - The login screen names the masked address the code was sent to
 
@@ -75,7 +75,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 - Require PHP 8.2 or newer
 - Drop support for Nextcloud 32 (which still allows PHP 8.1)
-- Internal cleanups and a refreshed build toolchain (no change in behaviour)
+- Internal cleanups and a refreshed build toolchain (no change in behavior)
 
 ### Security
 
