@@ -4,11 +4,7 @@ The security model is documented by audience — [users](doc/users.md), [adminis
 
 ## Supported Versions
 
-**What we promise:** every Nextcloud version that Nextcloud itself still supports is served by a line of this app that gets security fixes. Today that is the **3.5** line, for Nextcloud 33 to 35.
-
-**What we offer beyond it:** an older Nextcloud keeps the last line that ran on it — **3.3** for Nextcloud 32, version **2.8** below that — for as long as fixing it stays reasonable. We judge that per case, and nothing here commits us to it.
-
-Within a line only its latest release is fixed, so update to that one before reporting.
+The [versions table in the README](README.md#supported-versions) says which line to install for which Nextcloud server, and what that line gets. It is the promise: a row changes there before anything about it stops. Within a line only the latest release is fixed, so update to it before you report.
 
 ## Reporting a Vulnerability
 

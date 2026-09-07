@@ -16,17 +16,18 @@ Any second factor stops desktop and mobile clients from signing in with the norm
 
 The [user guide](doc/users.md) and the [administrator guide](doc/admins.md) cover all of this in detail.
 
-## Versions
+## Supported versions
 
-Every Nextcloud version that Nextcloud itself still supports is served by a line of this app that gets security fixes. An older Nextcloud keeps the last line that ran on it, for as long as maintaining it stays reasonable — that is an offer, not a promise. New features go first into the line built for the newest released Nextcloud; an older 3.x line gets them where that is easy.
+| Nextcloud | App | Security fixes | New features | App EOL |
+|---|---|---|---|---|
+| 35 | **3.5** | ✅ | ✅ | – |
+| 34 | **3.5** | ✅ | ✅ | – |
+| 33 | **3.5** | ✅ | ✅ | – |
+| 32 | 3.3 | ✅ | ⚠️ | – |
 
-| Line | Use it on | Security fixes | New features |
-|---|---|---|---|
-| **3.5** | Nextcloud 33–35 | yes | yes |
-| 3.3 | Nextcloud 32 | while reasonable | best effort |
-| [2.8](https://github.com/nursoda/twofactor_email/) | Nextcloud 30–31 | while reasonable | no |
+This table is the promise. It changes with every release, and the CHANGELOG says when a line's support ends. ⚠️ means best effort.
 
-Version 3 is a refactored successor of version 2 and started out from [twofactor_totp](https://github.com/nextcloud/twofactor_totp/). An upgrade from 2 to 3 keeps the provider switched on for each user; stored codes are not carried over, as they expire within minutes anyway.
+An upgrade from version 2 of this app keeps the provider switched on for each user; stored codes are not carried over, as they expire within minutes anyway.
 
 ## Documentation
 
