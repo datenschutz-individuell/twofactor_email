@@ -11,6 +11,8 @@
     "Your two-factor authentication code for {cloud} is:" : "Sinu kaheastmelise autentimise kood „{cloud}“ teenuse jaoks on:",
     "The code is valid for {validity} minutes." : "See kood kehtib {validity} minutit.",
     "If you did not try to log in, somebody else knows your username and your password — change your password and inform your administrator." : "Kui see polnud sina, kes üritas sisse logida, siis keegi teine teab sinu kasutajanime ja salasõna. Palun muuda kohe  oma salasõna ning teavita süsteemi peakasutajat.",
+    "Two-Factor Email" : "Kaheastmeline autentimise e-posti teel",
+    "A login code sent to the user's email address" : "Kasutaja e-postiaadressile saadetud autentimiskood",
     "Placeholders: {code}, {user}, {cloud}, {validity}." : "Kohatäitjad: {code}, {user}, {cloud}, {validity}.",
     "A {code} here may show up in notification previews on lock screens." : "See {code} kood võib olla nähtav seadmete lukustusvaadetes kirjade eelvaates ning muudes teavitustes.",
     "A placeholder must not be part of a web address." : "Kohatäitja ei saa olla veebiaadressi osa.",

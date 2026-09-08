@@ -11,6 +11,8 @@
     "Your two-factor authentication code for {cloud} is:" : "Váš kód dvojfaktorového overovania pre {cloud} je:",
     "The code is valid for {validity} minutes." : "Kód je platný {validity} minút.",
     "If you did not try to log in, somebody else knows your username and your password — change your password and inform your administrator." : "Ak ste sa nepokúšali prihlásiť, vaše používateľské meno a heslo pozná niekto iný — zmeňte heslo a informujte správcu.",
+    "Two-Factor Email" : "Dvojfaktorový e-mail",
+    "A login code sent to the user's email address" : "Prihlasovací kód odoslaný na e-mailovú adresu používateľa",
     "Placeholders: {code}, {user}, {cloud}, {validity}." : "Zástupné symboly: {code}, {user}, {cloud}, {validity}.",
     "A {code} here may show up in notification previews on lock screens." : "Kód {code} sa môže zobrazovať v náhľadoch upozornení na zamknutých obrazovkách.",
     "A placeholder must not be part of a web address." : "Zástupný symbol nesmie byť súčasťou webovej adresy.",
