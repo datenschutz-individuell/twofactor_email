@@ -3,6 +3,9 @@ OC.L10N.register(
     {
     "Email" : "E-mail",
     "Authentication code" : "Ověřovací kód",
+    "Length (characters)" : "Délka (znaků)",
+    "Validity (minutes)" : "Platnost (minuty)",
+    "Email template" : "Šablona e-mailu",
     "Subject" : "Předmět",
     "Body" : "Těle textu",
     "Unhandled error!" : "Neošetřená chyba!",
