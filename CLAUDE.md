@@ -69,6 +69,7 @@ Each of these was decided. [`REVIEW.md`](REVIEW.md) carries the reasoning, what 
 
 - **`ChallengeController::resend()` carries both `#[NoTwoFactorRequired]` and a `@NoTwoFactorRequired` docblock annotation.** Nextcloud 33 reads the exemption from the docblock only, so removing either one breaks a supported server. `CompatibilityShimsTest` fails as soon as that stops being true. **That test is the register of every such carve-out**, each with the condition that ends it. A new workaround the app carries only because it spans several server or PHP versions belongs there, so that dropping a version is a sweep and not a search.
 - **`symfony/console` is held at `^6.4.42`.** Nextcloud bundles Symfony 6.4, and `occ` commands must build against the same major.
+- **`psalm/phar` is held at `~6.16.1`.** Psalm 6.17 crashes in the taint pass on first-class callables, one of which `TemplateRenderer::paragraphs()` uses. **This one expires:** raise the range once a 6.17.x carries [vimeo/psalm#11932](https://github.com/vimeo/psalm/pull/11932).
 - **`allowScripts` in `package.json` lists `fsevents`, which is never installed here.** It is darwin-only, and the entry cannot be written back on Linux once it is gone — so do not run `npm install-scripts prune` blindly.
 - **`@nextcloud/vite-config` is pinned to a pre-release.** Only that version allows Vite 8. **This one expires:** switch as soon as a stable release supports Vite 8, and treat the pin as a finding from then on.
 
