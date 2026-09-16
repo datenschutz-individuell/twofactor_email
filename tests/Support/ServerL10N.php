@@ -11,6 +11,7 @@ namespace OCA\TwoFactorEMail\Test\Support;
 
 use LogicException;
 use OCP\IL10N;
+use RuntimeException;
 
 /**
  * Translates the way the Nextcloud server does, for tests that render a text a
@@ -23,12 +24,14 @@ use OCP\IL10N;
  *   - lib/private/L10N/L10NString.php, __toString(): the source string is looked
  *     up in the translations, then vsprintf'd — always, so a translation whose
  *     format markers do not match the parameters raises the same error a rendered
- *     mail would
- * Read from server 34 on 2026-08-26.
+ *     mail would; an empty result throws, as it does since server 35
+ * Read from server 35.0.0 on 2026-09-17.
  *
- * Left out on purpose: the plural and %n handling of L10NString, and everything
- * around locales. The mail texts use none of it, so the methods below refuse
- * instead of guessing — copy the server's behavior here when a test needs one.
+ * Left out on purpose: the plural and %n handling of L10NString, its refusal of
+ * a pipe character in the translation or, where none exists, in the English
+ * source, and everything around locales. The mail texts use none of it, so the
+ * methods below refuse instead of guessing — copy the server's behavior here
+ * when a test needs one.
  */
 final readonly class ServerL10N implements IL10N {
 
@@ -46,7 +49,11 @@ final readonly class ServerL10N implements IL10N {
 		if (!is_array($parameters)) {
 			$parameters = [$parameters];
 		}
-		return vsprintf($this->translations[$text] ?? $text, $parameters);
+		$translated = vsprintf($this->translations[$text] ?? $text, $parameters);
+		if ($translated === '') {
+			throw new RuntimeException('The translated text is empty: ' . $text);
+		}
+		return $translated;
 	}
 
 	#[\Override]
