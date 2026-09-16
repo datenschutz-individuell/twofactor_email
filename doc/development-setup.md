@@ -69,7 +69,7 @@ Rector is the other tool that is not installed here, and CI does not run it eith
 
 ## Rector, when the Nextcloud range moves
 
-Rector can rewrite calls that a new server renamed, but it is not part of this project: its Nextcloud sets for 33, 34 and 35 are the same file, and over `lib/` they propose nothing at all. Run it from a throwaway directory when the supported range moves, then throw the directory away:
+Rector can rewrite calls that a new server renamed, but it is not part of this project: its set for 34 repeats the one for 33, the set for 35 only renames the Doctrine DBAL schema classes that this app never touches, and over `lib/` they propose nothing at all. Run it from a throwaway directory when the supported range moves, then throw the directory away:
 
 ```bash
 mkdir -p /tmp/rector && cd /tmp/rector
