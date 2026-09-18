@@ -66,6 +66,7 @@ OC.L10N.register(
     "Enter the authentication code that was sent to you:" : "Size gönderilen doğrulama kodunu yazın:",
     "Send a new code" : "Yeni bir kod gönder",
     "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Daha önceki kod henüz geçerli olduğu için yeni bir kod gönderilmedi. Önceki kod gelmediyse, aşağıdaki \"%s\" seçeneğini kullanın.",
-    "Submit" : "Gönder"
+    "Submit" : "Gönder",
+    "Your code" : "Kodunuz"
 },
 "nplurals=2; plural=(n > 1);");

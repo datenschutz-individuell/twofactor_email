@@ -64,6 +64,7 @@
     "Enter the authentication code that was sent to you:" : "Digite o código de autenticação que lhe foi enviado:",
     "Send a new code" : "Enviar um novo código",
     "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Nenhum novo código foi enviado, pois um código anterior ainda está válido. Caso ele não tenha chegado, use “%s” abaixo.",
-    "Submit" : "Enviar"
+    "Submit" : "Enviar",
+    "Your code" : "Seu código"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }
