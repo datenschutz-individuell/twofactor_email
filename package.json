@@ -79,7 +79,7 @@
     "@nextcloud/vite-config": "^2.5.4",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitest/coverage-v8": "^5.0.0",
-    "@vue/test-utils": "^2.5.0",
+    "@vue/test-utils": "^2.5.1",
     "eslint": "^10.10.0",
     "happy-dom": "^20.14.5",
     "vite": "^7.3.6",
