@@ -66,6 +66,7 @@ OC.L10N.register(
     "Enter the authentication code that was sent to you:" : "請輸入已寄送給您的驗證碼：",
     "Send a new code" : "傳送新驗證碼",
     "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "因為先前傳送的驗證碼仍然有效，因此不會寄送新的驗證碼。若未收到驗證碼，請使用下方的「%s」。",
-    "Submit" : "提交"
+    "Submit" : "提交",
+    "Your code" : "您的代碼"
 },
 "nplurals=1; plural=0;");

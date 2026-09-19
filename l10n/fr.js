@@ -66,6 +66,7 @@ OC.L10N.register(
     "Enter the authentication code that was sent to you:" : "Saisissez le code d'authentification qui vous a été envoyé :",
     "Send a new code" : "Envoyer un nouveau code",
     "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Aucun nouveau code n'a été envoyé car le précédent est encore valide. S'il n'est pas arrivé, utilisez « %s » ci-dessous.",
-    "Submit" : "Envoyer"
+    "Submit" : "Envoyer",
+    "Your code" : "Votre code"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
