@@ -83,7 +83,7 @@
     "eslint": "^10.10.0",
     "happy-dom": "^20.14.5",
     "vite": "^7.3.6",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.1"
   },
   "allowScripts": {
     "@parcel/watcher": false,
