@@ -64,6 +64,7 @@
     "Enter the authentication code that was sent to you:" : "Cuir isteach an cód fíordheimhnithe a seoladh chugat:",
     "Send a new code" : "Seol cód nua",
     "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Níor seoladh aon chód nua, mar tá ceann níos luaithe fós bailí. Mura bhfuair sé, bain úsáid as \"%s\" thíos.",
-    "Submit" : "Cuir isteach"
+    "Submit" : "Cuir isteach",
+    "Your code" : "Do chód"
 },"pluralForm" :"nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);"
 }
