@@ -68,7 +68,7 @@ Run the checks that match your diff **before** opening a pull request. CI is the
 Each of these was decided. [`REVIEW.md`](REVIEW.md) carries the reasoning, what rides along with it and the condition that ends it — read that entry before undoing one.
 
 - **`ChallengeController::resend()` carries both `#[NoTwoFactorRequired]` and a `@NoTwoFactorRequired` docblock annotation.** Nextcloud 33 reads the exemption from the docblock only, so removing either one breaks a supported server. `CompatibilityShimsTest` fails as soon as that stops being true. **That test is the register of every such carve-out**, each with the condition that ends it. A new workaround the app carries only because it spans several server or PHP versions belongs there, so that dropping a version is a sweep and not a search.
-- **`symfony/console` is held at `^6.4.42`.** Nextcloud bundles Symfony 6.4, and `occ` commands must build against the same major.
+- **`symfony/console` is held at `^6.4`.** Nextcloud 33 and 34 bundle Symfony 6.4, and `occ` commands must build against the oldest supported server's major. Nextcloud 35 ships Symfony 7, which is why every `execute()` declares its `int` return type — that is what makes the same code run on both.
 - **`allowScripts` in `package.json` lists `fsevents`, which is never installed here.** It is darwin-only, and the entry cannot be written back on Linux once it is gone — so do not run `npm install-scripts prune` blindly.
 - **`@nextcloud/vite-config` is pinned to a pre-release.** Only that version allows Vite 8. **This one expires:** switch as soon as a stable release supports Vite 8, and treat the pin as a finding from then on.
 
