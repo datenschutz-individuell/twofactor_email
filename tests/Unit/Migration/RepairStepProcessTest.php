@@ -79,6 +79,21 @@ final class RepairStepProcessTest extends TestCase {
 		}
 	}
 
+	/**
+	 * Nextcloud reads the config lexicon while it updates the app, in the same process
+	 * as a schema migration, so the same rule applies.
+	 */
+	public function testTheConfigLexiconUsesNoAppClasses(): void {
+		$source = file_get_contents(self::ROOT . '/lib/Config/ConfigLexicon.php');
+		self::assertNotFalse($source);
+		self::assertSame(
+			[],
+			$this->appClassesUsedBy($source),
+			'ConfigLexicon uses classes of this app. Nextcloud reads it in the process that performed the '
+			. 'update, where those classes are still the previous version — spell the values out instead.',
+		);
+	}
+
 	private function sourceOf(string $class): string {
 		$file = self::ROOT . '/lib' . str_replace(['OCA\\TwoFactorEMail', '\\'], ['', '/'], $class) . '.php';
 		self::assertFileExists($file, $class . ' is registered as a repair step but has no source file');
@@ -121,14 +136,18 @@ final class RepairStepProcessTest extends TestCase {
 
 		// Every way a class is named in a body: static access, instantiation, a type in
 		// front of a variable, an instanceof test. A leading backslash means the global
-		// namespace and is not ours.
+		// namespace and is not ours; a name after :: is a constant, not a class.
 		preg_match_all(
-			'~(?<!\\\\)\b(?:new\s+|instanceof\s+)?([A-Z]\w*)(?=::|\s*\(|\s+\$|\s*;)~',
+			'~(?<!\\\\)(?<!::)\b(?:new\s+|instanceof\s+)?([A-Z]\w*)(?=::|\s*\(|\s+\$|\s*;)~',
 			$source,
 			$used,
 		);
 
-		$found = [];
+		// A fully qualified name names this app no matter where it stands.
+		$body = preg_replace('~^(?:namespace|use)\s+[^;]+;~m', '', $source);
+		preg_match_all('~\\\\?\\bOCA\\\\TwoFactorEMail(?:\\\\\\w+)+~', (string)$body, $qualified);
+
+		$found = array_map(static fn (string $name): string => ltrim($name, '\\'), $qualified[0]);
 		foreach (array_unique($used[1]) as $name) {
 			if (in_array($name, ['self', 'static', 'parent'], true)) {
 				continue;
@@ -138,6 +157,7 @@ final class RepairStepProcessTest extends TestCase {
 				$found[] = $resolved;
 			}
 		}
+		$found = array_values(array_unique($found));
 		sort($found);
 
 		return $found;

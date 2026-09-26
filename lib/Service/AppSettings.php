@@ -10,26 +10,16 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Service;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
+use OCA\TwoFactorEMail\Config\ConfigLexicon;
 use OCP\IAppConfig;
 use OCP\IL10N;
 
 final readonly class AppSettings implements IAppSettings {
 
-	// Config keys used to store the settings in the app config. Public so the repair
-	// step can read the raw values, which the getters here correct or hide.
-	public const KEY_CODE_LENGTH = 'code_length';
-	public const KEY_CODE_VALID_MINUTES = 'code_valid_minutes';
-	public const KEY_RESEND_MIN_MINUTES = 'resend_min_minutes';
-	public const KEY_EMAIL_SUBJECT = 'email_subject';
-	public const KEY_EMAIL_TEMPLATE = 'email_template';
-
 	// Default values — used when no value has been stored in the app config.
 	// For the email template parts an empty string means: use the localized
 	// default text (the getDefault* methods below).
-	// The int defaults are public so the occ settings command can display them.
-	public const DEFAULT_CODE_LENGTH = 6;
-	public const DEFAULT_CODE_VALID_MINUTES = 10;
-	public const DEFAULT_RESEND_MIN_MINUTES = 1;
+	// The keys and the numeric defaults live in ConfigLexicon.
 	private const DEFAULT_EMAIL_SUBJECT = '';
 	private const DEFAULT_EMAIL_TEMPLATE = '';
 
@@ -67,7 +57,7 @@ final readonly class AppSettings implements IAppSettings {
 	#[\Override]
 	public function getCodeLength(): int {
 		return $this->clamp(
-			$this->appConfig->getValueInt(Application::APP_ID, self::KEY_CODE_LENGTH, self::DEFAULT_CODE_LENGTH),
+			$this->appConfig->getValueInt(Application::APP_ID, ConfigLexicon::KEY_CODE_LENGTH, ConfigLexicon::DEFAULT_CODE_LENGTH),
 			SettingsValidator::MIN_CODE_LENGTH,
 			SettingsValidator::MAX_CODE_LENGTH,
 			'code length',
@@ -77,7 +67,7 @@ final readonly class AppSettings implements IAppSettings {
 	#[\Override]
 	public function getCodeValidMinutes(): int {
 		return $this->clamp(
-			$this->appConfig->getValueInt(Application::APP_ID, self::KEY_CODE_VALID_MINUTES, self::DEFAULT_CODE_VALID_MINUTES),
+			$this->appConfig->getValueInt(Application::APP_ID, ConfigLexicon::KEY_CODE_VALID_MINUTES, ConfigLexicon::DEFAULT_CODE_VALID_MINUTES),
 			SettingsValidator::MIN_CODE_VALID_MINUTES,
 			SettingsValidator::MAX_CODE_VALID_MINUTES,
 			'code validity',
@@ -87,7 +77,7 @@ final readonly class AppSettings implements IAppSettings {
 	#[\Override]
 	public function getResendMinMinutes(): int {
 		return $this->clamp(
-			$this->appConfig->getValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, self::DEFAULT_RESEND_MIN_MINUTES),
+			$this->appConfig->getValueInt(Application::APP_ID, ConfigLexicon::KEY_RESEND_MIN_MINUTES, ConfigLexicon::DEFAULT_RESEND_MIN_MINUTES),
 			SettingsValidator::MIN_RESEND_MINUTES,
 			SettingsValidator::MAX_RESEND_MINUTES,
 			'resend cooldown',
@@ -116,7 +106,7 @@ final readonly class AppSettings implements IAppSettings {
 	#[\Override]
 	public function getEMailSubject(): string {
 		return $this->usableText(
-			$this->appConfig->getValueString(Application::APP_ID, self::KEY_EMAIL_SUBJECT, self::DEFAULT_EMAIL_SUBJECT),
+			$this->appConfig->getValueString(Application::APP_ID, ConfigLexicon::KEY_EMAIL_SUBJECT, self::DEFAULT_EMAIL_SUBJECT),
 			'email subject',
 		);
 	}
@@ -124,7 +114,7 @@ final readonly class AppSettings implements IAppSettings {
 	#[\Override]
 	public function getEMailTemplate(): string {
 		return $this->usableText(
-			$this->appConfig->getValueString(Application::APP_ID, self::KEY_EMAIL_TEMPLATE, self::DEFAULT_EMAIL_TEMPLATE),
+			$this->appConfig->getValueString(Application::APP_ID, ConfigLexicon::KEY_EMAIL_TEMPLATE, self::DEFAULT_EMAIL_TEMPLATE),
 			'email body',
 		);
 	}
@@ -149,35 +139,35 @@ final readonly class AppSettings implements IAppSettings {
 
 	#[\Override]
 	public function setCodeLength(int $codeLength): void {
-		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_CODE_LENGTH, $codeLength);
+		$this->appConfig->setValueInt(Application::APP_ID, ConfigLexicon::KEY_CODE_LENGTH, $codeLength);
 	}
 
 	#[\Override]
 	public function setCodeValidMinutes(int $codeValidMinutes): void {
-		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_CODE_VALID_MINUTES, $codeValidMinutes);
+		$this->appConfig->setValueInt(Application::APP_ID, ConfigLexicon::KEY_CODE_VALID_MINUTES, $codeValidMinutes);
 	}
 
 	#[\Override]
 	public function setResendMinMinutes(int $resendMinutes): void {
-		$this->appConfig->setValueInt(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES, $resendMinutes);
+		$this->appConfig->setValueInt(Application::APP_ID, ConfigLexicon::KEY_RESEND_MIN_MINUTES, $resendMinutes);
 	}
 
 	#[\Override]
 	public function setEMailSubject(string $subject): void {
-		$this->appConfig->setValueString(Application::APP_ID, self::KEY_EMAIL_SUBJECT, $subject);
+		$this->appConfig->setValueString(Application::APP_ID, ConfigLexicon::KEY_EMAIL_SUBJECT, $subject);
 	}
 
 	#[\Override]
 	public function setEMailTemplate(string $body): void {
-		$this->appConfig->setValueString(Application::APP_ID, self::KEY_EMAIL_TEMPLATE, $body);
+		$this->appConfig->setValueString(Application::APP_ID, ConfigLexicon::KEY_EMAIL_TEMPLATE, $body);
 	}
 
 	#[\Override]
 	public function resetToDefaults(): void {
-		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_CODE_LENGTH);
-		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_CODE_VALID_MINUTES);
-		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_RESEND_MIN_MINUTES);
-		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_EMAIL_SUBJECT);
-		$this->appConfig->deleteKey(Application::APP_ID, self::KEY_EMAIL_TEMPLATE);
+		$this->appConfig->deleteKey(Application::APP_ID, ConfigLexicon::KEY_CODE_LENGTH);
+		$this->appConfig->deleteKey(Application::APP_ID, ConfigLexicon::KEY_CODE_VALID_MINUTES);
+		$this->appConfig->deleteKey(Application::APP_ID, ConfigLexicon::KEY_RESEND_MIN_MINUTES);
+		$this->appConfig->deleteKey(Application::APP_ID, ConfigLexicon::KEY_EMAIL_SUBJECT);
+		$this->appConfig->deleteKey(Application::APP_ID, ConfigLexicon::KEY_EMAIL_TEMPLATE);
 	}
 }

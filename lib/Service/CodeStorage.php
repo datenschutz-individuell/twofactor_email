@@ -10,14 +10,11 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Service;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
+use OCA\TwoFactorEMail\Config\ConfigLexicon;
 use OCP\Config\IUserConfig;
 use OCP\Config\ValueType;
 
 final readonly class CodeStorage implements ICodeStorage {
-	private const KEY_CODE = 'code';
-	private const KEY_CREATED_AT = 'code_created_at';
-	private const KEY_ADDRESS_HASH = 'code_address_hash';
-
 	public function __construct(
 		private IAppSettings $settings,
 		private IUserConfig $config,
@@ -27,19 +24,19 @@ final readonly class CodeStorage implements ICodeStorage {
 	#[\Override]
 	public function readCode(string $userId, ?string $address): ?string {
 		$expiresBefore = time() - $this->settings->getCodeValidMinutes() * 60;
-		$createdAt = $this->config->getValueInt($userId, Application::APP_ID, self::KEY_CREATED_AT);
+		$createdAt = $this->config->getValueInt($userId, Application::APP_ID, ConfigLexicon::KEY_CODE_CREATED_AT);
 		if ($createdAt < $expiresBefore) {
 			$this->deleteCode($userId);
 			return null;
 		}
 
-		$code = $this->config->getValueString($userId, Application::APP_ID, self::KEY_CODE);
+		$code = $this->config->getValueString($userId, Application::APP_ID, ConfigLexicon::KEY_CODE);
 		if ($code === '') {
 			$this->deleteCode($userId);
 			return null;
 		}
 
-		$storedHash = $this->config->getValueString($userId, Application::APP_ID, self::KEY_ADDRESS_HASH);
+		$storedHash = $this->config->getValueString($userId, Application::APP_ID, ConfigLexicon::KEY_CODE_ADDRESS_HASH);
 		// An empty stored hash is not a match either: it is what a code written by an
 		// earlier version of the app looks like, and one written without an address
 		// cannot exist. Both end here, which costs a login in progress one extra code.
@@ -59,13 +56,13 @@ final readonly class CodeStorage implements ICodeStorage {
 		if ($this->readCode($userId, $address) === null) {
 			return null;
 		}
-		$createdAt = $this->config->getValueInt($userId, Application::APP_ID, self::KEY_CREATED_AT);
+		$createdAt = $this->config->getValueInt($userId, Application::APP_ID, ConfigLexicon::KEY_CODE_CREATED_AT);
 		return max(0, time() - $createdAt);
 	}
 
 	#[\Override]
 	public function deleteCode(string $userId): bool {
-		$existed = $this->config->getValueString($userId, Application::APP_ID, self::KEY_CODE) !== '';
+		$existed = $this->config->getValueString($userId, Application::APP_ID, ConfigLexicon::KEY_CODE) !== '';
 		// A timestamp or a fingerprint without a code still has to go, or a row nothing
 		// else looks for would stay behind for good: deleteExpired() finds users by the
 		// timestamp alone and would report a removal that never happened, and readCode()
@@ -74,45 +71,42 @@ final readonly class CodeStorage implements ICodeStorage {
 		// at all — a missing timestamp reads as 0, which always counts as expired. Asking
 		// whether the key exists is what separates that from a stored 0, which has to stay
 		// deletable or it would be counted as removed on every run and never go away.
-		$hasLeftovers = $this->config->hasKey($userId, Application::APP_ID, self::KEY_CODE)
-			|| $this->config->hasKey($userId, Application::APP_ID, self::KEY_CREATED_AT)
-			|| $this->config->hasKey($userId, Application::APP_ID, self::KEY_ADDRESS_HASH);
+		$hasLeftovers = $this->config->hasKey($userId, Application::APP_ID, ConfigLexicon::KEY_CODE)
+			|| $this->config->hasKey($userId, Application::APP_ID, ConfigLexicon::KEY_CODE_CREATED_AT)
+			|| $this->config->hasKey($userId, Application::APP_ID, ConfigLexicon::KEY_CODE_ADDRESS_HASH);
 		if (!$existed && !$hasLeftovers) {
 			return false;
 		}
 
-		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CODE);
-		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_CREATED_AT);
-		$this->config->deleteUserConfig($userId, Application::APP_ID, self::KEY_ADDRESS_HASH);
+		$this->config->deleteUserConfig($userId, Application::APP_ID, ConfigLexicon::KEY_CODE);
+		$this->config->deleteUserConfig($userId, Application::APP_ID, ConfigLexicon::KEY_CODE_CREATED_AT);
+		$this->config->deleteUserConfig($userId, Application::APP_ID, ConfigLexicon::KEY_CODE_ADDRESS_HASH);
 		return $existed;
 	}
 
 	#[\Override]
 	public function writeCode(string $userId, string $code, string $address, ?int $createdAt = null): void {
 		$createdAt ??= time();
-		// The stored value is a hash, but flag it sensitive so it is masked in
-		// occ config:list and system/support reports.
-		$this->config->setValueString($userId, Application::APP_ID, self::KEY_CODE, $code, flags: IUserConfig::FLAG_SENSITIVE);
-		$this->config->setValueInt($userId, Application::APP_ID, self::KEY_CREATED_AT, $createdAt);
-		// Flagged like the code itself: an unsalted hash of an address confirms a
-		// guessed address to anyone reading occ config:list or a support report, and
-		// the app keeps addresses out of its own log for the same reason.
-		$this->config->setValueString($userId, Application::APP_ID, self::KEY_ADDRESS_HASH, $this->addressHash($address), flags: IUserConfig::FLAG_SENSITIVE);
+		// ConfigLexicon marks both hashes sensitive, and its flags win. The flags stay here
+		// as well, for a process in which the lexicon is not registered.
+		$this->config->setValueString($userId, Application::APP_ID, ConfigLexicon::KEY_CODE, $code, flags: IUserConfig::FLAG_SENSITIVE);
+		$this->config->setValueInt($userId, Application::APP_ID, ConfigLexicon::KEY_CODE_CREATED_AT, $createdAt);
+		$this->config->setValueString($userId, Application::APP_ID, ConfigLexicon::KEY_CODE_ADDRESS_HASH, $this->addressHash($address), flags: IUserConfig::FLAG_SENSITIVE);
 	}
 
 	#[\Override]
 	public function deleteAllCodes(): int {
-		$count = count($this->config->getValuesByUsers(Application::APP_ID, self::KEY_CREATED_AT, ValueType::INT));
-		$this->config->deleteKey(Application::APP_ID, self::KEY_CODE);
-		$this->config->deleteKey(Application::APP_ID, self::KEY_CREATED_AT);
-		$this->config->deleteKey(Application::APP_ID, self::KEY_ADDRESS_HASH);
+		$count = count($this->config->getValuesByUsers(Application::APP_ID, ConfigLexicon::KEY_CODE_CREATED_AT, ValueType::INT));
+		$this->config->deleteKey(Application::APP_ID, ConfigLexicon::KEY_CODE);
+		$this->config->deleteKey(Application::APP_ID, ConfigLexicon::KEY_CODE_CREATED_AT);
+		$this->config->deleteKey(Application::APP_ID, ConfigLexicon::KEY_CODE_ADDRESS_HASH);
 		return $count;
 	}
 
 	#[\Override]
 	public function deleteExpired(): int {
 		$expiresBefore = time() - $this->settings->getCodeValidMinutes() * 60;
-		$creationTime = $this->config->getValuesByUsers(Application::APP_ID, self::KEY_CREATED_AT, ValueType::INT);
+		$creationTime = $this->config->getValuesByUsers(Application::APP_ID, ConfigLexicon::KEY_CODE_CREATED_AT, ValueType::INT);
 
 		$count = 0;
 		// A user id of digits only arrives as an int: PHP converts numeric array

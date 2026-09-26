@@ -26,6 +26,7 @@ The building blocks and the interface each one implements:
 | Address masking               | `Service\IEMailAddressMasker` | `Service\EMailAddressMasker`                                              |
 | Enable/disable state          | `Service\IStateManager`       | `Service\StateManager`                                                    |
 | Settings                      | `Service\IAppSettings`        | `Service\AppSettings` (+ `Service\SettingsValidator`, `Service\WarnOnce`) |
+| Config key declarations       | `ILexicon` (OCP)              | `Config\ConfigLexicon`                                                    |
 
 Around these services sit the HTTP controllers, event listeners (activity/notifications/registry updates on state change and on email removal), the daily cleanup background job, `occ` commands, and the admin/personal settings sections.
 
