@@ -21,9 +21,9 @@
     "bamarni/composer-bin-plugin": "^1.9.1",
     "christophwurst/nextcloud_testing": "^3.0",
     "nextcloud/ocp": "^33 || ^34",
-    "psalm/phar": "~6.17.2",
+    "psalm/phar": "~6.18.1",
     "roave/security-advisories": "dev-latest",
-    "symfony/console": "^6.4.45"
+    "symfony/console": "^6.4.46"
   },
   "scripts": {
     "lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
