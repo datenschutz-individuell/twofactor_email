@@ -40,10 +40,12 @@ Two things cover that gap instead. The `Nextcloud next` workflow runs the unit t
 `krankerl` is only needed to build the package. If it does not work for you — it has been known to fail with `reference 'refs/remotes/origin/master' not found`, which comes from libgit2 inside it, not from your repository — mount your working tree instead:
 
 ```bash
-composer install -o          # only the autoloader is needed at runtime
+composer install -o --no-dev # only the autoloader is needed at runtime
 npm ci && npm run build      # produces js/ and css/
 APP_DIR="$(git rev-parse --show-toplevel)" ./smoke.sh
 ```
+
+`--no-dev` matters: the development tools pull in `symfony/console` 6.4, which then hides the Symfony 7 that Nextcloud 35 ships, and `occ` fails with `Call to undefined method …::addCommand()`. Run `composer install` again afterwards to get the tools back.
 
 Naming a directory switches the mode: nothing is unpacked, that directory is mounted. `setup.sh` takes the same route, and `UNPACK` states it explicitly if you ever need to override the default (`UNPACK=0` mount, `UNPACK=1` unpack the package).
 
