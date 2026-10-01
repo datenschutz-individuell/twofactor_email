@@ -5,11 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 3.3.4 (2026-10-03)
 
 ### Changed
 
 - The app is named "Two-Factor Email", like the other two-factor providers in the app list
+- Translations for 18 languages, taken from the 3.6 line
+- Complete Danish translation, reviewed by bargib
+- Complete Swedish and Greek translations
 
 ## 3.3.3 (2026-09-05)
 
