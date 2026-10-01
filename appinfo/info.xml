@@ -35,7 +35,7 @@ normal password. Each of them needs an app password instead, created under
 "Personal settings / Security".
 
 The user and administrator guides cover all of this in detail.]]></description>
-    <version>3.5.1</version>
+    <version>3.6.0</version>
     <licence>agpl</licence>
     <author mail="twofactor-email@datenschutz-individuell.de">
         Olav Seyfarth (datenschutz-individuell) [see CONTRIBUTORS.md for more]
