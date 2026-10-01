@@ -56,6 +56,11 @@
     "A new authentication code was just sent. Please enter it:" : "Gerade wurde ein neuer Bestätigungscode gesendet. Bitte diesen eingeben:",
     "Enter the authentication code that was sent to you:" : "Geben Sie den Bestätigungscode ein, den Sie erhalten haben:",
     "Submit" : "Übermitteln",
-    "Send a new code" : "Einen neuen Code senden"
+    "Send a new code" : "Einen neuen Code senden",
+    "Two-Factor Email" : "Zwei-Faktor-E-Mail",
+    "Codes will be sent to your primary email address." : "Codes werden an Ihre primäre E-Mail-Adresse gesendet",
+    "A new authentication code was just sent to %s. Please enter it:" : "Gerade wurde ein neuer Bestätigungscode an %s gesendet. Bitte diesen eingeben:",
+    "Enter the authentication code that was sent to %s:" : "Den Bestätigungscode eingeben, der an %s gesendet wurde:",
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Es wurde kein neuer Code gesendet, da ein vorhergehender noch gültig ist. Wenn er nicht angekommen ist, \"%s\" unten verwenden."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

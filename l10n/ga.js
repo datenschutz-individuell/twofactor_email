@@ -58,6 +58,11 @@ OC.L10N.register(
     "A new authentication code was just sent. Please enter it:" : "Seoladh cód fíordheimhnithe nua díreach. Cuir isteach é le do thoil:",
     "Enter the authentication code that was sent to you:" : "Cuir isteach an cód fíordheimhnithe a seoladh chugat:",
     "Submit" : "Cuir isteach",
-    "Send a new code" : "Seol cód nua"
+    "Send a new code" : "Seol cód nua",
+    "Two-Factor Email" : "Ríomhphost Dhá Fhachtóir",
+    "Codes will be sent to your primary email address." : "Seolfar cóid chuig do phríomhsheoladh ríomhphoist.",
+    "A new authentication code was just sent to %s. Please enter it:" : "Seoladh cód fíordheimhnithe nua chuig %s díreach anois. Cuir isteach é le do thoil:",
+    "Enter the authentication code that was sent to %s:" : "Cuir isteach an cód fíordheimhnithe a seoladh chuig %s:",
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Níor seoladh aon chód nua, mar tá ceann níos luaithe fós bailí. Mura bhfuair sé, bain úsáid as \"%s\" thíos."
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

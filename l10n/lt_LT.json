@@ -20,6 +20,7 @@
     "The verification email could not be sent. Please try again later or contact your administrator." : "Nepavyko išsiųsti patvirtinimo laiško. Prašome pabandyti vėliau arba susisiekti su administratoriumi.",
     "A new authentication code was just sent. Please enter it:" : "Tik ką buvo išsiųstas naujas patvirtinimo kodas. Įveskite jį:",
     "Enter the authentication code that was sent to you:" : "Įveskite jums atsiųstą autentifikavimo kodą:",
-    "Submit" : "Pateikti"
+    "Submit" : "Pateikti",
+    "Defaults: empty fields use the localized default text, shown as a hint inside the field." : "Numatytosios reikšmės: tuščiuose laukuose naudojamas lokalizuotas numatytasis tekstas, rodomas kaip užuomina lauko viduje."
 },"pluralForm" :"nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);"
 }

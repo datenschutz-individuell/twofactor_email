@@ -58,6 +58,11 @@ OC.L10N.register(
     "A new authentication code was just sent. Please enter it:" : "已寄送新的驗證碼。請輸入：",
     "Enter the authentication code that was sent to you:" : "請輸入已寄送給您的驗證碼：",
     "Submit" : "提交",
-    "Send a new code" : "傳送新驗證碼"
+    "Send a new code" : "傳送新驗證碼",
+    "Two-Factor Email" : "兩階段驗證電子郵件",
+    "Codes will be sent to your primary email address." : "驗證碼將會傳送至您的主要電子郵件地址。",
+    "A new authentication code was just sent to %s. Please enter it:" : "新的驗證碼已傳送至 %s。請輸入：",
+    "Enter the authentication code that was sent to %s:" : "輸入傳送至 %s 的驗證碼：",
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "因為先前傳送的驗證碼仍然有效，因此不會寄送新的驗證碼。若未收到驗證碼，請使用下方的「%s」。"
 },
 "nplurals=1; plural=0;");
