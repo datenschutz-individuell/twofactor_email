@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/2.0.0/),
 
 ## Unreleased
 
+### Added
+
+- occ shows type, default and description of a setting, and refuses a mistyped key
+
 ### Changed
 
 - The app is named "Two-Factor Email", like the other two-factor providers in the app list

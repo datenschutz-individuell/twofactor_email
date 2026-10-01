@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OCA\TwoFactorEMail\Migration;
 
 use OCA\TwoFactorEMail\AppInfo\Application;
+use OCA\TwoFactorEMail\Config\ConfigLexicon;
 use OCA\TwoFactorEMail\Mail\LinkScanner;
-use OCA\TwoFactorEMail\Service\AppSettings;
 use OCA\TwoFactorEMail\Service\SettingsValidator;
 use OCP\IAppConfig;
 use OCP\Migration\IOutput;
@@ -56,14 +56,14 @@ final readonly class RepairEmailTexts implements IRepairStep {
 
 	#[\Override]
 	public function run(IOutput $output): void {
-		$this->checkText($output, AppSettings::KEY_EMAIL_SUBJECT, 'subject', false);
-		$this->checkText($output, AppSettings::KEY_EMAIL_TEMPLATE, 'body', true);
-		$this->checkNumber($output, AppSettings::KEY_CODE_LENGTH, 'code length',
-			AppSettings::DEFAULT_CODE_LENGTH, SettingsValidator::MIN_CODE_LENGTH, SettingsValidator::MAX_CODE_LENGTH);
-		$this->checkNumber($output, AppSettings::KEY_CODE_VALID_MINUTES, 'code validity',
-			AppSettings::DEFAULT_CODE_VALID_MINUTES, SettingsValidator::MIN_CODE_VALID_MINUTES, SettingsValidator::MAX_CODE_VALID_MINUTES);
-		$this->checkNumber($output, AppSettings::KEY_RESEND_MIN_MINUTES, 'resend cooldown',
-			AppSettings::DEFAULT_RESEND_MIN_MINUTES, SettingsValidator::MIN_RESEND_MINUTES, SettingsValidator::MAX_RESEND_MINUTES);
+		$this->checkText($output, ConfigLexicon::KEY_EMAIL_SUBJECT, 'subject', false);
+		$this->checkText($output, ConfigLexicon::KEY_EMAIL_TEMPLATE, 'body', true);
+		$this->checkNumber($output, ConfigLexicon::KEY_CODE_LENGTH, 'code length',
+			ConfigLexicon::DEFAULT_CODE_LENGTH, SettingsValidator::MIN_CODE_LENGTH, SettingsValidator::MAX_CODE_LENGTH);
+		$this->checkNumber($output, ConfigLexicon::KEY_CODE_VALID_MINUTES, 'code validity',
+			ConfigLexicon::DEFAULT_CODE_VALID_MINUTES, SettingsValidator::MIN_CODE_VALID_MINUTES, SettingsValidator::MAX_CODE_VALID_MINUTES);
+		$this->checkNumber($output, ConfigLexicon::KEY_RESEND_MIN_MINUTES, 'resend cooldown',
+			ConfigLexicon::DEFAULT_RESEND_MIN_MINUTES, SettingsValidator::MIN_RESEND_MINUTES, SettingsValidator::MAX_RESEND_MINUTES);
 	}
 
 	private function warn(IOutput $output, string $message): void {

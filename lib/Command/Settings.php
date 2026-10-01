@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\Command;
 
-use OCA\TwoFactorEMail\Service\AppSettings;
+use OCA\TwoFactorEMail\Config\ConfigLexicon;
 use OCA\TwoFactorEMail\Service\IAppSettings;
 use OCA\TwoFactorEMail\Service\SettingsValidator;
 use Symfony\Component\Console\Command\Command;
@@ -83,9 +83,9 @@ final class Settings extends Command {
 	private function listSettings(SymfonyStyle $io): void {
 		$emptyMeansDefault = '(empty — the localized default text is used)';
 		$io->table(['Setting', 'Value', 'Default'], [
-			['code_length', $this->appSettings->getCodeLength(), AppSettings::DEFAULT_CODE_LENGTH],
-			['code_valid_minutes', $this->appSettings->getCodeValidMinutes(), AppSettings::DEFAULT_CODE_VALID_MINUTES],
-			['resend_min_minutes', $this->appSettings->getResendMinMinutes(), AppSettings::DEFAULT_RESEND_MIN_MINUTES],
+			['code_length', $this->appSettings->getCodeLength(), ConfigLexicon::DEFAULT_CODE_LENGTH],
+			['code_valid_minutes', $this->appSettings->getCodeValidMinutes(), ConfigLexicon::DEFAULT_CODE_VALID_MINUTES],
+			['resend_min_minutes', $this->appSettings->getResendMinMinutes(), ConfigLexicon::DEFAULT_RESEND_MIN_MINUTES],
 			['email_subject', $this->appSettings->getEMailSubject() ?: $emptyMeansDefault, $this->preview($this->appSettings->getDefaultEMailSubject())],
 			['email_template', $this->preview($this->appSettings->getEMailTemplate()) ?: $emptyMeansDefault, $this->preview($this->appSettings->getDefaultEMailBody())],
 		]);

@@ -105,6 +105,8 @@ Code length, code validity, the resend cooldown and the subject and body of the 
 
 **The three numeric settings are bounded when they are read, too.** `occ config:app:set twofactor_email …` writes past this app's validation, so a value outside the range is corrected to the nearest valid one at use time — the app never generates a code shorter than the minimum. `occ twofactor_email:settings` shows the value in effect, so a corrected one looks like a plain setting there. The correction goes to the log: once per request while the value is in use, and once more from the repair step after an update. That step is a background job, so look in the log, not in the output of `occ upgrade`.
 
+**A mistyped key is refused.** The app declares its settings to Nextcloud, so `occ config:app:get twofactor_email <key> --key-details` shows the type, the default and a short description of a setting, even before it is set. `occ config:app:set` with a key the app does not know stores nothing and answers `Config value were not updated`; the log names the key. This checks names and types, not ranges.
+
 Abuse of the "resend code" action is limited both by the app's own resend cooldown and by Nextcloud's **per-user rate limit and brute-force protection**.
 
 ## When no code arrives

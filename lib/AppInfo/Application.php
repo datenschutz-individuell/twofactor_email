@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\TwoFactorEMail\AppInfo;
 
+use OCA\TwoFactorEMail\Config\ConfigLexicon;
 use OCA\TwoFactorEMail\Event\StateChanged;
 use OCA\TwoFactorEMail\Listener\EMailDeleted;
 use OCA\TwoFactorEMail\Listener\StateChangeActivity;
@@ -63,6 +64,7 @@ final class Application extends App implements IBootstrap {
 		$context->registerEventListener(UserChangedEvent::class, EMailDeleted::class);
 
 		$context->registerNotifierService(Notifier::class);
+		$context->registerConfigLexicon(ConfigLexicon::class);
 	}
 
 	#[\Override]
