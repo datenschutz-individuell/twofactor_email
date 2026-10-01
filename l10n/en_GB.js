@@ -58,6 +58,11 @@ OC.L10N.register(
     "A new authentication code was just sent. Please enter it:" : "A new authentication code was just sent. Please enter it:",
     "Enter the authentication code that was sent to you:" : "Enter the authentication code that was sent to you:",
     "Submit" : "Submit",
-    "Send a new code" : "Send a new code"
+    "Send a new code" : "Send a new code",
+    "Two-Factor Email" : "Two-Factor Email",
+    "Codes will be sent to your primary email address." : "Codes will be sent to your primary email address.",
+    "A new authentication code was just sent to %s. Please enter it:" : "A new authentication code was just sent to %s. Please enter it:",
+    "Enter the authentication code that was sent to %s:" : "Enter the authentication code that was sent to %s:",
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below."
 },
 "nplurals=2; plural=(n != 1);");
