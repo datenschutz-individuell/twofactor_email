@@ -58,6 +58,11 @@ OC.L10N.register(
     "A new authentication code was just sent. Please enter it:" : "Μόλις στάλθηκε ένας νέος κωδικός πιστοποίησης. Παρακαλούμε εισαγάγετέ τον:",
     "Enter the authentication code that was sent to you:" : "Εισαγάγετε τον κωδικό πιστοποίησης που σας στάλθηκε:",
     "Submit" : "Υποβολή",
-    "Send a new code" : "Αποστολή νέου κωδικού"
+    "Send a new code" : "Αποστολή νέου κωδικού",
+    "A new authentication code was just sent to %s. Please enter it:" : "Μόλις στάλθηκε ένας νέος κωδικός πιστοποίησης στο %s. Παρακαλούμε εισαγάγετέ τον:",
+    "Codes will be sent to your primary email address." : "Οι κωδικοί θα αποστέλλονται στην κύρια διεύθυνση email σας.",
+    "Enter the authentication code that was sent to %s:" : "Εισαγάγετε τον κωδικό πιστοποίησης που στάλθηκε στο %s:",
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Δεν στάλθηκε νέος κωδικός, επειδή ένας προηγούμενος είναι ακόμη έγκυρος. Αν δεν έφτασε, χρησιμοποιήστε το «%s» παρακάτω.",
+    "Two-Factor Email" : "Email δύο παραγόντων"
 },
 "nplurals=2; plural=(n != 1);");

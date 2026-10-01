@@ -56,6 +56,12 @@ OC.L10N.register(
     "The body must not exceed {max} characters." : "Brödtexten får inte överstiga {max} tecken.",
     "The body must contain the {code} placeholder." : "Brödtexten måste innehålla platshållaren {code}.",
     "The verification email could not be sent. Please try again later or contact your administrator." : "Det gick inte att skicka verifieringsmeddelandet. Försök igen senare eller kontakta administratören.",
-    "Send a new code" : "Skicka en ny kod"
+    "Send a new code" : "Skicka en ny kod",
+    "A new authentication code was just sent to %s. Please enter it:" : "En ny verifieringskod har just skickats till %s. Ange den här:",
+    "Codes will be sent to your primary email address." : "Koderna skickas till din primära e-postadress.",
+    "Enter the authentication code that was sent to %s:" : "Ange den verifieringskod som skickades till %s:",
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Ingen ny kod skickades eftersom en tidigare kod fortfarande är giltig. Om den inte har kommit fram, använd \"%s\" nedan.",
+    "Two-Factor Email" : "Tvåfaktors-e-post",
+    "Links: URLs are detected and rendered as linked URL text." : "Länkar: URL:er identifieras och visas som länkad URL-text."
 },
 "nplurals=2; plural=(n != 1);");

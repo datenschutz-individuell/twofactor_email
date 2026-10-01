@@ -57,6 +57,7 @@
     "Enter the authentication code that was sent to %s:" : "Masukkan kode autentikasi yang dikirim ke %s:",
     "Enter the authentication code that was sent to you:" : "Masukkan kode autentikasi yang dikirim kepada Anda:",
     "Send a new code" : "Kirim kode baru",
-    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Tidak ada kode baru yang dikirim karena kode sebelumnya masih berlaku. Jika kode tersebut tidak diterima, gunakan \"%s\" di bawah ini."
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Tidak ada kode baru yang dikirim karena kode sebelumnya masih berlaku. Jika kode tersebut tidak diterima, gunakan \"%s\" di bawah ini.",
+    "Links: URLs are detected and rendered as linked URL text." : "Tautan: URL akan dideteksi dan ditampilkan sebagai teks URL bertautan."
 },"pluralForm" :"nplurals=1; plural=0;"
 }

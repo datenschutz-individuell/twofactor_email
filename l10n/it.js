@@ -59,6 +59,7 @@ OC.L10N.register(
     "Enter the authentication code that was sent to %s:" : "Inserisci il codice di autenticazione che ti è stato inviato a %s:",
     "Enter the authentication code that was sent to you:" : "Inserisci il codice di autenticazione che ti è stato inviato:",
     "Send a new code" : "Invia un nuovo codice",
-    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Non è stato inviato alcun nuovo codice perché quello precedente è ancora valido. Se non è arrivato, usa \"%s\" qui sotto."
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Non è stato inviato alcun nuovo codice perché quello precedente è ancora valido. Se non è arrivato, usa \"%s\" qui sotto.",
+    "Links: URLs are detected and rendered as linked URL text." : "Collegamenti: gli URL vengono rilevati e visualizzati come testo del collegamento."
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

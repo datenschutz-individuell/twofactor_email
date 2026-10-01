@@ -62,6 +62,7 @@ OC.L10N.register(
     "A new authentication code was just sent to %s. Please enter it:" : "Az önce %s adresine yeni bir doğrulama kodu gönderildi. Lütfen kodu yazın:",
     "Enter the authentication code that was sent to %s:" : "%s adresine gönderilen doğrulama kodunu yazın:",
     "Send a new code" : "Yeni bir kod gönder",
-    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Daha önceki kod henüz geçerli olduğu için yeni bir kod gönderilmedi. Önceki kod gelmediyse, aşağıdaki \"%s\" seçeneğini kullanın."
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Daha önceki kod henüz geçerli olduğu için yeni bir kod gönderilmedi. Önceki kod gelmediyse, aşağıdaki \"%s\" seçeneğini kullanın.",
+    "Links: URLs are detected and rendered as linked URL text." : "Bağlantılar: Adresler algılanır ve bağlantılı adres yazısı olarak işlenir."
 },
 "nplurals=2; plural=(n > 1);");

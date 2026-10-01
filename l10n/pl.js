@@ -61,6 +61,7 @@ OC.L10N.register(
     "A new authentication code was just sent to %s. Please enter it:" : "Nowy kod uwierzytelniający został właśnie wysłany na %s. Wprowadź go:",
     "Enter the authentication code that was sent to %s:" : "Wprowadź kod uwierzytelniający wysłany na %s:",
     "Send a new code" : "Wyślij nowy kod",
-    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Nowy kod nie został wysłany, ponieważ poprzedni jest nadal ważny. Jeśli nie dotarł, użyj poniżej opcji \"%s\"."
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Nowy kod nie został wysłany, ponieważ poprzedni jest nadal ważny. Jeśli nie dotarł, użyj poniżej opcji \"%s\".",
+    "Links: URLs are detected and rendered as linked URL text." : "Linki: adresy URL są wykrywane i wyświetlane jako tekst z odnośnikiem."
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

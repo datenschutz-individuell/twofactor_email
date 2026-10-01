@@ -59,6 +59,7 @@ OC.L10N.register(
     "Enter the authentication code that was sent to %s:" : "Zadajte overovací kód odoslaný na adresu %s:",
     "Enter the authentication code that was sent to you:" : "Zadajte overovací kód, ktorý vám bol odoslaný:",
     "Send a new code" : "Odoslať nový kód",
-    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Nový kód nebol odoslaný, pretože skorší kód je stále platný. Ak vám neprišiel, použite nižšie „%s“."
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Nový kód nebol odoslaný, pretože skorší kód je stále platný. Ak vám neprišiel, použite nižšie „%s“.",
+    "Links: URLs are detected and rendered as linked URL text." : "Odkazy: URL sa rozpoznajú a zobrazia ako text odkazov."
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");
