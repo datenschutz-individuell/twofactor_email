@@ -143,11 +143,11 @@ async function onReset() {
 </script>
 
 <style scoped>
-/* Visual grouping; headings and lists keep their browser defaults.
+/* Headings, lists and spacing keep the Nextcloud defaults.
    Secondary text (descriptions, hints) uses the NC muted text color. */
 .settings-group {
 	border: 0;
-	margin: 0 0 32px;
+	margin: 0;
 	padding: 0;
 	max-width: 64em;
 }
