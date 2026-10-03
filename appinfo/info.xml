@@ -33,7 +33,7 @@ cannot log in.
 Any second factor stops desktop and mobile clients from signing in with the
 normal password. Each of them needs an app password instead, created under
 "Personal settings / Security".]]></description>
-    <version>3.3.3</version>
+    <version>3.3.4</version>
     <licence>agpl</licence>
     <author mail="twofactor-email@datenschutz-individuell.de">
         Olav Seyfarth (datenschutz-individuell) [see CONTRIBUTORS.md for more]
