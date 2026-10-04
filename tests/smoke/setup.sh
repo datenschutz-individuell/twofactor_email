@@ -158,6 +158,11 @@ occ_write() {
 occ_write user:setting admin settings email admin@example.org
 occ_write app:enable twofactor_email
 
+# Docker creates custom_apps as root to hold the mount, so no apps directory is writable,
+# and Nextcloud 35 then answers /settings/apps with an error 500. Only the directory
+# itself: the app inside it is mounted read-only.
+docker compose exec -T nextcloud chown www-data:www-data /var/www/html/custom_apps
+
 # Wait for HTTP too, not only for occ. `occ status` goes through docker exec, so it
 # reports "installed" while Apache may still be unable to serve a request. Whoever runs
 # next then talks to a server that is not there yet, and the first failure reads
