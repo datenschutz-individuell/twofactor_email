@@ -34,7 +34,7 @@
 						id="twofactor_email-codeResendMinutes"
 						v-model="inputValues.codeResendMinutes"
 						:errorMessage="errorMessages.codeResendMinutes"
-						:label="t('twofactor_email', 'Resend cooldown (minutes)')"
+						:label="resendCooldownLabel"
 						:loading="loading"
 						:result="successRefs.codeResendMinutes"
 						type="number" />
@@ -112,6 +112,9 @@ const defaults = {
 }
 
 const { inputValues, loading, successRefs, errorMessages } = useAdminSettings(store, fieldKeys)
+
+// TRANSLATORS Keep this label short. The text above the fields already explains it.
+const resendCooldownLabel = t('twofactor_email', 'Resend cooldown (minutes)')
 
 // Hints shown below the subject field
 // (rendered line by line via white-space: pre-line)
