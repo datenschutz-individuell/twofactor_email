@@ -27,7 +27,7 @@ OC.L10N.register(
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Dauer und Gültigkeit der per E-Mail versendeten Einmalcodes sowie der Zeitraum, nach dem ein Benutzer einen neuen Code anfordern kann.",
     "Length (characters)" : "Länge (Zeichen)",
     "Validity (minutes)" : "Gültigkeit (Minuten)",
-    "Resend cooldown (minutes)" : "Wartezeit bis zum erneuten Senden (Minuten)",
+    "Resend cooldown (minutes)" : "Wartezeit (Minuten)",
     "Email template" : "E-Mail-Vorlage",
     "This template defines the email that delivers the one-time code to users. It is partially dynamic using placeholders." : "Diese Vorlage definiert die E-Mail, mit der den Benutzern der Einmalcode zugestellt wird. Sie ist durch die Verwendung von Platzhaltern teilweise dynamisch gestaltet.",
     "Subject" : "Betreff",
