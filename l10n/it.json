@@ -26,7 +26,7 @@
     "Length and validity of the one-time codes sent via email, and how soon a user may request a new code." : "Lunghezza e validità dei codici monouso inviati via email, e quanto presto un utente può richiederne uno nuovo.",
     "Length (characters)" : "Lunghezza (caratteri)",
     "Validity (minutes)" : "Validità (minuti)",
-    "Resend cooldown (minutes)" : "Tempo di attesa per un nuovo invio (minuti)",
+    "Resend cooldown (minutes)" : "Attesa (minuti)",
     "Email template" : "Modello email",
     "This template defines the email that delivers the one-time code to users. It is partially dynamic using placeholders." : "Questo modello definisce l'email che consegna il codice monouso agli utenti. Il suo contenuto è in parte dinamico grazie ai segnaposto.",
     "Reset all Two-Factor email app-wide admin settings to their defaults" : "Ripristina tutte le impostazioni di amministrazione di Two-Factor Email ai valori predefiniti",
