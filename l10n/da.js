@@ -44,7 +44,7 @@ OC.L10N.register(
     "Proceed" : "Fortsæt",
     "Use two-factor authentication via email" : "Brug to-faktor-godkendelse via e-mail",
     "No email address available, please set a primary email address in your personal settings first." : "Der er ingen e-mailadresse tilgængelig. Angiv først en primær e-mailadresse i dine personlige indstillinger.",
-    "Password confirmation failed. Please try again." : "Bekræftelse af adgangskode mislykkedes. Prøv igen.",
+    "Password confirmation failed. Please try again." : "Adgangskoden kunne ikke bekræftes. Prøv igen.",
     "Your email address was removed in the meantime, please set a primary email address in your personal settings first." : "Din e-mailadresse er blevet fjernet i mellemtiden. Angiv først en primær e-mailadresse i dine personlige indstillinger.",
     "_You can request a new code in %n minute._::_You can request a new code in %n minutes._" : ["Du kan anmode om en ny kode om %n minut.","Du kan anmode om en ny kode om %n minutter."],
     "You can request a new code in <1 minute." : "Du kan anmode om en ny kode om mindre end 1 minut.",
