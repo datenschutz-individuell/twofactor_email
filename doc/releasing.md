@@ -49,7 +49,7 @@ This is the part that looks like a bug in your instances and is not. Two indepen
 - The **store website** loads them straight from raw.githubusercontent, so any format a browser renders is fine. `small-thumbnail` is used only there, in the app grid, whose container is 200 pixels high — a picture of exactly that height is shown pixel for pixel; anything larger is scaled down.
 - A **Nextcloud instance** never fetches the URL itself. `/settings/apps` asks `https://usercontent.apps.nextcloud.com/<the URL, base64-encoded>` for the **screenshot** — never the thumbnail — and shows it in the app grid and as the sidebar header, where it is cropped to fill.
 
-**That proxy does not serve a lossless webp.** It answers `File not found` for one, while lossy webp and PNG come through; measured across the webp screenshots the store has registered on raw.githubusercontent. The screenshot therefore has to be a PNG. The thumbnail never passes the proxy, so it can stay a lossless webp, which for a picture that size is smaller than either a PNG or a lossy webp. A lossless webp looks perfectly fine on the store website and is invisible in every instance.
+**The proxy fetches each URL once and keeps the copy for good.** It accepts any image format, so both pictures are lossless webp. A changed picture needs a new file name, or instances keep showing the old one. Keep the old file on `main` until the release that names the new one is published: the store website loads the current release's URL from there.
 
 ## Signing
 

@@ -52,8 +52,8 @@ The user and administrator guides cover all of this in detail.]]></description>
     <bugs>https://github.com/datenschutz-individuell/twofactor_email/issues</bugs>
     <repository>https://github.com/datenschutz-individuell/twofactor_email.git</repository>
     <screenshot
-            small-thumbnail="https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/doc/store/challenge.webp">
-        https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/doc/store/challenge.png
+            small-thumbnail="https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/doc/store/thumbnail.webp">
+        https://raw.githubusercontent.com/datenschutz-individuell/twofactor_email/main/doc/store/screenshot.webp
     </screenshot>
     <dependencies>
         <php min-version="8.2" max-version="8.5"/>

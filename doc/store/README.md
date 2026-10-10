@@ -4,9 +4,9 @@ Both are named in `appinfo/info.xml` and are fetched from GitHub by their raw UR
 
 | File | Size | Format | Read by |
 |---|---|---|---|
-| `challenge.png` | 855×479 | PNG | the store page, and every Nextcloud instance |
-| `challenge.webp` | 356×200 | lossless webp | the store's app grid only |
+| `screenshot.webp` | 855×479 | lossless webp | the store page, and every Nextcloud instance |
+| `thumbnail.webp` | 356×200 | lossless webp | the store's app grid only |
 
-Both files show the same picture and share a base name; only the format differs, and `info.xml` names each one. The thumbnail is a 1:1 cut-out of the screenshot, not a scaled copy: the grid container is 200 pixels high, so a picture of exactly that height is shown pixel for pixel and stays readable.
+The thumbnail is a 1:1 cut-out of the screenshot, not a scaled copy: the grid container is 200 pixels high, so a picture of exactly that height is shown pixel for pixel and stays readable.
 
-**The formats are not interchangeable.** Only the screenshot passes Nextcloud's image proxy, and that one refuses a lossless webp — hence PNG. The thumbnail is never proxied, so it uses the smaller lossless webp. [releasing.md](../releasing.md) explains why.
+**A changed picture needs a new file name.** Instances get the screenshot through a proxy that fetches each URL only once. Keep the old file until the release that names the new one is published. [releasing.md](../releasing.md) explains the proxy.
