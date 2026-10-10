@@ -42,7 +42,7 @@ jobs:
       # which is also what Nextcloud 35 recommends. The low end is covered better
       # elsewhere — php-lint runs every declared version, psalm runs the floor.
       - name: Set up php8.5
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.5'
           extensions: ctype,curl,dom,gd,iconv,intl,json,mbstring,openssl,posix,sqlite,xml,zip
@@ -82,7 +82,7 @@ jobs:
       # 8.2 like the ordinary psalm job, so this differs from it in exactly one
       # thing: the OCP it analyses against. psalm.xml targets 8.2 either way.
       - name: Set up php8.2
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.2'
           extensions: ctype,curl,dom,gd,iconv,intl,json,mbstring,openssl,posix,sqlite,xml,zip
