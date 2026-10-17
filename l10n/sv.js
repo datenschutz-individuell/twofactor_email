@@ -13,6 +13,9 @@ OC.L10N.register(
     "Your two-factor authentication code for {cloud} is:" : "Din kod för tvåfaktorsautentisering i {cloud} är:",
     "The code is valid for {validity} minutes." : "Koden är giltig i {validity} minuter.",
     "If you did not try to log in, somebody else knows your username and your password — change your password and inform your administrator." : "Om du inte försökte logga in känner någon annan till ditt användarnamn och lösenord – byt lösenord och informera administratören.",
+    "Two-Factor Email" : "Tvåfaktor via e-post",
+    "A login code sent to the user's email address" : "En inloggningskod som skickas till användarens e-postadress",
+    "### A two-factor provider using email\n\nNextcloud can ask for a second factor after the password (two-factor\nauthentication, 2FA). Each kind of second factor comes from a provider app\nthat a server admin installs. This one emails a one-time code (OTP) - six\ndigits by default - and asks for it on a second login page.\n\n### Installation and setup\n\nAn admin installs and enables this app. The server needs a working mail\nsetup, because the code travels by email.\n\nA user then switches it on under \"Personal settings / Security\", which needs\nan email address in \"Personal info\". An admin can switch it on for someone\ninstead: \"occ twofactorauth:enable USERID email\".\n\nNextcloud can also enforce a second factor for everyone or per group, though\nnever one particular method. Email is a low-friction choice there: the user\nconfirms one code and is done, with no device to enroll. Check first that\nevery account has a working address - a user whose address does not work\ncannot log in.\n\nAny second factor stops desktop and mobile clients from signing in with the\nnormal password. Each of them needs an app password instead, created under\n\"Personal settings / Security\".\n\nThe user and administrator guides cover all of this in detail." : "### Tvåfaktorautentisering via e-post<br><br>Nextcloud kan begära en andra faktor efter lösenordet. Varje metod för tvåfaktorautentisering (2FA) tillhandahålls av en app som serveradministratören installerar. Den här appen skickar en engångskod (OTP) via e-post, normalt sex siffror, som användaren anger på en andra inloggningssida.<br><br>### Installation och inställning<br><br>En administratör installerar och aktiverar appen. Serverns e-post måste fungera eftersom koden skickas den vägen.<br><br>Användaren aktiverar sedan metoden under ”Personliga inställningar / Säkerhet”. Det kräver att en e-postadress finns under ”Personlig information”. En administratör kan i stället aktivera metoden för användaren med `occ twofactorauth:enable USERID email`.<br><br>Nextcloud kan också kräva en andra faktor för alla eller för vissa grupper, men kan inte tvinga fram en viss metod. E-post är ett enkelt alternativ: användaren anger en kod och behöver inte registrera någon enhet. Kontrollera först att alla konton har fungerande e-postadresser. Den vars adress inte fungerar kan inte logga in.<br><br>När en andra faktor används kan skrivbords- och mobilklienter inte logga in med det vanliga lösenordet. Varje klient behöver i stället ett applösenord, som skapas under ”Personliga inställningar / Säkerhet”.<br><br>Användar- och administratörshandböckerna beskriver detta närmare.",
     "Resend cooldown (minutes)" : "Väntetid före ny kod (minuter)",
     "Placeholders: {code}, {user}, {cloud}, {validity}." : "Platshållare: {code}, {user}, {cloud}, {validity}.",
     "A {code} here may show up in notification previews on lock screens." : "En {code} här kan visas i förhandsvisningar av aviseringar på låsskärmen.",
@@ -37,6 +40,7 @@ OC.L10N.register(
     "Unhandled error!" : "Okänt fel!",
     "Two-factor authentication via email was enabled." : "Tvåfaktorsautentisering via e-post aktiverades.",
     "Codes will be sent to your primary email address:" : "Koderna skickas till din primära e-postadress:",
+    "Codes will be sent to your primary email address." : "Koderna skickas till din primära e-postadress.",
     "Proceed" : "Fortsätt",
     "Use two-factor authentication via email" : "Använd tvåfaktorsautentisering via e-post",
     "No email address available, please set a primary email address in your personal settings first." : "Ingen e-postadress är tillgänglig. Ange först en primär e-postadress i dina personliga inställningar.",
@@ -56,9 +60,13 @@ OC.L10N.register(
     "The text must be valid UTF-8." : "Texten måste vara giltig UTF-8.",
     "A placeholder must not be part of a web address: the value would be sent to whoever the address belongs to." : "En platshållare får inte vara en del av en webbadress: värdet skulle skickas till den som äger adressen.",
     "The verification email could not be sent. Please try again later or contact your administrator." : "Det gick inte att skicka verifieringsmeddelandet. Försök igen senare eller kontakta administratören.",
+    "A new authentication code was just sent to %s. Please enter it:" : "En ny autentiseringskod har skickats till %s. Ange den här:",
     "A new authentication code was just sent. Please enter it:" : "En ny verifieringskod har just skickats. Ange den här:",
+    "Enter the authentication code that was sent to %s:" : "Ange autentiseringskoden som skickades till %s:",
     "Enter the authentication code that was sent to you:" : "Ange den verifieringskod som du har fått:",
     "Send a new code" : "Skicka en ny kod",
-    "Submit" : "Skicka"
+    "No new code was sent, because an earlier one is still valid. If it did not arrive, use \"%s\" below." : "Ingen ny kod skickades eftersom den tidigare fortfarande gäller. Om du inte har fått den kan du använda ”%s” nedan.",
+    "Submit" : "Skicka",
+    "Your code" : "Din kod"
 },
 "nplurals=2; plural=(n != 1);");
