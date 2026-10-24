@@ -22,7 +22,6 @@
     "christophwurst/nextcloud_testing": "^3.0",
     "nextcloud/ocp": "^32 || ^33 || ^34",
     "psalm/phar": "^6.8.2",
-    "roave/security-advisories": "dev-latest",
     "symfony/console": "^6.4.48"
   },
   "scripts": {
