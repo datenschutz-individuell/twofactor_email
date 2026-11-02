@@ -5,8 +5,9 @@
 # dependency watching. This reports rather than repairs: a failing workflow
 # reaches the maintainer by mail and needs no token with write access.
 #
-# Threshold `moderate`: both branches carry low findings from elliptic beneath
-# the Vite config's polyfill plugin, accepted in REVIEW.md.
+# Findings that REVIEW.md accepts are listed per branch below, each with its
+# severity. The job fails on any other finding, on a changed severity, and on a
+# listed one that is gone, so that the list and REVIEW.md are cleaned up together.
 
 name: npm audit
 
@@ -26,9 +27,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        branch:
-          - main
-          - release/3.3
+        include:
+          - branch: main
+            allowed: &accepted GHSA-3g3m-2fjr-6pw4:moderate GHSA-848j-6mx2-7j84:low GHSA-g3hv-75wg-m249:moderate
+          - branch: release/3.3
+            allowed: *accepted
 
     name: npm audit (${{ matrix.branch }})
 
@@ -59,5 +62,21 @@ jobs:
         run: npm i -g "npm@$NPM_VERSION"
 
       # The lock file is what a release ships, and needs no install to be judged.
+      # The list lives here, not in the audited branch: the scheduled run uses
+      # the default branch's workflow for both branches. An advisory without a
+      # GHSA ID is keyed by its URL, so it can never match the list.
       - name: Audit
-        run: npm audit --package-lock-only --audit-level=moderate
+        env:
+          ALLOWED: ${{ matrix.allowed }}
+        run: |
+          export LC_ALL=C
+          npm audit --package-lock-only --json > audit.json || true
+          jq -e '.vulnerabilities | type == "object"' audit.json > /dev/null
+          jq -r '.vulnerabilities[].via[] | objects | "\(.severity)\t\(.name)\t\(.title)\t\(.url)"' audit.json | sort -u
+          jq -r '.vulnerabilities[].via[] | objects | "\((.url | capture("(?<id>GHSA-[0-9a-z-]+)").id) // .url):\(.severity)"' audit.json | sort -u > found
+          tr ' ' '\n' <<< "$ALLOWED" | sort -u > allowed
+          new=$(comm -23 found allowed | paste -sd ' ')
+          gone=$(comm -13 found allowed | paste -sd ' ')
+          [ -z "$new" ] || echo "::error::New or changed findings: $new"
+          [ -z "$gone" ] || echo "::error::Listed but no longer found, remove from this workflow and REVIEW.md: $gone"
+          [ -z "$new$gone" ]
