@@ -48,6 +48,8 @@ Run the checks that match your diff **before** opening a pull request. CI is the
 
 **Query npm with `--all`.** `npm ls <package>` and friends traverse shallowly without it and silently miss deeper paths, which is how a dependency once looked dev-only when it was not. After an update, read the warnings and remove their cause rather than treating them as background noise, and re-check whether the existing pins and `overrides` still change anything — every one of them is debt.
 
+**After `npm update`, check for duplicate copies and run `npm dedupe` if there are any.** `npm update` raises each package as far as the range of the package that needs it allows. When one of them pins tightly — `vite` holds `rolldown` with `~` — and the others allow more, npm installs two copies: the newest at the top and the pinned one below `vite`. `npm ls --all <package>` shows this. `npm dedupe` then picks the newest version that every range accepts and removes the extra copy. It cannot do more than the ranges allow: when they do not overlap, both copies stay, and the fix belongs upstream. An update can also remove lock entries that nothing needs any more; for each removed package in the diff, check that nothing still depends on it.
+
 ## Conventions
 
 - **Every new file needs licensing.** Either an SPDX header or an entry in `REUSE.toml`; the `reuse` CI job fails otherwise. Root-level Markdown is licensed through an **explicit filename entry** in `REUSE.toml` — only `doc/**` and `l10n/**` are globbed, so a new root file has to be added there by hand.
