@@ -62,7 +62,7 @@ jobs:
         run: composer require --dev nextcloud/ocp:dev-${{ matrix.ocp == 'min' && steps.versions.outputs.branches-min || steps.versions.outputs.branches-max }} --ignore-platform-reqs --with-dependencies --no-scripts
 
       - name: Run coding standards check
-        run: composer run psalm -- --threads=1 --monochrome --no-progress --output-format=github
+        run: composer run psalm -- --monochrome --no-progress --output-format=github
 
       - name: Run taint analysis
-        run: composer run psalm:taint -- --threads=1 --monochrome --no-progress --output-format=github
+        run: composer run psalm:taint -- --monochrome --no-progress --output-format=github
