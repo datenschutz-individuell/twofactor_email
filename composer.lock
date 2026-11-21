@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b936d49e623fdc5e468b1569af7fa952",
+    "content-hash": "76fdb8e2bda76f5d8a94688fe7462e5c",
     "packages": [],
     "packages-dev": [
         {
@@ -213,8 +213,7 @@
                 "issues": "https://github.com/nextcloud-deps/ocp/issues",
                 "source": "https://github.com/nextcloud-deps/ocp/tree/v34.0.6"
             },
-            "time": "2026-10-31T03:08:26+00:00",
-            "published-time": "2026-11-13T03:59:03+00:00"
+            "time": "2026-10-31T03:08:26+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -900,16 +899,16 @@
         },
         {
             "name": "psalm/phar",
-            "version": "7.3.0",
+            "version": "7.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/psalm/phar.git",
-                "reference": "db70a5db1f257ac0e9589d61c5a3d2f9ad593408"
+                "reference": "fd6f78659419d280c9cc27691a496047d78ec5be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/psalm/phar/zipball/db70a5db1f257ac0e9589d61c5a3d2f9ad593408",
-                "reference": "db70a5db1f257ac0e9589d61c5a3d2f9ad593408",
+                "url": "https://api.github.com/repos/psalm/phar/zipball/fd6f78659419d280c9cc27691a496047d78ec5be",
+                "reference": "fd6f78659419d280c9cc27691a496047d78ec5be",
                 "shasum": ""
             },
             "require": {
@@ -929,9 +928,9 @@
             "description": "Composer-based Psalm Phar",
             "support": {
                 "issues": "https://github.com/psalm/phar/issues",
-                "source": "https://github.com/psalm/phar/tree/7.3.0"
+                "source": "https://github.com/psalm/phar/tree/7.10.0"
             },
-            "time": "2026-11-11T00:47:10+00:00"
+            "time": "2026-11-18T00:49:00+00:00"
         },
         {
             "name": "psr/clock",
