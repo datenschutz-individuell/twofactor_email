@@ -58,7 +58,7 @@
     "@nextcloud/router": "^3.2.0",
     "@nextcloud/vue": "^9.14.1",
     "pinia": "^4.1.0",
-    "vue": "^3.5.45"
+    "vue": "^3.5.46"
   },
   "browserslist": [
     "extends @nextcloud/browserslist-config"
@@ -78,7 +78,7 @@
     "@nextcloud/typings": "^1.10.0",
     "@nextcloud/vite-config": "^2.5.4",
     "@vitejs/plugin-vue": "^6.0.11",
-    "@vitest/coverage-v8": "^5.1.0",
+    "@vitest/coverage-v8": "^5.1.1",
     "@vue/test-utils": "^2.6.0",
     "eslint": "^10.15.0",
     "happy-dom": "^21.0.4",
