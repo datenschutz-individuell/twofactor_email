@@ -74,12 +74,12 @@
     "@nextcloud/typings": "^1.10.0",
     "@nextcloud/vite-config": "3.0.0-beta.1",
     "@vitejs/plugin-vue": "^6.0.11",
-    "@vitest/coverage-v8": "^5.1.1",
+    "@vitest/coverage-v8": "^5.1.2",
     "@vue/test-utils": "^2.6.0",
-    "eslint": "^10.15.0",
+    "eslint": "^10.16.0",
     "happy-dom": "^21.0.4",
-    "vite": "^8.3.8",
-    "vitest": "^5.1.1"
+    "vite": "^8.4.0",
+    "vitest": "^5.1.2"
   },
   "allowScripts": {
     "@parcel/watcher": false,

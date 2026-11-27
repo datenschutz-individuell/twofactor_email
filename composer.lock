@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9528cf927e42b2d60eefda56637383ac",
+    "content-hash": "b6a5f36d0dce4a0a729e29ed15d42dfa",
     "packages": [],
     "packages-dev": [
         {
@@ -913,16 +913,16 @@
         },
         {
             "name": "psalm/phar",
-            "version": "7.13.2",
+            "version": "7.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/psalm/phar.git",
-                "reference": "d9fd1fc97cfd9d1830e3d61bf8ce581124ce4773"
+                "reference": "353b3d26a92d02e7ae1803739758608f58dcc920"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/psalm/phar/zipball/d9fd1fc97cfd9d1830e3d61bf8ce581124ce4773",
-                "reference": "d9fd1fc97cfd9d1830e3d61bf8ce581124ce4773",
+                "url": "https://api.github.com/repos/psalm/phar/zipball/353b3d26a92d02e7ae1803739758608f58dcc920",
+                "reference": "353b3d26a92d02e7ae1803739758608f58dcc920",
                 "shasum": ""
             },
             "require": {
@@ -942,10 +942,10 @@
             "description": "Composer-based Psalm Phar",
             "support": {
                 "issues": "https://github.com/psalm/phar/issues",
-                "source": "https://github.com/psalm/phar/tree/7.13.2"
+                "source": "https://github.com/psalm/phar/tree/7.22.1"
             },
-            "time": "2026-11-21T01:31:48+00:00",
-            "published-time": "2026-11-21T01:31:58+00:00"
+            "time": "2026-11-27T00:49:27+00:00",
+            "published-time": "2026-11-27T00:49:36+00:00"
         },
         {
             "name": "psr/clock",
@@ -2315,16 +2315,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v6.4.50",
+            "version": "v6.4.51",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "955771637c0a01d5e91730aa8f63edae5190e2c7"
+                "reference": "3176cb05763b4690fd0b9f4073fa452c4c9163bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/955771637c0a01d5e91730aa8f63edae5190e2c7",
-                "reference": "955771637c0a01d5e91730aa8f63edae5190e2c7",
+                "url": "https://api.github.com/repos/symfony/console/zipball/3176cb05763b4690fd0b9f4073fa452c4c9163bb",
+                "reference": "3176cb05763b4690fd0b9f4073fa452c4c9163bb",
                 "shasum": ""
             },
             "require": {
@@ -2389,7 +2389,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v6.4.50"
+                "source": "https://github.com/symfony/console/tree/v6.4.51"
             },
             "funding": [
                 {
@@ -2409,8 +2409,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-11-03T21:19:33+00:00",
-            "published-time": "2026-11-04T11:24:42+00:00"
+            "time": "2026-11-06T16:06:30+00:00",
+            "published-time": "2026-11-25T09:20:03+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -2825,16 +2825,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v7.4.22",
+            "version": "v7.4.24",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "a5a6912edbbfc4c98cd080bc4bbe37c8e7eeb20a"
+                "reference": "e88ac51768062ad548bf2f900c52231e7e83e475"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/a5a6912edbbfc4c98cd080bc4bbe37c8e7eeb20a",
-                "reference": "a5a6912edbbfc4c98cd080bc4bbe37c8e7eeb20a",
+                "url": "https://api.github.com/repos/symfony/process/zipball/e88ac51768062ad548bf2f900c52231e7e83e475",
+                "reference": "e88ac51768062ad548bf2f900c52231e7e83e475",
                 "shasum": ""
             },
             "require": {
@@ -2866,7 +2866,7 @@
             "description": "Executes commands in sub-processes",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/process/tree/v7.4.22"
+                "source": "https://github.com/symfony/process/tree/v7.4.24"
             },
             "funding": [
                 {
@@ -2886,8 +2886,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-25T14:40:16+00:00",
-            "published-time": "2026-10-28T18:21:18+00:00"
+            "time": "2026-11-23T08:23:51+00:00",
+            "published-time": "2026-11-25T09:25:48+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -2979,16 +2979,16 @@
         },
         {
             "name": "symfony/string",
-            "version": "v7.4.22",
+            "version": "v7.4.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "8dff7da3a56638f1d189c5368183294102de4ced"
+                "reference": "93c0ef02c1548d3b9498e8c4cc92f77106ca5d46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/8dff7da3a56638f1d189c5368183294102de4ced",
-                "reference": "8dff7da3a56638f1d189c5368183294102de4ced",
+                "url": "https://api.github.com/repos/symfony/string/zipball/93c0ef02c1548d3b9498e8c4cc92f77106ca5d46",
+                "reference": "93c0ef02c1548d3b9498e8c4cc92f77106ca5d46",
                 "shasum": ""
             },
             "require": {
@@ -3046,7 +3046,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v7.4.22"
+                "source": "https://github.com/symfony/string/tree/v7.4.25"
             },
             "funding": [
                 {
@@ -3066,8 +3066,8 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-10-23T16:51:52+00:00",
-            "published-time": "2026-10-28T18:21:18+00:00"
+            "time": "2026-11-25T18:09:18+00:00",
+            "published-time": "2026-11-27T14:42:23+00:00"
         },
         {
             "name": "theseer/tokenizer",
