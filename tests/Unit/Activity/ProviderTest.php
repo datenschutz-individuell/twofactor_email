@@ -80,6 +80,9 @@ class ProviderTest extends TestCase {
 			->method('getSubject')
 			->willReturn($subject->value);
 		$event->expects($this->once())
+			->method('setRichSubject')
+			->with($subject->getTranslatedSubject($l));
+		$event->expects($this->once())
 			->method('setParsedSubject')
 			->with($subject->getTranslatedSubject($l));
 
