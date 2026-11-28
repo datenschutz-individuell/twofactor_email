@@ -37,7 +37,11 @@ final class Provider implements IProvider {
 		$l = $this->l10n->get(Application::APP_ID, $language);
 
 		$event->setIcon($this->urlGenerator->getAbsoluteURL($this->urlGenerator->imagePath('core', 'actions/password.svg')));
-		$event->setParsedSubject($notification->getTranslatedSubject($l));
+		$subject = $notification->getTranslatedSubject($l);
+		// The activity app also shows the event as a notification, and a notification
+		// refuses an empty rich subject. Without it, every poll logs an error.
+		$event->setRichSubject($subject);
+		$event->setParsedSubject($subject);
 
 		return $event;
 	}
